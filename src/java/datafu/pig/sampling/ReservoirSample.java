@@ -97,8 +97,7 @@ public class ReservoirSample extends AccumulatorEvalFunc<DataBag> implements Alg
   @Override
   public void cleanup()
   {
-    this.reservoir = null;
-    this.scoreGen = null;
+    this.reservoir.clear();
   }
 
   @Override
@@ -218,6 +217,8 @@ public class ReservoirSample extends AccumulatorEvalFunc<DataBag> implements Alg
           output.add(new ScoredTuple(scoreGen.generateScore(sample), sample).getIntermediateTuple(tupleFactory));
         }
       } else {     
+        getReservoir().clear();
+        
         for (Tuple sample : samples) {
           getReservoir().consider(new ScoredTuple(scoreGen.generateScore(sample), sample));
         }    
@@ -256,6 +257,8 @@ public class ReservoirSample extends AccumulatorEvalFunc<DataBag> implements Alg
 
     @Override
     public Tuple exec(Tuple input) throws IOException {
+      getReservoir().clear();
+      
       DataBag bagOfSamples = (DataBag) input.get(0);
       for (Tuple innerTuple : bagOfSamples) {
         DataBag samples = (DataBag) innerTuple.get(0);        
@@ -300,6 +303,8 @@ public class ReservoirSample extends AccumulatorEvalFunc<DataBag> implements Alg
     
     @Override
     public DataBag exec(Tuple input) throws IOException {
+      getReservoir().clear();
+      
       DataBag bagOfSamples = (DataBag) input.get(0);
       for (Tuple innerTuple : bagOfSamples) {
         DataBag samples = (DataBag) innerTuple.get(0);        

@@ -44,6 +44,86 @@ import datafu.test.pig.PigTests;
  */
 public class WeightedReservoirSamplingTests extends PigTests
 {
+  /**
+  register $JAR_PATH
+
+  DEFINE ReservoirSample datafu.pig.sampling.WeightedReservoirSample('$RESERVOIR_SIZE','2');
+  DEFINE Assert datafu.pig.util.Assert();
+  
+  data = LOAD 'input' AS (A_id:int, B_id:chararray, C:int, W:double);
+  sampled = FOREACH (GROUP data BY A_id) GENERATE group as A_id, ReservoirSample(data.(B_id,C,W)) as sample_data;
+  sampled = FILTER sampled BY Assert((SIZE(sample_data) <= $RESERVOIR_SIZE ? 1 : 0), 'must be <= $RESERVOIR_SIZE');
+  sampled = FOREACH sampled GENERATE A_id, FLATTEN(sample_data);
+  STORE sampled INTO 'output';
+
+   */
+  @Multiline
+  private String weightedReservoirSampleGroupTest;
+  
+  /**
+   * Verifies that WeightedReservoirSample works when data grouped by a key.
+   * In particular it ensures that the reservoir is not reused across keys.
+   * 
+   * <p>
+   * This confirms the fix for DATAFU-11.
+   * </p>
+   * 
+   * @throws Exception
+   */
+  @Test
+  public void weightedReservoirSampleGroupTest() throws Exception
+  {    
+    // first value is the key.  second to last value matches the key so we can
+    // verify the register is reset for each key.  values should not
+    // bleed across to other keys.
+    writeLinesToFile("input",
+                     "1\tB1\t1\t1.0",
+                     "1\tB1\t1\t1.0",
+                     "1\tB3\t1\t1.0",
+                     "1\tB4\t1\t1.0",
+                     "2\tB1\t2\t1.0",
+                     "2\tB2\t2\t1.0",
+                     "3\tB1\t3\t1.0",
+                     "3\tB1\t3\t1.0",
+                     "3\tB3\t3\t1.0",
+                     "4\tB1\t4\t1.0",
+                     "4\tB2\t4\t1.0",
+                     "4\tB3\t4\t1.0",
+                     "4\tB4\t4\t1.0",
+                     "5\tB1\t5\t1.0",
+                     "6\tB2\t6\t1.0",
+                     "6\tB2\t6\t1.0",
+                     "6\tB3\t6\t1.0",
+                     "7\tB1\t7\t1.0",
+                     "7\tB2\t7\t1.0",
+                     "7\tB3\t7\t1.0",
+                     "8\tB1\t8\t1.0",
+                     "8\tB2\t8\t1.0",
+                     "9\tB3\t9\t1.0",
+                     "9\tB3\t9\t1.0",
+                     "9\tB6\t9\t1.0",
+                     "9\tB5\t9\t1.0",
+                     "10\tB1\t10\t1.0",
+                     "10\tB2\t10\t1.0",
+                     "10\tB2\t10\t1.0",
+                     "10\tB2\t10\t1.0",
+                     "10\tB6\t10\t1.0",
+                     "10\tB7\t10\t1.0");
+   
+    for(int i=1; i<=3; i++) {
+      int reservoirSize = i ;
+      PigTest test = createPigTestFromString(weightedReservoirSampleGroupTest, "RESERVOIR_SIZE="+reservoirSize);
+      test.runScript();
+      
+      List<Tuple> tuples = getLinesForAlias(test, "sampled");
+      
+      for (Tuple tuple : tuples)
+      {
+        Assert.assertEquals(((Number)tuple.get(0)).intValue(), ((Number)tuple.get(2)).intValue());
+      }
+    }
+  }
+  
  /** 
   register $JAR_PATH 
  

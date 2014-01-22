@@ -252,6 +252,14 @@ public class WeightedReservoirSample extends ReservoirSample {
         @Override
         public double generateScore(Tuple sample) throws ExecException
         {
+            if(this.weightIdx >= sample.size())
+            {
+                throw new ExecException(String.format("Weight index %d is outside tuple bounds", this.weightIdx));
+            }
+            if (sample.get(this.weightIdx) == null)
+            { 
+                throw new ExecException(String.format("null value for weight at index %d",this.weightIdx));
+            }
             double weight = ((Number)sample.get(this.weightIdx)).doubleValue();
             if(Double.compare(weight, 0.0) <= 0)
             {

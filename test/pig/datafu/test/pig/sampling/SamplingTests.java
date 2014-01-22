@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -338,6 +339,86 @@ public class SamplingTests extends PigTests
       PigTest test = createPigTestFromString(reservoirSampleTest, "RESERVOIR_SIZE="+reservoirSize);
       test.runScript();
       assertOutput(test, "sampled", "("+reservoirSize+")");
+    }
+  }
+  
+  /**
+  register $JAR_PATH
+
+  DEFINE ReservoirSample datafu.pig.sampling.ReservoirSample('$RESERVOIR_SIZE');
+  DEFINE Assert datafu.pig.util.Assert();
+  
+  data = LOAD 'input' AS (A_id:int, B_id:chararray, C:int);
+  sampled = FOREACH (GROUP data BY A_id) GENERATE group as A_id, ReservoirSample(data.(B_id,C)) as sample_data;
+  sampled = FILTER sampled BY Assert((SIZE(sample_data) <= $RESERVOIR_SIZE ? 1 : 0), 'must be <= $RESERVOIR_SIZE');
+  sampled = FOREACH sampled GENERATE A_id, FLATTEN(sample_data);
+  STORE sampled INTO 'output';
+
+   */
+  @Multiline
+  private String reservoirSampleGroupTest;
+  
+  /**
+   * Verifies that ReservoirSample works when data grouped by a key.
+   * In particular it ensures that the reservoir is not reused across keys.
+   * 
+   * <p>
+   * This confirms the fix for DATAFU-11.
+   * </p>
+   * 
+   * @throws Exception
+   */
+  @Test
+  public void reservoirSampleGroupTest() throws Exception
+  {    
+    // first value is the key.  last value matches the key so we can
+    // verify the register is reset for each key.  values should not
+    // bleed across to other keys.
+    writeLinesToFile("input",
+                     "1\tB1\t1",
+                     "1\tB1\t1",
+                     "1\tB3\t1",
+                     "1\tB4\t1",
+                     "2\tB1\t2",
+                     "2\tB2\t2",
+                     "3\tB1\t3",
+                     "3\tB1\t3",
+                     "3\tB3\t3",
+                     "4\tB1\t4",
+                     "4\tB2\t4",
+                     "4\tB3\t4",
+                     "4\tB4\t4",
+                     "5\tB1\t5",
+                     "6\tB2\t6",
+                     "6\tB2\t6",
+                     "6\tB3\t6",
+                     "7\tB1\t7",
+                     "7\tB2\t7",
+                     "7\tB3\t7",
+                     "8\tB1\t8",
+                     "8\tB2\t8",
+                     "9\tB3\t9",
+                     "9\tB3\t9",
+                     "9\tB6\t9",
+                     "9\tB5\t9",
+                     "10\tB1\t10",
+                     "10\tB2\t10",
+                     "10\tB2\t10",
+                     "10\tB2\t10",
+                     "10\tB6\t10",
+                     "10\tB7\t10");
+   
+    for(int i=1; i<=3; i++) {
+      int reservoirSize = i ;
+      PigTest test = createPigTestFromString(reservoirSampleGroupTest, "RESERVOIR_SIZE="+reservoirSize);
+      test.runScript();
+      
+      List<Tuple> tuples = getLinesForAlias(test, "sampled");
+      
+      for (Tuple tuple : tuples)
+      {
+        Assert.assertEquals(((Number)tuple.get(0)).intValue(), ((Number)tuple.get(2)).intValue());
+      }
     }
   }
   
