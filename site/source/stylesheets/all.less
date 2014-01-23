@@ -1,0 +1,52 @@
+@charset "utf-8";
+
+@import 'bootstrap.min.css';
+
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.header,
+.footer {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.header {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+  padding-bottom: 19px;
+}
+
+.footer {
+  margin-top: 50px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+
+  p {
+    text-align: center;
+  }
+}
+
+.header .header-title a {
+  color: #999999;
+}
+
+@media screen and (min-width: 768px) {
+  .header,
+  .footer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .header {
+    margin-bottom: 30px;
+  }
+}

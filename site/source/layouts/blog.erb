@@ -1,0 +1,16 @@
+<% wrap_layout :layout do %>
+<div class="row">
+  <article class="col-lg-10">
+    <h1><%= current_article.title %></h1>
+    <h5 class="text-muted"><time><%= current_article.date.strftime('%b %e, %Y') %></time></h5>
+    <% if current_page.data.author %>
+      <h5 class="text-muted"><%= current_page.data.author %></h5>
+    <% end %>
+
+    <hr>
+
+    <%= yield %>
+
+  </article>
+</div>
+<% end %>

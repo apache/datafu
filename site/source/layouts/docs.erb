@@ -1,0 +1,17 @@
+<% wrap_layout :layout do %>
+
+  <div class="row">
+    <div class="col-md-3">
+      <%= partial "layouts/docs_nav" %>
+    </div>
+    <div class="col-md-7">
+      <%= 
+        if current_page.data.section_name
+          %|<h4 class="text-muted">#{current_page.data.section_name}</h4>|
+        end
+      %>
+      <%= yield %>
+    </div>
+  </div>
+
+<% end %>

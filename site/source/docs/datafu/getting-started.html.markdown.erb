@@ -1,0 +1,134 @@
+---
+title: Getting Started - Apache DataFu Pig
+version: 1.2.0
+section_name: Apache DataFu Pig
+---
+
+# Getting Started
+
+Apache DataFu Pig is a collection of user-defined functions for working with large scale data in [Apache Pig](http://pig.apache.org/).  It has a number of useful functions available:
+
+<div class="row">
+  <div class="col-lg-6">
+    <h4>Statistics</h4>
+    <p>
+      Compute quantiles, median, variance, wilson binary confidence, etc.
+    </p>
+
+    <h4>Set Operations</h4>
+    <p>
+      Perform set intersection, union, or difference of bags.
+    </p>
+
+    <h4>Bags</h4>
+    <p>
+      Convenient functions for working with bags such as enumerate items,
+      append, prepend, concat, group, distinct, etc.
+    </p>
+
+    <h4>Sessions</h4>
+    <p>
+      Sessionize events from a stream of data.
+    </p>
+  </div>
+
+  <div class="col-lg-6">
+    <h4>Estimation</h4>
+    <p>
+      Streaming implementations that can estimate
+      quantiles, median, cardinality.
+    </p>
+
+    <h4>Sampling</h4>
+    <p>
+      Simple random sampling with or without replacement,
+      weighted sampling.
+    </p>
+
+    <h4>Link Analysis</h4>
+    <p>
+      Run PageRank on a graph represented by a bag of
+      nodes and edges.
+    </p>
+
+    <h4>More</h4>
+    <p>
+      Other useful methods like Assert and Coalesce.
+    </p>
+  </div>
+</div>
+
+If you'd like to read more details about these functions, check out the [Guide](/docs/datafu/guide.html).  Otherwise if you are
+ready to get started using DataFu Pig, keep reading.
+
+## Download
+
+DataFu Pig is available as a JAR that can be downloaded and registered with Pig.  It can be found in the Maven central repository
+under the group ID [com.linkedin.datafu](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.linkedin.datafu%22) by the
+name `datafu`.
+
+If you are using Ivy, you can download `datafu` and its dependencies with:
+
+```xml
+<dependency org="com.linkedin.datafu" name="datafu" rev="<%= current_page.data.version %>"/>
+```
+
+Or if you are using Maven:
+
+```xml
+<dependency>
+  <groupId>com.linkedin.datafu</groupId>
+  <artifactId>datafu</artifactId>
+  <version><%= current_page.data.version %></version>
+</dependency>
+```
+
+Your other option is to [download](https://github.com/linkedin/datafu/archive/master.zip) the code and build the JAR yourself.
+After unzipping the archive you can build the JAR by running `ant jar`.  The dependencies will be 
+downloaded to `lib/common`.
+
+## Basic Example: Computing Median
+
+Now that we have downloaded DataFu, let's use it to perform a very basic task: computing the median of some data.
+Suppose we have a file `input` in Hadoop with the following content:
+
+    1
+    2
+    3
+    2
+    2
+    2
+    3
+    2
+    2
+    1
+
+We can clearly see that the median is 2 for this data set.  First we'll start up Pig's grunt shell by running `pig` and
+then register the DataFu JAR:
+
+```pig
+register datafu-<%= current_page.data.version %>.jar
+```
+
+To compute the median we'll use DataFu's `StreamingMedian`, which computes an estimate of the median but has the benefit
+of not requiring the data to be sorted:
+
+```pig
+DEFINE Median datafu.pig.stats.StreamingMedian();
+```
+
+Next we can load the data and pass it into the function to compute the median:
+
+```pig
+data = LOAD 'input' using PigStorage() as (val:int);
+data = FOREACH (GROUP data ALL) GENERATE Median(data);
+DUMP data
+```
+
+This produces the expected output:
+
+    ((2.0))
+
+## Next Steps
+
+Check out the [Guide](/docs/datafu/guide.html) for more information on what you can do with DataFu.

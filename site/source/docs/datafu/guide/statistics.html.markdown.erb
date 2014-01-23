@@ -1,0 +1,65 @@
+---
+title: Statistics - Guide - Apache DataFu Pig
+version: 1.2.0
+section_name: Apache DataFu Pig - Guide
+---
+
+## Statistics
+
+### Median
+  
+Apache DataFu has two UDFs that can be used to compute the [median](http://en.wikipedia.org/wiki/Median) of a bag.
+[Median](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/Median.html) computes the median exactly, but
+requires that the input bag be sorted.  [StreamingMedian](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingMedian.html),
+on the other hand, does not require that the bag be sorted, however it computes only an estimate of the median.  But, because it does not require
+the input bag to be sorted, it is more efficient.
+
+Let's take a look at computing the median using `StreamingMedian`:
+
+```pig
+define Median datafu.pig.stats.StreamingMedian();
+
+-- input: 3,5,4,1,2
+input = LOAD 'input' AS (val:int);
+
+-- produces: 3
+medians = FOREACH (GROUP input ALL) GENERATE Median(input.val);
+```  
+
+### Quantiles
+
+[Quantiles](http://en.wikipedia.org/wiki/Quantile) are points at regular intervals within an ordered data set.  Essentially
+we divide an ordered data set into segments, and the quantiles are the values between the segments.  The quantiles people are probably
+most familiar with are those for median and percentiles.
+
+Similar to median, DataFu has two UDFs that can compute quantiles.  The median UDFs are in fact just wrappers around the quantile UDFs.
+[Quantile](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/Quantile.html) computes the quantiles of a sorted bag exactly,
+and [StreamingQuantile](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingQuantile.html) computes an estimate of
+the quantiles of a bag that does not need to be sorted.
+
+Let's take a look at computing the median using `StreamingQuantile`:
+
+```pig
+define Quantile datafu.pig.stats.StreamingQuantile('0.0','0.5','1.0');
+
+-- input: 9,10,2,3,5,8,1,4,6,7
+input = LOAD 'input' AS (val:int);
+
+-- produces: (1,5.5,10)
+quantiles = FOREACH (GROUP input ALL) GENERATE Quantile(input.val);
+```
+
+### Variance
+
+[Variance](http://en.wikipedia.org/wiki/Variance) can be computed using the [VAR](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/VAR.html)
+UDF:
+
+```pig
+define VAR datafu.pig.stats.VAR();
+
+-- input: 1,2,3,4,5,6,7,8,9
+input = LOAD 'input' AS (val:int);
+
+-- produces: 6.666666666666668
+variance = FOREACH (GROUP input ALL) GENERATE VAR(input.val);
+```

@@ -1,0 +1,58 @@
+---
+title: Hashing - Guide - Apache DataFu Pig
+version: 1.2.0
+section_name: Apache DataFu Pig - Guide
+---
+
+## Hashing
+
+### MD5
+
+The [MD5 hash](http://en.wikipedia.org/wiki/MD5) of a string can be computed with the 
+[MD5](/docs/datafu/<%= current_page.data.version %>/datafu/pig/hash/MD5.html)
+UDF.
+
+For example:
+
+```pig
+define MD5 datafu.pig.hash.MD5();
+  
+--input: "hello, world!"
+data_in = LOAD 'input' as (val:chararray);
+data_out = FOREACH data_in GENERATE MD5(val) as val;
+
+-- produces: (fc3ff98e8c6a0d3087d515c0473f8677)
+DUMP data_out;
+```
+
+The function can instead output base64 by passing 'base64' to the constructor.
+The default is 'hex' for hexadecimal.
+
+```pig
+define MD5 datafu.pig.hash.MD5('base64');
+```
+
+### SHA
+
+A [SHA](http://en.wikipedia.org/wiki/Secure_Hash_Algorithm) hash can be computed with
+[SHA](/docs/datafu/<%= current_page.data.version %>/datafu/pig/hash/SHA.html).
+The output will be in hexadecimal.
+
+```pig
+define SHA datafu.pig.hash.SHA();
+  
+--input: "hello, world!"
+data_in = LOAD 'input' as (val:chararray);
+data_out = FOREACH data_in GENERATE SHA(val) as val;
+
+-- produces: (7509e5bda0c762d2bac7f90d758b5b2263fa01ccbc542ab5e3df163be08e6ca9)
+DUMP data_out;
+```
+
+By default this uses SHA-256.
+The constructor also takes an optional parameter for the particular SHA algorithm to use.
+To use SHA-512 instead:
+
+```pig
+define SHA512 datafu.pig.hash.SHA('512');
+```

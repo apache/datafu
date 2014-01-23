@@ -1,0 +1,19 @@
+---
+title: "Blog - DataFu"
+---
+
+<% blog.articles.each do |article| %>
+<div class="row">
+  <article class="col-lg-10">
+    <h2><%= link_to article.title, article %></h2>
+    <h5 class="text-muted"><time><%= article.date.strftime('%b %e, %Y') %></time>
+    <% if article.data.author %>
+    <h5 class="text-muted">
+        <%= article.data.author %>
+    </h5>
+    <% end%>
+    <%= article.summary %>
+    <%= link_to "Read more...", article %>
+  </article>
+</div>
+<% end %>

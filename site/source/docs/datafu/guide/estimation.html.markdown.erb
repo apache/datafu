@@ -1,0 +1,48 @@
+---
+title: Estimation - Guide - Apache DataFu Pig
+version: 1.2.0
+section_name: Apache DataFu Pig - Guide
+---
+
+## Estimation
+
+In some cases you don't need exact results.  Estimates may be sufficient if it results in more efficient
+execution.  With this in mind Apache DataFu has UDFs for computing estimates of certain quantities.
+
+### Median and Quantiles
+
+[StreamingMedian](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingMedian.html) and
+[StreamingQuantile](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingQuantile.html) can
+compute estimates of the [median](http://en.wikipedia.org/wiki/Median)
+and [quantiles](http://en.wikipedia.org/wiki/Quantile) of bags. The advantage of these methods is they do not require
+the input bags to be sorted.  
+
+See [Statistics](/docs/datafu/guide/statistics.html) for more details.
+
+### Cardinality
+
+The [cardinality](http://en.wikipedia.org/wiki/Cardinality) of a data set is the number of distinct elements
+within it.  
+
+Suppose we have data consisting of member IDs and we want to know the count of distinct member IDs.
+We can do this in Pig as follows:
+
+```pig
+data = FOREACH data GENERATE member_id;
+data = DISTINCT data;
+data = FOREACH (GROUP data ALL) GENERATE SIZE(data);
+```
+
+However, this requires two jobs.  Alternatively we can use the
+[HyperLogLogPlusPlus](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/HyperLogLogPlusPlus.html) UDF
+to estimate the cardinality with good accuracy using only one job:
+
+```pig
+define HyperLogLogPlusPlus datafu.pig.stats.HyperLogLogPlusPlus();
+data = FOREACH (GROUP data ALL) GENERATE HyperLogLogPlusPlus(data);
+```
+
+The `HyperLogLogPlusPlus` UDF uses an implementation of the
+[HyperLogLog++](http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/pubs/archive/40671.pdf)
+algorithm provided by the [stream-lib](https://github.com/addthis/stream-lib) library.  HyperLogLog++ itself is an enhancement to
+the well known [HyperLogLog](http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf) algorithm.

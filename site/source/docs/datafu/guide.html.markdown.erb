@@ -1,0 +1,40 @@
+---
+title: Guide - Apache DataFu Pig
+version: 1.2.0
+section_name: Apache DataFu Pig
+---
+
+# Guide
+
+Apache DataFu Pig is a collection of user-defined functions for working with large scale data in [Apache Pig](https://pig.apache.org/).
+It has a number of useful functions available.  This guide provides examples of how to use these functiosn and serves as an overview for working with the library.
+
+* [Statistics](/docs/datafu/guide/statistics.html): median, quantiles, variance
+* [Bag Operations](/docs/datafu/guide/bag-operations.html): join, prepend, append, count items, concat
+* [Set Operations](/docs/datafu/guide/set-operations.html): set intersection, union, difference
+* [Sessions](/docs/datafu/guide/sessions.html): sessionize streams of data
+* [Sampling](/docs/datafu/guide/sampling.html): simple random sample with/without replacement, weighted sample
+* [Estimation](/docs/datafu/guide/estimation.html): cardinality estimation
+* [Hashing](/docs/datafu/guide/hashing.html): SHA and MD5
+* [Link Analysis](/docs/datafu/guide/link-analysis.html): PageRank
+* [More Tips and Tricks](/docs/datafu/guide/more-tips-and-tricks.html)
+
+There is also [Javadoc](/docs/datafu/javadoc.html) available for all UDFs in the library.  We continue to add
+UDFs to the library.  If you are interested in helping out please follow the [Contributing](/docs/datafu/contributing.html)
+guide.
+
+## Pig Compatibility
+
+The current version of DataFu has been tested against Pig 0.11.1 and 0.12.0.  DataFu should be compatible with some older versions of Pig, however we do not do any sort of testing with prior versions of Pig and do not guarantee compatibility.
+Our policy is to test against the most recent version of Pig whenever we release and make sure DataFu works with that version. 
+
+## Blog Posts
+
+* [Introducing DataFu](/blog/2012/01/10/introducing-datafu.html)
+* [DataFu: The WD-40 of Big Data](/blog/2013/01/24/datafu-the-wd-40-of-big-data.html)
+* [DataFu 1.0](/blog/2013/09/04/datafu-1-0.html)
+
+## Presentations
+
+* [A Brief Tour of DataFu](http://www.slideshare.net/matthewterencehayes/datafu)
+* [Building Data Products at LinkedIn with DataFu](http://www.slideshare.net/matthewterencehayes/building-data-products-at-linkedin-with-datafu)
