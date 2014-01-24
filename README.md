@@ -24,7 +24,7 @@ If you'd like to jump in and get started, check out the corresponding guides for
 * [DataFu 1.0](http://datafu.incubator.apache.org/blog/2013/09/04/datafu-1-0.html)
 * [DataFu's Hourglass: Incremental Data Processing in Hadoop](http://datafu.incubator.apache.org/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html)
 
-## Presentations
+## Presentations 
 
 * [A Brief Tour of DataFu](http://www.slideshare.net/matthewterencehayes/datafu)
 * [Building Data Products at LinkedIn with DataFu](http://www.slideshare.net/matthewterencehayes/building-data-products-at-linkedin-with-datafu)
