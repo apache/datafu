@@ -29,19 +29,21 @@ import datafu.test.pig.PigTests;
 /**
  * Tests for {@link SimpleRandomSample}.
  * 
+ * @deprecated This tests the deprecated functionality of SimpleRandomSample
+ *             where the probability can be specified in the constructor.  
  * @author ximeng
  * 
  */
-public class SimpleRandomSampleTest extends PigTests
+public class SimpleRandomSampleTestOld extends PigTests
 {
   /**
    * register $JAR_PATH
    * 
-   * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
+   * DEFINE SRS datafu.pig.sampling.SimpleRandomSample('$SAMPLING_PROBABILITY');
    * 
    * data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
    * 
-   * sampled = FOREACH (GROUP data ALL) GENERATE SRS(data, $p) as sample_data;
+   * sampled = FOREACH (GROUP data ALL) GENERATE SRS(data) as sample_data;
    * 
    * sampled = FOREACH sampled GENERATE COUNT(sample_data) AS sample_count;
    * 
@@ -50,42 +52,8 @@ public class SimpleRandomSampleTest extends PigTests
   @Multiline
   private String simpleRandomSampleTest;
 
-  /**
-   * register $JAR_PATH
-   * 
-   * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
-   * 
-   * data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
-   * 
-   * sampled = FOREACH (GROUP data ALL) GENERATE SRS(data, $p, $n1) as sample_data;
-   * 
-   * sampled = FOREACH sampled GENERATE COUNT(sample_data) AS sample_count;
-   * 
-   * STORE sampled INTO 'output';
-   */
-  @Multiline
-  private String simpleRandomSampleWithLowerBoundTest;
-
-  /**
-   * register $JAR_PATH
-   * 
-   * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
-   * 
-   * data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
-   * 
-   * sampled = FOREACH (GROUP data ALL) GENERATE SRS(data, $p1) as sample_1, SRS(data,
-   * $p2) AS sample_2;
-   * 
-   * sampled = FOREACH sampled GENERATE COUNT(sample_1) AS sample_count_1, COUNT(sample_2)
-   * AS sample_count_2;
-   * 
-   * STORE sampled INTO 'output';
-   */
-  @Multiline
-  private String simpleRandomSampleWithTwoCallsTest;
-
   @Test
-  public void testSimpleRandomSample() throws Exception
+  public void simpleRandomSampleTest() throws Exception
   {
     writeLinesToFile("input",
                      "A1\tB1\t1",
@@ -124,42 +92,22 @@ public class SimpleRandomSampleTest extends PigTests
     int n = 32;
     double p = 0.3;
     int s = (int) Math.ceil(p * n);
+    PigTest test =
+        createPigTestFromString(simpleRandomSampleTest, "SAMPLING_PROBABILITY=" + p);
 
-    PigTest test = createPigTestFromString(simpleRandomSampleTest, "p=" + p);
     test.runScript();
+
     assertOutput(test, "sampled", "(" + s + ")");
-
-    int n1 = 30;
-    PigTest testWithLB =
-        createPigTestFromString(simpleRandomSampleWithLowerBoundTest, "p=" + p, "n1="
-            + n1);
-    testWithLB.runScript();
-    assertOutput(testWithLB, "sampled", "(" + s + ")");
-
-    double p1 = 0.05;
-    double p2 = 0.95;
-    int s1 = (int) Math.ceil(p1 * n);
-    int s2 = (int) Math.ceil(p2 * n);
-
-    PigTest testWithTwoCalls =
-        createPigTestFromString(simpleRandomSampleWithTwoCallsTest, "p1=" + p1, "p2="
-            + p2);
-    testWithTwoCalls.runScript();
-    assertOutput(testWithTwoCalls, "sampled", "(" + s1 + "," + s2 + ")");
-
-    test.runScript();
-
   }
 
   /**
    * register $JAR_PATH
    * 
-   * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
+   * DEFINE SRS datafu.pig.sampling.SimpleRandomSample('$SAMPLING_PROBABILITY');
    * 
    * data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
    * 
-   * sampled = FOREACH (GROUP data BY A_id) GENERATE group, SRS(data,
-   * $SAMPLING_PROBABILITY) as sample_data;
+   * sampled = FOREACH (GROUP data BY A_id) GENERATE group, SRS(data) as sample_data;
    * 
    * sampled = FOREACH sampled GENERATE group, COUNT(sample_data) AS sample_count;
    * 
@@ -171,7 +119,7 @@ public class SimpleRandomSampleTest extends PigTests
   private String stratifiedSampleTest;
 
   @Test
-  public void testStratifiedSample() throws Exception
+  public void stratifiedSampleTest() throws Exception
   {
     writeLinesToFile("input",
                      "A1\tB1\t1",
@@ -225,6 +173,4 @@ public class SimpleRandomSampleTest extends PigTests
                  "(A8,1)",
                  "(A9,2)");
   }
-  
-  
 }
