@@ -34,7 +34,7 @@ import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
- * Scalable simple random sampling.
+ * Scalable simple random sampling (ScaSRS).
  * <p/>
  * This UDF implements a scalable simple random sampling algorithm described in
  * 
@@ -42,45 +42,78 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * X. Meng, Scalable Simple Random Sampling and Stratified Sampling, ICML 2013.
  * </pre>
  * 
- * It takes a sampling probability p as input and outputs a simple random sample of size
- * exactly ceil(p*n) with probability at least 99.99%, where $n$ is the size of the
- * population. This UDF is very useful for stratified sampling. For example,
+ * It takes a bag of n items and a sampling probability p as the inputs, and outputs a
+ * simple random sample of size exactly ceil(p*n) in a bag, with probability at least
+ * 99.99%. For example, the following script generates a simple random sample with
+ * sampling probability 0.1:
  * 
  * <pre>
- * DEFINE SRS datafu.pig.sampling.SimpleRandomSample('0.01');
- * examples = LOAD ...
- * grouped = GROUP examples BY label;
- * sampled = FOREACH grouped GENERATE FLATTEN(SRS(examples));
- * STORE sampled ...
+ * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
+ * 
+ * item    = LOAD 'input' AS (x:double); 
+ * sampled = FOREACH (GROUP item ALL) GENERATE FLATTEN(SRS(item, 0.01));
  * </pre>
  * 
- * We note that, in a Java Hadoop job, we can output pre-selected records directly using
+ * Optionally, user can provide a good lower bound of n as the third argument to help
+ * reduce the size of intermediate data, for example:
+ * 
+ * <pre>
+ * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
+ * 
+ * item    = LOAD 'input' AS (x:double); 
+ * summary = FOREACH (GROUP item ALL) GENERATE COUNT(item) AS count;
+ * sampled = FOREACH (GROUP item ALL) GENERATE FLATTEN(SRS(item, 0.01, summary.count));
+ * </pre>
+ * 
+ * This UDF is very useful for stratified sampling. For example, the following script
+ * keeps all positive examples while downsampling negatives with probability 0.1:
+ * 
+ * <pre>
+ * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
+ * 
+ * item    = LOAD 'input' AS (x:double, label:int);
+ * grouped = FOREACH (GROUP item BY label) GENERATE item, (group == 1 ? 1.0 : 0.1) AS p; 
+ * sampled = FOREACH grouped GENERATE FLATTEN(SRS(item, p));
+ * </pre>
+ * 
+ * In a Java Hadoop MapReduce job, we can output selected items directly using
  * MultipleOutputs. However, this feature is not available in a Pig UDF. So we still let
- * pre-selected records go through the sort phase. However, as long as the sample size is
- * not huge, this should not be a big problem.
+ * selected items go through the sort phase. However, as long as the sample size is not
+ * huge, this should not be a big problem.
+ * 
+ * In the first version, the sampling probability is specified in the constructor. This 
+ * method is deprecated now and will be removed in the next release.
  * 
  * @author ximeng
  * 
  */
 public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
 {
-  private static final TupleFactory tupleFactory = TupleFactory.getInstance();
-  private static final BagFactory bagFactory = BagFactory.getInstance();
+  /**
+   * Prefix for the output bag name.
+   */
+  public static final String OUTPUT_BAG_NAME_PREFIX = "SRS";
+
+  private static final TupleFactory _TUPLE_FACTORY = TupleFactory.getInstance();
+  private static final BagFactory _BAG_FACTORY = BagFactory.getInstance();
 
   public SimpleRandomSample()
   {
+    // empty
   }
 
+  /**
+   * Constructs this UDF with a sampling probability.
+   * 
+   * @deprecated Should specify the sampling probability in the function call.
+   */
+  @Deprecated
   public SimpleRandomSample(String samplingProbability)
   {
-    Double p = Double.parseDouble(samplingProbability);
-
-    if (p < 0.0 || p > 1.0)
-    {
-      throw new IllegalArgumentException("Sampling probability must be inside [0, 1].");
-    }
+	double p = Double.parseDouble(samplingProbability);
+	verifySamplingProbability(p);
   }
-
+  
   @Override
   public String getInitial()
   {
@@ -111,67 +144,145 @@ public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
         throw new RuntimeException("Expected a BAG as input");
       }
 
-      return new Schema(new Schema.FieldSchema(getSchemaName(this.getClass()
-                                                                 .getName()
-                                                                 .toLowerCase(), input),
+      return new Schema(new Schema.FieldSchema(super.getSchemaName(OUTPUT_BAG_NAME_PREFIX,
+                                                                   input),
                                                inputFieldSchema.schema,
                                                DataType.BAG));
     }
     catch (FrontendException e)
     {
-      e.printStackTrace();
       throw new RuntimeException(e);
     }
   }
 
   static public class Initial extends EvalFunc<Tuple>
   {
-    private double _samplingProbability;
-    private RandomDataImpl _rdg = new RandomDataImpl();
+    // Should avoid creating many random number generator instances.
+    private static RandomDataImpl _RNG = new RandomDataImpl();
+
+    synchronized private static double nextDouble()
+    {
+      return _RNG.nextUniform(0.0d, 1.0d);
+    }
 
     public Initial()
     {
+      // empty
     }
 
+    @Deprecated
     public Initial(String samplingProbability)
     {
-      _samplingProbability = Double.parseDouble(samplingProbability);
+      _p = Double.parseDouble(samplingProbability);
     }
+    
+    private boolean _first = true;
+    private double _p = -1.0d; // the sampling probability
+    private long _n1 = 0L; // the input lower bound of the size of the population
+    private long _localCount = 0L; // number of items processed by this instance
 
     @Override
     public Tuple exec(Tuple input) throws IOException
     {
-      Tuple output = tupleFactory.newTuple();
-      DataBag selected = bagFactory.newDefaultBag();
-      DataBag waiting = bagFactory.newSortedBag(new ScoredTupleComparator());
+      int numArgs = input.size();
+      
+      // The first if clause is for backward compatibility, which should be removed 
+      // after we remove specifying sampling probability in the constructor.
+      if(numArgs == 1)
+      {
+        if(_p < 0.0d)
+        {
+          throw new IllegalArgumentException("Sampling probability is not given.");
+        }
+      }
+      else if (numArgs < 2 || numArgs > 3)
+      {
+        throw new IllegalArgumentException("The input tuple should have either two or three fields: "
+            + "a bag of items, the sampling probability, "
+            + "and optionally a good lower bound of the size of the population or the exact number.");
+      }
 
       DataBag items = (DataBag) input.get(0);
+      long numItems = items.size();
+      _localCount += numItems;
 
-      if (items != null)
+      // This is also for backward compatibility. Should change to
+      // double p = ((Number) input.get(1)).doubleValue();
+      // after we remove specifying sampling probability in the constructor.
+      double p = numArgs == 1 ? _p : ((Number) input.get(1)).doubleValue();
+      if (_first)
       {
-        long n = items.size();
-
-        double q1 = getQ1(n, _samplingProbability);
-        double q2 = getQ2(n, _samplingProbability);
-
-        for (Tuple item : items)
+        _p = p;
+        verifySamplingProbability(p);
+      }
+      else
+      {
+        if (p != _p)
         {
-          double key = _rdg.nextUniform(0.0d, 1.0d);
+          throw new IllegalArgumentException("The sampling probability must be a scalar, but found two different values: "
+              + _p + " and " + p + ".");
+        }
+      }
 
-          if (key < q1)
+      long n1 = 0L;
+      if (numArgs > 2)
+      {
+        n1 = ((Number) input.get(2)).longValue();
+
+        if (_first)
+        {
+          _n1 = n1;
+        }
+        else
+        {
+          if (n1 != _n1)
           {
-            selected.add(item);
-          }
-          else if (key < q2)
-          {
-            waiting.add(new ScoredTuple(key, item).getIntermediateTuple(tupleFactory));
+            throw new IllegalArgumentException("The lower bound of the population size must be a scalar, but found two different values: "
+                + _n1 + " and " + n1 + ".");
           }
         }
-
-        output.append(n);
-        output.append(selected);
-        output.append(waiting);
       }
+
+      _first = false;
+
+      // Use the local count if the input lower bound is smaller.
+      n1 = Math.max(n1, _localCount);
+
+      DataBag selected = _BAG_FACTORY.newDefaultBag();
+      DataBag waiting = _BAG_FACTORY.newDefaultBag();
+
+      if (n1 > 0L)
+      {
+        double q1 = getQ1(n1, p);
+        double q2 = getQ2(n1, p);
+
+        for (Tuple t : items)
+        {
+          double x = nextDouble();
+          if (x < q1)
+          {
+            selected.add(t);
+          }
+          else if (x < q2)
+          {
+            waiting.add(new ScoredTuple(x, t).getIntermediateTuple(_TUPLE_FACTORY));
+          }
+        }
+      }
+
+      /*
+       * The output tuple contains the following fields: sampling probability (double),
+       * number of processed items in this tuple (long), a good lower bound of the size of
+       * the population or the exact number (long), a bag of selected items (bag), and a
+       * bag of waitlisted items with scores (bag).
+       */
+      Tuple output = _TUPLE_FACTORY.newTuple();
+
+      output.append(p);
+      output.append(numItems);
+      output.append(n1);
+      output.append(selected);
+      output.append(waiting);
 
       return output;
     }
@@ -181,36 +292,51 @@ public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
   {
     public Intermediate()
     {
+      // empty
     }
-
+    
+    @Deprecated
     public Intermediate(String samplingProbability)
     {
-      _samplingProbability = Double.parseDouble(samplingProbability);
+      // empty
     }
-
-    private double _samplingProbability;
 
     @Override
     public Tuple exec(Tuple input) throws IOException
     {
       DataBag bag = (DataBag) input.get(0);
-      DataBag selected = bagFactory.newDefaultBag();
-      DataBag aggWaiting = bagFactory.newSortedBag(new ScoredTupleComparator());
-      DataBag waiting = bagFactory.newSortedBag(new ScoredTupleComparator());
-      Tuple output = tupleFactory.newTuple();
 
-      long n = 0L;
+      DataBag selected = _BAG_FACTORY.newDefaultBag();
+      DataBag aggWaiting = _BAG_FACTORY.newDefaultBag();
 
-      for (Tuple innerTuple : bag)
+      boolean first = true;
+      double p = 0.0d;
+      long numItems = 0L; // number of items processed, including rejected
+      long n1 = 0L;
+
+      for (Tuple tuple : bag)
       {
-        n += (Long) innerTuple.get(0);
+        if (first)
+        {
+          p = (Double) tuple.get(0);
+          first = false;
+        }
 
-        selected.addAll((DataBag) innerTuple.get(1));
+        numItems += (Long) tuple.get(1);
+        n1 = Math.max((Long) tuple.get(2), numItems);
 
-        double q1 = getQ1(n, _samplingProbability);
-        double q2 = getQ2(n, _samplingProbability);
+        selected.addAll((DataBag) tuple.get(3));
+        aggWaiting.addAll((DataBag) tuple.get(4));
+      }
 
-        for (Tuple t : (DataBag) innerTuple.get(2))
+      DataBag waiting = _BAG_FACTORY.newDefaultBag();
+
+      if (n1 > 0L)
+      {
+        double q1 = getQ1(n1, p);
+        double q2 = getQ2(n1, p);
+
+        for (Tuple t : aggWaiting)
         {
           ScoredTuple scored = ScoredTuple.fromIntermediateTuple(t);
 
@@ -220,42 +346,18 @@ public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
           }
           else if (scored.getScore() < q2)
           {
-            aggWaiting.add(t);
-          }
-          else
-          {
-            break;
+            waiting.add(t);
           }
         }
       }
 
-      double q1 = getQ1(n, _samplingProbability);
-      double q2 = getQ2(n, _samplingProbability);
+      Tuple output = _TUPLE_FACTORY.newTuple();
 
-      for (Tuple t : aggWaiting)
-      {
-        ScoredTuple scored = ScoredTuple.fromIntermediateTuple(t);
-
-        if (scored.getScore() < q1)
-        {
-          selected.add(scored.getTuple());
-        }
-        else if (scored.getScore() < q2)
-        {
-          waiting.add(t);
-        }
-        else
-        {
-          break;
-        }
-      }
-
-      output.append(n);
+      output.append(p);
+      output.append(numItems);
+      output.append(n1);
       output.append(selected);
       output.append(waiting);
-
-      System.err.println("Read " + n + " items, selected " + selected.size()
-          + ", and wait-listed " + aggWaiting.size() + ".");
 
       return output;
     }
@@ -263,51 +365,110 @@ public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
 
   static public class Final extends EvalFunc<DataBag>
   {
-    private double _samplingProbability;
-
     public Final()
     {
+      // empty
     }
 
+    @Deprecated
     public Final(String samplingProbability)
     {
-      _samplingProbability = Double.parseDouble(samplingProbability);
+      // empty
     }
-
+    
     @Override
     public DataBag exec(Tuple input) throws IOException
     {
       DataBag bag = (DataBag) input.get(0);
-      long n = 0L;
-      DataBag selected = bagFactory.newDefaultBag();
-      DataBag waiting = bagFactory.newSortedBag(new ScoredTupleComparator());
 
-      for (Tuple innerTuple : bag)
+      boolean first = true;
+      double p = 0.0d; // the sampling probability
+      long n = 0L; // the size of the population (total number of items)
+
+      DataBag selected = _BAG_FACTORY.newDefaultBag();
+      DataBag waiting = _BAG_FACTORY.newSortedBag(ScoredTupleComparator.getInstance());
+
+      for (Tuple tuple : bag)
       {
-        n += (Long) innerTuple.get(0);
-        selected.addAll((DataBag) innerTuple.get(1));
-        waiting.addAll((DataBag) innerTuple.get(2));
+        if (first)
+        {
+          p = (Double) tuple.get(0);
+          first = false;
+        }
+
+        n += (Long) tuple.get(1);
+        selected.addAll((DataBag) tuple.get(3));
+        waiting.addAll((DataBag) tuple.get(4));
       }
 
-      long sampleSize = (long) Math.ceil(_samplingProbability * n);
-      long nNeeded = sampleSize - selected.size();
+      long numSelected = selected.size();
+      long numWaiting = waiting.size();
+
+      long s = (long) Math.ceil(p * n); // sample size
+
+      System.out.println("To sample " + s + " items from " + n + ", we pre-selected "
+          + numSelected + ", and waitlisted " + waiting.size() + ".");
+
+      long numNeeded = s - selected.size();
+
+      if (numNeeded < 0)
+      {
+        System.err.println("Pre-selected " + numSelected + " items, but only needed " + s
+            + ".");
+      }
 
       for (Tuple scored : waiting)
       {
-        if (nNeeded <= 0)
+        if (numNeeded <= 0)
         {
           break;
         }
         selected.add(ScoredTuple.fromIntermediateTuple(scored).getTuple());
-        nNeeded--;
+        numNeeded--;
+      }
+
+      if (numNeeded > 0)
+      {
+        System.err.println("The waiting list only has " + numWaiting
+            + " items, but needed " + numNeeded + " more.");
       }
 
       return selected;
     }
   }
 
-  private static class ScoredTupleComparator implements Comparator<Tuple>
+  // computes a threshold to select items
+  private static double getQ1(long n, double p)
   {
+    double t1 = 20.0d / (3.0d * n);
+    double q1 = p + t1 - Math.sqrt(t1 * t1 + 3.0d * t1 * p);
+    return q1;
+  }
+
+  // computes a threshold to reject items
+  private static double getQ2(long n, double p)
+  {
+    double t2 = 10.0d / n;
+    double q2 = p + t2 + Math.sqrt(t2 * t2 + 2.0d * t2 * p);
+    return q2;
+  }
+  
+  private static void verifySamplingProbability(double p)
+  {
+	if(p < 0.0 || p > 1.0) 
+	{
+	  throw new IllegalArgumentException("Sampling probabiilty must be inside [0, 1].");
+	}
+  }
+
+  static class ScoredTupleComparator implements Comparator<Tuple>
+  {
+    public static final ScoredTupleComparator getInstance()
+    {
+      return _instance;
+    }
+
+    private static final ScoredTupleComparator _instance = new ScoredTupleComparator();
 
     @Override
     public int compare(Tuple o1, Tuple o2)
@@ -325,17 +486,4 @@ public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
     }
   }
 
-  private static double getQ1(long n, double p)
-  {
-    double t1 = 20.0 / (3.0 * n);
-    double q1 = p + t1 - Math.sqrt(t1 * t1 + 3.0 * t1 * p);
-    return q1;
-  }
-
-  private static double getQ2(long n, double p)
-  {
-    double t2 = 10.0 / n;
-    double q2 = p + t2 + Math.sqrt(t2 * t2 + 2.0 * t2 * p);
-    return q2;
-  }
 }
