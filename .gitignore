@@ -15,3 +15,7 @@ pigunit-input-overriden.txt
 *.asc
 /bin/
 .ant-targets-build.xml
+/data/
+*.iml
+.idea
+.DS_Store

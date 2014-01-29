@@ -27,6 +27,7 @@
   <property name="test.dir" value="${basedir}/test" />
   <property name="pigtestsrc.dir" value="${test.dir}/pig" />
   <property name="dist.dir" value="${basedir}/dist" />
+  <property name="data.dir" value="${basedir}/data" />
   <property name="tools.dir" value="${basedir}/tools" />
   <property name="lib.dir" value="${basedir}/lib" />
   <property name="common.lib.dir" value="${lib.dir}/common" />
@@ -49,6 +50,7 @@
   <property name="commons-math.jar" value="commons-math-jar-${commons-math.version}.jar" />
   <property name="guava.jar" value="guava-jar-${guava.version}.jar" />
   <property name="stream.jar" value="stream-jar-${stream.version}.jar" />
+  <property name="opennlp.jar" value="opennlp-tools-bundle-${opennlp.version}.jar" />
 
   <!-- Java configuration -->
   <property name="targetJavaVersion" value="1.5" />
@@ -108,6 +110,13 @@
   <target name="maven-ant-tasks-jar-download" description="Download maven tasks jar">
     <mkdir dir="${ivy.jar.dir}"/>
     <get src="${maven.jar.repo.url}" dest="${maven.jar}" usetimestamp="true"/>
+  </target>
+
+  <target name="opennlp-model-download" description="Download OpenNLP models">
+    <mkdir dir="${data.dir}"/>
+    <get src="http://opennlp.sourceforge.net/models-1.5/en-pos-maxent.bin" dest="${data.dir}/en-pos-maxent.bin" usetimestamp="true"/>
+    <get src="http://opennlp.sourceforge.net/models-1.5/en-sent.bin" dest="${data.dir}/en-sent.bin" usetimestamp="true"/>
+    <get src="http://opennlp.sourceforge.net/models-1.5/en-token.bin" dest="${data.dir}/en-token.bin" usetimestamp="true"/>
   </target>
   
   <target name="maven-taskdef" depends="maven-ant-tasks-jar-download">
@@ -346,7 +355,7 @@
     <delete file="${dist.dir}/${final.name}-orig.jar" />
     <move file="${dist.dir}/${final.name}.jar" tofile="${dist.dir}/${final.name}-orig.jar" />
     <java jar="${tools.dir}/autojar.jar" fork="true">
-      <arg line="-baeq -o ${dist.dir}/${final.name}.jar -c ${packaged.lib.dir}/${fastutil.jar}:${packaged.lib.dir}/${commons-math.jar}:${packaged.lib.dir}/${stream.jar}:${packaged.lib.dir}/${guava.jar} ${dist.dir}/${final.name}-orig.jar" />
+      <arg line="-baeq -o ${dist.dir}/${final.name}.jar -c ${packaged.lib.dir}/*.jar ${dist.dir}/${final.name}-orig.jar" />
     </java>
     <delete file="${dist.dir}/${final.name}-orig.jar" />
     
@@ -360,6 +369,7 @@
         <rule pattern="org.apache.commons.math.**" result="datafu.org.apache.commons.math.@1"/>
         <rule pattern="com.clearspring.analytics.**" result="datafu.com.clearspring.analytics.@1"/>
         <rule pattern="com.google.common.**" result="datafu.com.google.common.@1"/>
+        <rule pattern="opennlp.**" result="datafu.opennlp.@1"/>
     </jarjar>
     <delete file="${dist.dir}/${final.name}-orig.jar" />
   </target>
@@ -388,7 +398,7 @@
     </jarjar>
   </target>
   
-  <target name="test" depends="build-pig-tests, jar" description="Runs the pig tests">
+  <target name="test" depends="build-pig-tests, jar, opennlp-model-download" description="Runs the pig tests">
     <taskdef resource="testngtasks" classpath="${tools.lib.dir}/testng-jar-${testng.version}.jar"/>
     <testng classpathref="run-tests-classpath" methods="${test.methods}"
             outputDir="${report.dir}" verbose="2" haltonfailure="true" haltonskipped="true">
@@ -398,7 +408,7 @@
     </testng>
   </target>
   
-  <target name="test-instrumented" depends="build-pig-tests, jar-instrumented" description="Runs the tests with instrumented JARs">
+  <target name="test-instrumented" depends="build-pig-tests, jar-instrumented, opennlp-model-download" description="Runs the tests with instrumented JARs">
     <taskdef resource="testngtasks" classpath="${tools.lib.dir}/testng-jar-${testng.version}.jar"/>
     <testng classpathref="instrumented-test-classpath" methods="${test.methods}"
             outputDir="${report.dir}" haltonfailure="true" haltonskipped="true">
