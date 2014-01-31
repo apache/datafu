@@ -1,6 +1,6 @@
 # Apache DataFu website
 
-We use [Middleman](http://middlemanapp.com/) to generate the website content.  This requires Ruby.
+We use [Middleman](http://middlemanapp.com/) to generate the website content. This requires Ruby.
 
 ## Setup
 
