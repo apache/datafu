@@ -441,4 +441,4 @@ If you're interested in the project, we also encourage you to try running the un
 
 ## Conclusion
 
-We hope this whets your appetite for incremental data processing with DataFu's Hourglass. The [code](https://github.com/linkedin/datafu/tree/master/contrib/hourglass) is available on Github in the [DataFu](https://github.com/linkedin/datafu) repository under an Apache 2.0 license. Documentation is available [here](/docs/hourglass/current/). We are accepting contributions, so if you are interesting in helping out, please fork the code and send us your pull requests!
+We hope this whets your appetite for incremental data processing with DataFu's Hourglass. The [code](https://github.com/linkedin/datafu/tree/master/contrib/hourglass) is available on Github in the [DataFu](https://github.com/linkedin/datafu) repository under an Apache 2.0 license. Documentation is available [here](/docs/hourglass/javadoc.html). We are accepting contributions, so if you are interesting in helping out, please fork the code and send us your pull requests!

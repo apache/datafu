@@ -40,7 +40,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  * 
  * <p>
  * The algorithm is described here:
- * {@link <a href="www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf">http://www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf</a>}
+ * {@link <a href="http://www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf" target="_blank">http://www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf</a>}
  * </p>
  * 
  * <p>
