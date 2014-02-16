@@ -708,6 +708,68 @@ public class BagTests extends PigTests
                  "({(Z,1,0),(A,1,0),(B,2,0),(C,3,0),(D,4,0),(E,5,0)})",
                  "({(A,10,2),(M,50,3),(Z,49,22),(B,1,1)})");
   }
+ 
+  /**
+  register $JAR_PATH
+
+  define DistinctBy datafu.pig.bags.DistinctBy('1', '2');
+
+  data = LOAD 'input' AS (data: bag {T: tuple(a:CHARARRAY, b:map[INT], c:bag{t: tuple(c0:CHARARRAY, c1:INT)})});
+
+  data2 = FOREACH data GENERATE DistinctBy(data);
+
+  --describe data2;
+
+  STORE data2 INTO 'output';
+
+   */
+  @Multiline
+  private String distinctByMultiComplexFieldTest;
+
+  @Test
+  public void distinctByMultiComplexFieldTest() throws Exception
+  {
+    PigTest test = createPigTestFromString(distinctByMultiComplexFieldTest);
+
+    writeLinesToFile("input",
+                     "({(a-b,[a#0,b#1],{(a-b,0),(a-b,1)}),(a-c,[b#1,a#0],{(a-b,0),(a-b,1)}),(a-d,[a#1,b#0],{(a-b,1),(a-b,2)})})");
+    
+    test.runScript();
+ 
+    assertOutput(test, "data2",
+                 "({(a-b,[b#1,a#0],{(a-b,0),(a-b,1)}),(a-d,[b#0,a#1],{(a-b,1),(a-b,2)})})");
+  }
+
+  /**
+  register $JAR_PATH
+
+  define DistinctBy datafu.pig.bags.DistinctBy('1');
+
+  data = LOAD 'input' AS (data: bag {T: tuple(a:CHARARRAY, b:CHARARRAY)});
+
+  data2 = FOREACH data GENERATE DistinctBy(data);
+
+  --describe data2;
+
+  STORE data2 INTO 'output';
+
+   */
+  @Multiline
+  private String distinctByDelimTest;
+
+  @Test
+  public void distinctByDelimTest() throws Exception
+  {
+    PigTest test = createPigTestFromString(distinctByDelimTest);
+    
+    writeLinesToFile("input",
+                     "({(a-b,c),(a-b,d)})");
+    
+    test.runScript();
+    
+    assertOutput(test, "data2",
+                 "({(a-b,c),(a-b,d)})");
+  }
   
   @Test
   public void distinctByExecTest() throws Exception

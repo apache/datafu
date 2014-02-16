@@ -28,6 +28,7 @@ import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
+import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 
@@ -60,9 +61,8 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  */
 public class DistinctBy extends AccumulatorEvalFunc<DataBag>
 {
-  private final static String delimiter = "-";
   private HashSet<Integer> fields = new HashSet<Integer>();
-  private HashSet<String> seen = new HashSet<String>();   
+  private HashSet<Tuple> seen = new HashSet<Tuple>();
   private DataBag outputBag;
   
   public DistinctBy(String... fields)
@@ -85,10 +85,10 @@ public class DistinctBy extends AccumulatorEvalFunc<DataBag>
     
     DataBag inputBag = (DataBag)input.get(0);
     for (Tuple t : inputBag) {
-      String distinctString = getDistinctString(t, this.fields);
-      if (!seen.contains(distinctString)) {
+      Tuple distinctFieldTuple = getDistinctFieldTuple(t, this.fields);
+      if (!seen.contains(distinctFieldTuple)) {
         outputBag.add(t);
-        seen.add(distinctString);
+        seen.add(distinctFieldTuple);
       }
     }
   }
@@ -147,17 +147,16 @@ public class DistinctBy extends AccumulatorEvalFunc<DataBag>
     }
   }
   
-  private String getDistinctString(Tuple t, HashSet<Integer> distinctFieldPositions) throws ExecException {
-    String[] tokens = t.toDelimitedString(delimiter).split(delimiter);
-    StringBuffer buffer = new StringBuffer();
-    for(int i=0; i<tokens.length; i++) {
+  private Tuple getDistinctFieldTuple(Tuple t, HashSet<Integer> distinctFieldPositions) throws ExecException {
+    Tuple fieldTuple = TupleFactory.getInstance().newTuple(distinctFieldPositions.size());
+    int idx = 0;
+    for(int i=0; i<t.size(); i++) {
       if (distinctFieldPositions.contains(i)) {
-        buffer.append(tokens[i]);
-        buffer.append(delimiter);
+        fieldTuple.set(idx, t.get(i));
+        idx++;
       }
     }
-    buffer.substring(0, buffer.length() - delimiter.length());
-    return buffer.toString();
+    return fieldTuple;
   }
 
 }
