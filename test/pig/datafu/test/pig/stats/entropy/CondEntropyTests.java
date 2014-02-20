@@ -37,12 +37,12 @@ import datafu.test.pig.PigTests;
  * Use R function to compute condition entropy as the test benchmark
  * http://cran.r-project.org/web/packages/infotheo/infotheo.pdf
  */
-public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
+public class CondEntropyTests extends AbstractEntropyTests
 {
   /**
   register $JAR_PATH
 
-  define CondEntropy datafu.pig.stats.entropy.StreamingCondEntropy();
+  define CondEntropy datafu.pig.stats.entropy.CondEntropy();
   
   data = load 'input' as (valX:double, valY:chararray);
   --describe data;
@@ -56,7 +56,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   @Multiline private String condEntropy;
   
   @Test
-  public void uniqValStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void uniqValEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(condEntropy); 
     
@@ -89,7 +89,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   }
 
   @Test
-  public void singleValStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void singleValEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(condEntropy);
     
@@ -122,7 +122,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   }
 
   @Test
-  public void dupValStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void dupValEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(condEntropy); 
     
@@ -155,7 +155,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   }
 
   @Test
-  public void emptyInputBagStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void emptyInputBagEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(condEntropy);
     
@@ -171,7 +171,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   }
 
   @Test
-  public void singleElemInputBagStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void singleElemInputBagEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(condEntropy);
     
@@ -196,7 +196,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   /**
   register $JAR_PATH
 
-  define Entropy datafu.pig.stats.entropy.StreamingCondEntropy();
+  define Entropy datafu.pig.stats.entropy.CondEntropy();
   
   data = load 'input' as (valX1:chararray, valX2:chararray, valY:chararray);
   data = foreach data generate (valX1, valX2) as X, valY as Y;
@@ -212,7 +212,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   @Multiline private String pairCondEntropy;
  
   @Test
-  public void dupPairValStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void dupPairValEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(pairCondEntropy);
     
@@ -248,7 +248,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   /**
   register $JAR_PATH
 
-  define CondEntropy datafu.pig.stats.entropy.StreamingCondEntropy('$type','$base');
+  define CondEntropy datafu.pig.stats.entropy.CondEntropy('$type','$base');
   
   data = load 'input' as (valX:double, valY:chararray);
   --describe data;
@@ -262,7 +262,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   @Multiline private String condLogEntropy;
  
   @Test
-  public void dupValStreamingEmpiricalCondEntropoyLog2Test() throws Exception
+  public void dupValEmpiricalCondEntropoyLog2Test() throws Exception
   {
     PigTest test = createPigTestFromString(condLogEntropy, "type=empirical", "base=log2");
  
@@ -295,7 +295,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   }
 
   @Test
-  public void dupValStreamingEmpiricalCondEntropoyLog10Test() throws Exception
+  public void dupValEmpiricalCondEntropoyLog10Test() throws Exception
   {
     PigTest test = createPigTestFromString(condLogEntropy, "type=empirical", "base=log10");
  
@@ -330,7 +330,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   /**
   register $JAR_PATH
 
-  define CondEntropy datafu.pig.stats.entropy.StreamingCondEntropy();
+  define CondEntropy datafu.pig.stats.entropy.CondEntropy();
   
   data = load 'input' as (valX:double, valY:chararray);
   --describe data;
@@ -343,7 +343,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   @Multiline private String noOrderCondEntropy;
   
   @Test
-  public void noOrderStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void noOrderEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(noOrderCondEntropy); 
     
@@ -369,7 +369,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   /**
   register $JAR_PATH
 
-  define CondEntropy datafu.pig.stats.entropy.StreamingCondEntropy();
+  define CondEntropy datafu.pig.stats.entropy.CondEntropy();
   
   data = load 'input' as (valX:double);
   --describe data;
@@ -383,7 +383,7 @@ public class StreamingEmpiricalCondEntropyTests extends AbstractEntropyTests
   @Multiline private String invalidInputCondEntropy;
  
   @Test
-  public void invalidInputStreamingEmpiricalCondEntropoyTest() throws Exception
+  public void invalidInputEmpiricalCondEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(invalidInputCondEntropy); 
     

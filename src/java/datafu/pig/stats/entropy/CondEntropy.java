@@ -34,45 +34,39 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 
 /**
- * Calculate the conditional entropy H(Y|X) of random variables X and Y according to its 
+ * Calculate conditional entropy H(Y|X) of random variables X and Y following conditional entropy's 
  * {@link <a href="http://en.wikipedia.org/wiki/Conditional_entropy" target="_blank">wiki definition</a>}, 
  * X is the conditional variable and Y is the variable that conditions on X.
  * <p>
- * The input to this UDF is a bag of 2 field tuple.
- * <ul>
- *     <li>the 1st field of the tuple is an instance of variable X.
- *     <li>the 2nd field of the tuple is an instance of variable Y.
- * </ul>
- * </p>
- * <p>
- * An exception will be thrown if the input tuple does not have 2 fields.
+ * Each tuple of the input bag has 2 fields, the 1st field is an object instance of variable X and
+ * the 2nd field is an object instance of variable Y. An exception will be thrown if the number of fields is not 2.
  * </p> 
  * <p>
- * This UDF's constructor definition and parameters are the same as that of * {@link datafu.pig.stats.entropy.StreamingEntropy}
+ * This UDF's constructor definition and parameters are the same as that of {@link datafu.pig.stats.entropy.Entropy}
  * </p>
  * <p>
  * Note:
  * <ul>
- *     <li>input bag to the UDF must be sorted on X and Y, with X in the first order.
- *     <li>Entropy value is returned as double type.
+ *     <li>The input bag to this UDF must be <b>sorted</b> on X and Y, with X in the first sort order.
+ *     An exception will be thrown if the input bag is not sorted.
+ *     <li>The returned entropy value is of double type.
  * </ul>
  * </p>
  * <p>
  * How to use: 
  * </p>
  * <p>
- * This UDF is suitable to calculate conditional entropy in a nested FOREACH after a GROUP BY,
- * where we sort the inner bag and use the sorted bag as the input to this UDF.
+ * This UDF calculates conditional entropy given raw data tuples of X and Y without the need to pre-compute per tuple occurrence frequency.
  * </p>
  * <p>
- * This is a scenario in which we would like to get 2 variables' conditional entropy in different constraint groups.
+ * It could be used in a nested FOREACH after a GROUP BY, in which we sort the inner bag and use the sorted bag as this UDF's input.
  * </p>
  * <p>
  * Example:
  * <pre>
  * {@code
  * --define empirical conditional entropy with Euler's number as the logarithm base
- * define CondEntropy datafu.pig.stats.entropy.stream.StreamingCondEntropy();
+ * define CondEntropy datafu.pig.stats.entropy.CondEntropy();
  *
  * input = LOAD 'input' AS (grp: chararray, valX: double, valY: double);
  *
@@ -91,12 +85,12 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * <pre>
  * {@code
  * ------------
- * -- calculate mutual information I(X, Y) using streaming conditional entropy and streaming entropy
+ * -- calculate mutual information I(X, Y) using conditional entropy UDF and entropy UDF
  * -- I(X, Y) = H(Y) - H(Y|X)
  * ------------
  * 
- * define CondEntropy datafu.pig.stats.entropy.stream.StreamingCondEntropy();
- * define Entropy datafu.pig.stats.entropy.stream.StreamingEntropy();
+ * define CondEntropy datafu.pig.stats.entropy.CondEntropy();
+ * define Entropy datafu.pig.stats.entropy.Entropy();
  * 
  * input = LOAD 'input' AS (grp: chararray, valX: double, valY: double);
  * 
@@ -114,9 +108,9 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * }
  * </pre>
  * </p>
- * @see StreamingEntropy
+ * @see Entropy
  */
-public class StreamingCondEntropy extends AccumulatorEvalFunc<Double> {
+public class CondEntropy extends AccumulatorEvalFunc<Double> {
     //last visited tuple of <x,y>
     private Tuple xy;
     
@@ -135,17 +129,17 @@ public class StreamingCondEntropy extends AccumulatorEvalFunc<Double> {
     //entropy estimator for H(x)
     private EntropyEstimator condXEstimator;
     
-    public StreamingCondEntropy() throws ExecException
+    public CondEntropy() throws ExecException
     {
       this(EntropyEstimator.EMPIRICAL_ESTIMATOR);
     }
     
-    public StreamingCondEntropy(String type) throws ExecException 
+    public CondEntropy(String type) throws ExecException 
     {
       this(type, EntropyUtil.LOG);
     }
 
-    public StreamingCondEntropy(String type, String base) throws ExecException
+    public CondEntropy(String type, String base) throws ExecException
     {
       try {
           this.combEstimator = EntropyEstimator.createEstimator(type, base);

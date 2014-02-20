@@ -36,12 +36,12 @@ import datafu.test.pig.PigTests;
  * R's entropy library: http://cran.r-project.org/web/packages/entropy/entropy.pdf
  * used as our test benchmark
  */
-public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
+public class ChaoShenEntropyTests extends AbstractEntropyTests
 {
   /**
   register $JAR_PATH
 
-  define Entropy datafu.pig.stats.entropy.StreamingEntropy('$type','$base');
+  define Entropy datafu.pig.stats.entropy.Entropy('$type','$base');
   
   data = load 'input' as (val:double);
   --describe data;
@@ -55,7 +55,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   @Multiline private String entropy;
 
   @Test  
-  public void uniqValStreamingChaoShenEntropoyTest() throws Exception
+  public void uniqValChaoShenEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(entropy, "type=chaosh", "base=log");
     
@@ -96,7 +96,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   }
 
   @Test  
-  public void singleValStreamingChaoShenEntropoyTest() throws Exception
+  public void singleValChaoShenEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(entropy, "type=chaosh", "base=log");
     
@@ -136,7 +136,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   }
 
   @Test  
-  public void dupValStreamingChaoShenEntropoyTest() throws Exception
+  public void dupValChaoShenEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(entropy,"type=chaosh", "base=log");
     
@@ -178,7 +178,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
 
 
   @Test  
-  public void emptyInputBagStreamingChaoShenEntropoyTest() throws Exception
+  public void emptyInputBagChaoShenEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(entropy, "type=chaosh", "base=log");
     
@@ -207,7 +207,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   }
 
   @Test  
-  public void singleElemInputBagStreamingChaoShenEntropoyTest() throws Exception
+  public void singleElemInputBagChaoShenEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(entropy, "type=chaosh", "base=log");
     
@@ -236,7 +236,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   /**
   register $JAR_PATH
 
-  define Entropy datafu.pig.stats.entropy.StreamingEntropy('$type','$base');
+  define Entropy datafu.pig.stats.entropy.Entropy('$type','$base');
 
   data = load 'input' as (x:chararray, y:double);
   --describe data;
@@ -250,7 +250,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   @Multiline private String pairEntropy;
  
   @Test  
-  public void dupPairValStreamingChaoShenEntropoyTest() throws Exception
+  public void dupPairValChaoShenEntropoyTest() throws Exception
   {
     PigTest test = createPigTestFromString(pairEntropy, "type=chaosh", "base=log");
     
@@ -287,7 +287,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   }
 
   @Test  
-  public void dupValStreamingChaoShenEntropoyLog2Test() throws Exception
+  public void dupValChaoShenEntropoyLog2Test() throws Exception
   {
     PigTest test = createPigTestFromString(entropy,"type=chaosh", "base=log2");
     
@@ -329,7 +329,7 @@ public class StreamingChaoShenEntropyTests extends AbstractEntropyTests
   }
 
   @Test  
-  public void dupValStreamingChaoShenEntropoyLog10Test() throws Exception
+  public void dupValChaoShenEntropoyLog10Test() throws Exception
   {
     PigTest test = createPigTestFromString(entropy, "type=chaosh", "base=log10");
     
