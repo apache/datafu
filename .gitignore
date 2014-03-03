@@ -1,5 +1,6 @@
 /dist/
-/build/
+/.gradle/
+build/
 annotation-plugin.jar
 .factorypath
 .classpath
@@ -15,6 +16,8 @@ pigunit-input-overriden.txt
 *.asc
 /bin/
 .ant-targets-build.xml
+.project
+.settings/
 /data/
 *.iml
 .idea

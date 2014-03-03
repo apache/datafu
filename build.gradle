@@ -1,0 +1,19 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  apply from: file('gradle/buildscript.gradle'), to: buildscript 
+}
+
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+}
+
+apply from: file("gradle/dependency-versions.gradle")
+
+allprojects {
+  apply plugin: 'eclipse'
+}

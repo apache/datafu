@@ -38,14 +38,54 @@ If you'd like to jump in and get started, check out the corresponding guides for
 
 Bugs and feature requests can be filed [here](https://issues.apache.org/jira/browse/DATAFU).  For other help please see the [discussion group](http://groups.google.com/group/datafu).
 
-## Building the Code
+## Developers
+
+### DataFu Pig
+
+#### Building the Code
 
 The Apache DataFu Pig library can be built by running the command below.  More information about working with the source
 code can be found in the [DataFu Pig Contributing Guide](http://datafu.incubator.apache.org/docs/datafu/contributing.html).
 
 ```
-ant jar
+./gradlew assemble
 ```
+
+The built JAR can be found under `datafu-pig/build/libs` by the name `datafu-pig-x.y.z.jar`, where x.y.z is the version.
+
+#### Generating Eclipse Files
+
+This command generates the eclipse project and classpath files:
+
+```
+./gradlew eclipse
+```
+
+To clean up the eclipse files:
+
+```
+./gradlew cleanEclipse
+```
+
+#### Running the Tests
+
+To run all the tests:
+
+```
+./gradlew test
+```
+
+To run tests for a single class, use the `test.single` property.  For example, to run only the QuantileTests:
+
+```
+/gradlew :datafu-pig:test -Dtest.single=QuantileTests
+```
+
+The tests can also be run from within eclipse.
+
+### DataFu Hourglass
+
+#### Building the Code
 
 The Apache DataFu Pig library can be built by running the commands below.  More information about working with the source
 code can be found in the [DataFu Hourglass Contributing Guide](http://datafu.incubator.apache.org/docs/hourglass/contributing.html).

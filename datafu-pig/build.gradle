@@ -1,0 +1,246 @@
+apply plugin: 'java'
+apply plugin: 'license'
+apply plugin: 'gradle-autojar'
+apply plugin: 'maven-publish'
+apply plugin: 'download-task'
+
+import groovy.xml.MarkupBuilder
+
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+  dependencies {
+      classpath 'com.github.rholder:gradle-autojar:1.0.1'
+      classpath 'de.undercouch:gradle-download-task:0.5'
+  }
+}
+
+// the autojarred configuration includes all JARs that will be included
+// in the final JAR via autojar
+configurations.create('autojarred')
+
+configurations.create('jarjar')
+
+configurations {
+  compile {
+    extendsFrom autojarred
+  }
+}
+
+eclipse { 
+  jdt { 
+    file { 
+      withProperties {  properties -> 
+        // set up annotation processing, which we use so we can have multi-line strings in our tests
+        properties.setProperty("org.eclipse.jdt.core.compiler.processAnnotations", "enabled")
+      }
+    }
+  }
+}
+
+// need to assemble the build plugin for eclipse since tests use the annotation processor defined there
+tasks.eclipse.dependsOn(':build-plugin:assemble')
+
+// more annotation processor setup
+eclipseJdt { 
+  doFirst { 
+    def f = file(".factorypath")
+    def w = new FileWriter(f)
+    def xml = new MarkupBuilder(w)
+    xml.setDoubleQuotes(true)
+    xml."factorypath"() { 
+      "factorypathentry" (
+        kind: "EXTJAR", 
+        id: configurations.testCompile.find { 
+          it.name.startsWith("build-plugin")
+        }, 
+        enabled: true, 
+        runInBatchMode: false
+      )
+    }
+    w.close()
+  }
+}
+
+cleanEclipse { 
+  doLast { 
+    delete ".apt_generated"
+    delete ".settings"
+    delete ".factorypath"
+    delete "bin"
+  }
+}
+
+jar 
+{
+  // initial jar only includes the main classes of datafu, not the dependencies.
+  // this is not the one we'll publish.
+  classifier = "core"
+}
+
+task sourcesJar(type: Jar) {
+  description 'Creates the sources jar'
+
+  classifier = 'sources'
+  from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  description 'Creates the javadoc jar'
+
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+ext 
+{
+  autojarBuildDir = tasks.jar.destinationDir
+}
+
+task jarWithDependencies(type: Autojar) {
+  description 'Creates a jar that includes the dependencies (under their own namespaces)'
+  autojarFiles = [tasks.jar.getArchivePath().absoluteFile]
+  targetConfiguration = configurations.autojarred
+  autojarExtra = '-baeq'
+}
+
+task jarWithDependenciesNamespaced(dependsOn: jarWithDependencies) {
+  description 'Creates the jar that includes dependencies (under a datafu namespace)'
+
+  outputFile = file(tasks.jar.getArchivePath().absoluteFile.toString().replace("-core","-jarjar"))
+
+  doLast {
+    project.ant {
+      taskdef name: "jarjar", classname: "com.tonicsystems.jarjar.JarJarTask", classpath: configurations.jarjar.asPath
+      jarjar(jarfile: outputFile, filesetmanifest: "merge") {
+        zipfileset(src: tasks.jarWithDependencies.autojarOutput)
+        rule pattern: "it.unimi.dsi.fastutil.**", result: "datafu.it.unimi.dsi.fastutil.@1"
+        rule pattern: "org.apache.commons.math.**", result: "datafu.org.apache.commons.math.@1"
+        rule pattern: "com.clearspring.analytics.**", result: "datafu.com.clearspring.analytics.@1"
+        rule pattern: "com.google.common.**", result: "datafu.com.google.common.@1"
+        rule pattern: "opennlp.**", result: "datafu.opennlp.@1"
+      }
+    }
+  }
+}
+
+task finalJar(type: Jar, dependsOn: jarWithDependenciesNamespaced) {
+  description 'Creates the final jar' 
+
+  from(zipTree(jarWithDependenciesNamespaced.outputFile))
+}
+
+// don't publish the core archive, as this doesn't have the dependencies
+configurations.archives.artifacts.removeAll { return it.classifier == "core"; }
+
+artifacts {
+  archives sourcesJar
+  archives javadocJar
+  archives finalJar
+}
+
+// Note: alternate way to publish: https://github.com/Netflix/gradle-template
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifact sourcesJar
+      artifact javadocJar
+      artifact finalJar
+
+      pom.withXml {
+        asNode().appendNode("packaging","jar")
+        asNode().appendNode("name","Apache DataFu")        
+        asNode().appendNode("description","A collection of user-defined functions for working with large-scale data in Hadoop and Pig.")
+        asNode().appendNode("url","http://datafu.incubator.apache.org/")
+
+        def licenseNode = asNode().appendNode("licenses").appendNode("license")
+        licenseNode.appendNode("name","The Apache Software License, Version 2.0")
+        licenseNode.appendNode("url","http://www.apache.org/licenses/LICENSE-2.0.txt")
+        licenseNode.appendNode("distribution","repo")
+
+        def dependenciesNode = asNode().appendNode("dependencies")
+        def dependency = dependenciesNode.appendNode("dependency")
+        dependency.appendNode("groupId","joda-time")
+        dependency.appendNode("artifactId","joda-time")
+        dependency.appendNode("version","$jodaTimeVersion")
+      }
+    }
+  }
+}
+
+// create tasks to automatically add the license header
+license {
+  header rootProject.file('HEADER')
+  skipExistingHeaders = true
+}
+
+dependencies {
+  // dependencies that are packaged into the jar using autojar
+  // autojar only includes what is needed
+  autojarred "it.unimi.dsi:fastutil:$fastutilVersion"
+  autojarred "org.apache.commons:commons-math:$commonsMathVersion"
+  autojarred "com.clearspring.analytics:stream:$streamVersion"
+  autojarred "com.google.guava:guava:$guavaVersion"
+  autojarred "org.apache.opennlp:opennlp-tools:$openNlpVersion"
+  autojarred "org.apache.opennlp:opennlp-uima:$openNlpVersion"
+  autojarred "org.apache.opennlp:opennlp-maxent:$openNlpMaxEntVersion"
+
+  // needed to run jarjar
+  jarjar "com.googlecode.jarjar:jarjar:1.3"
+
+  // not included in autojar because it's already a pig dependency and so
+  // should be available
+  compile "joda-time:joda-time:$jodaTimeVersion"
+
+  // needed for compilation only.  obviously don't need to autojar this.
+  compile "org.apache.pig:pig:$pigVersion"
+  compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+
+  testCompile "org.apache.pig:pigunit:$pigVersion"
+  testCompile "log4j:log4j:$log4jVersion"
+  testCompile "jline:jline:$jlineVersion"
+  testCompile "org.antlr:antlr:$antlrVersion"
+  testCompile "commons-io:commons-io:$commonsIoVersion"
+
+  testCompile "org.testng:testng:$testngVersion"
+  testCompile project(":build-plugin")
+}
+
+compileTestJava.doFirst {
+  options.compilerArgs = ['-processor', 'org.adrianwalker.multilinestring.MultilineProcessor']
+}
+
+// open NLP models used for testing.  these are not shipped with datafu.
+task downloadOpenNlpModels << {
+  download {
+    src 'http://opennlp.sourceforge.net/models-1.5/en-pos-maxent.bin'
+    dest file('data/en-pos-maxent.bin')
+    onlyIfNewer true
+  }
+  download {
+    src 'http://opennlp.sourceforge.net/models-1.5/en-sent.bin'
+    dest file('data/en-sent.bin')
+    onlyIfNewer true
+  }
+  download {
+    src 'http://opennlp.sourceforge.net/models-1.5/en-token.bin'
+    dest file('data/en-token.bin')
+    onlyIfNewer true
+  }
+}
+
+// download models so can test in eclipse or testng
+tasks.eclipse.dependsOn('downloadOpenNlpModels')
+tasks.test.dependsOn('downloadOpenNlpModels')
+
+test {
+  // enable TestNG support (default is JUnit)
+  useTestNG()
+
+  systemProperty 'datafu.jar.dir', file('build/libs')
+  systemProperty 'datafu.data.dir', file('data')
+
+  maxHeapSize = "2G"
+}

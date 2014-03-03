@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 echo $$ > test.pid
-ant test
+gradle test
 rm test.pid
