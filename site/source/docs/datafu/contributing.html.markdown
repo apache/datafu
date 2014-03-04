@@ -17,35 +17,30 @@ To clone the repository run the following command:
 
 The following command generates the necessary files to load the project in Eclipse:
 
-    ant eclipse
+    ./gradlew eclipse
+
+To clean up the eclipse files:
+
+    ./gradlew cleanEclipse
 
 Note that you may run out of heap when executing tests in Eclipse.  To fix this adjust your heap settings for the TestNG plugin.  Go to Eclipse->Preferences.  Select TestNG->Run/Debug.  Add "-Xmx1G" to the JVM args.
 
 ## Build the JAR
 
-    ant jar
+The Apache DataFu Pig library can be built by running the command below. 
+
+    ./gradlew assemble
+
+The built JAR can be found under `datafu-pig/build/libs` by the name `datafu-pig-x.y.z.jar`, where x.y.z is the version.
     
 ## Running Tests
 
 All the tests can be run from within eclipse.  However they can also be run from the command line.  To run all the tests:
 
-    ant test
+    ./gradlew test
 
-To run specific tests from the command line, you have a few options.  One option is to run all tests within a given class.  To do this, run the same command but override `testclasses.pattern`, which defaults to `**/*.class`.  For example, to run all tests defined in `QuantileTests`:
+To run a specific set of tests from the command line, you can define the `test.single` system property.  For example, to run all tests defined in `QuantileTests`:
 
-    ant test -Dtestclasses.pattern=**/QuantileTests.class
+    ./gradlew :datafu-pig:test -Dtest.single=QuantileTests
 
-The other option is to run a specific test within a class:
-
-    ant test -Dtest.methods=datafu.test.pig.stats.QuantileTests.quantileTest
-
-You may also provide a command separated list of tests:
-
-    ant test -Dtest.methods=datafu.test.pig.stats.QuantileTests.quantileTest,datafu.test.pig.stats.QuantileTests.quantile2Test
-
-## Compute code coverage
-
-We use [Cobertura](http://cobertura.github.io/cobertura/) to compute code coverage, which can be run with:
-
-    ant coverage
 
