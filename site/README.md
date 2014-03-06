@@ -26,6 +26,6 @@ Now visit [http://localhost:4567/](http://localhost:4567/) to see the website in
 
 The static content can be built with:
 
-    bundle exec build
+    bundle exec middleman build
 
 This will produces the content in the `/build` directory.
