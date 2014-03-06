@@ -84,4 +84,5 @@ end
 
 page "/", :layout => "docs"
 page "/docs/*", :layout => "docs"
+page "/community/*", :layout => "docs"
 
