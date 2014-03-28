@@ -476,7 +476,7 @@ public abstract class AbstractPartitionPreservingIncrementalJob extends Incremen
         
       moveStagedFiles(report,incrementalStagingPath);
       
-      if (getCountersParentPath() == null)
+      if (getCountersParentPath() == null && job.getCountersPath() != null)
       {
         // save the counters in the target path, for lack of a better place to put it
         Path counters = job.getCountersPath();
