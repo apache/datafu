@@ -45,13 +45,15 @@ public class DateRangePlanner
    * @param available The input dates which are available
    * @param daysAgo Number of days to subtract from the end date
    * @param numDays Number of days to process
+   * @param failOnMissing true to fail if days are missing in desired date range
    * @return desired date range for inputs to be processed
    */
   public static DateRange getDateRange(Date beginDateOverride, 
                                        Date endDateOverride,
                                        Collection<Date> available,
                                        Integer daysAgo,
-                                       Integer numDays)
+                                       Integer numDays,
+                                       boolean failOnMissing)
   {
     Date beginDate = null;
     Date endDate = null;
@@ -143,7 +145,7 @@ public class DateRangePlanner
       }
     }
     
-    if (endAvailable.compareTo(endDate) < 0)
+    if (endAvailable.compareTo(endDate) < 0 && failOnMissing)
     {
       throw new IllegalArgumentException(String.format("Latest available date %s is less than desired end date %s",
                                                        PathUtils.datedPathFormat.format(endAvailable),
@@ -164,7 +166,7 @@ public class DateRangePlanner
       }
     }
     
-    if (beginAvailable.compareTo(beginDate) > 0)
+    if (beginAvailable.compareTo(beginDate) > 0 && failOnMissing)
     {
       throw new IllegalArgumentException(String.format("Desired begin date is %s but the next available date is %s",                                                       
                                                        PathUtils.datedPathFormat.format(beginDate),

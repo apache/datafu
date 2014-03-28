@@ -261,7 +261,7 @@ public class PartitionPreservingExecutionPlanner extends ExecutionPlanner
                     
           newDataCount++;
         }
-        else
+        else if (isFailOnMissing())
         {
           throw new RuntimeException("missing input data for " + currentDate);
         }

@@ -60,7 +60,7 @@ public class StagedOutputJob extends Job implements Callable<Boolean>
   private final Logger _log;
   private Path _countersPath;
   private Path _countersParentPath;
-  private boolean _writeCounters = true;
+  private boolean _writeCounters = false;
   
   /**
    * Creates a job which using a temporary staging location for the output data.

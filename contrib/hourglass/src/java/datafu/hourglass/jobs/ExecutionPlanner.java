@@ -419,7 +419,7 @@ public abstract class ExecutionPlanner
   protected void determineDateRange()
   {
     _log.info("Determining range of input data to consume");
-    _range = DateRangePlanner.getDateRange(getStartDate(), getEndDate(), getAvailableInputsByDate().keySet(), getDaysAgo(), getNumDays());
+    _range = DateRangePlanner.getDateRange(getStartDate(), getEndDate(), getAvailableInputsByDate().keySet(), getDaysAgo(), getNumDays(), isFailOnMissing());
     if (_range.getBeginDate() == null || _range.getEndDate() == null)
     {
       throw new RuntimeException("Expected start and end date");
