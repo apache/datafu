@@ -177,7 +177,7 @@ public abstract class AbstractNonIncrementalJob extends TimeBasedJob
       dates.add(dp.getDate());
     }
     
-    DateRange dateRange = DateRangePlanner.getDateRange(getStartDate(), getEndDate(), dates, getDaysAgo(), getNumDays());
+    DateRange dateRange = DateRangePlanner.getDateRange(getStartDate(), getEndDate(), dates, getDaysAgo(), getNumDays(), true);
     
     Map<Date,DatePath> existingInputs = new HashMap<Date,DatePath>();
     for (DatePath input : inputs)

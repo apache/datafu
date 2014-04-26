@@ -29,3 +29,29 @@ The static content can be built with:
     bundle exec middleman build
 
 This will produces the content in the `/build` directory.
+
+## Check out the website source
+
+The static website content is located in another repo:
+
+    svn co https://svn.apache.org/repos/asf/incubator/datafu apache-datafu-website
+
+## Commit the changes
+
+In the `apache-datafu-website` folder, delete the old content, which we will be replacing
+with new content:
+
+    cd apache-datafu-website
+    rm -rf site
+
+Now copy the built content to the `apache-datafu-website` folder, replacing the old `site` folder:
+
+    cp -r ~/Projects/incubator-datafu/site/build site
+
+Check what has changed:
+
+    svn status
+
+If you have added or removed files, you may need to run `svn add` or `svn rm`.
+
+Once you are satisfied with the changes you can commit.

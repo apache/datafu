@@ -128,7 +128,6 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
     }
   }
   
-  Map<Tuple, List<Tuple>> groups = new HashMap<Tuple, List<Tuple>>();
   TupleFactory tupleFactory = TupleFactory.getInstance();
   BagFactory bagFactory = BagFactory.getInstance();
 
@@ -136,13 +135,14 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
   @Override
   public DataBag exec(Tuple input) throws IOException
   {
+    Map<Tuple, List<Tuple>> groups = new HashMap<Tuple, List<Tuple>>();
     fieldNames = (List<String>)getInstanceProperties().get(FIELD_NAMES_PROPERTY);
     
     DataBag inputBag = (DataBag)input.get(0);    
     
     for (Tuple tuple : inputBag) {
       Tuple key = extractKey(tuple);
-      addGroup(key, tuple);
+      addGroup(groups, key, tuple);
     }
     
     DataBag outputBag = bagFactory.newDefaultBag();
@@ -172,7 +172,7 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
     return key;
   }
   
-  private void addGroup(Tuple key, Tuple value) {
+  private void addGroup (Map<Tuple, List<Tuple>> groups, Tuple key, Tuple value) {
     if (!groups.containsKey(key)) {
       groups.put(key, new LinkedList<Tuple>());
     }

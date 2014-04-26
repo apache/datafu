@@ -1187,7 +1187,7 @@ public class BagTests extends PigTests
 
   define BagGroup datafu.pig.bags.BagGroup();
   
-  data = LOAD 'input' AS (input_bag: bag {T: tuple(k: int, v: chararray)});
+  data = LOAD 'input' AS (input_bag: bag {T: tuple(k: chararray, v: chararray)});
   describe data;
   
   data2 = FOREACH data GENERATE BagGroup(input_bag, input_bag.k) as grouped;
@@ -1210,10 +1210,12 @@ public class BagTests extends PigTests
   public void bagGroupSingleTest() throws Exception
   {
     PigTest test = createPigTestFromString(bagGroupSingleTest);
-    writeLinesToFile("input", "({(1,A),(1,B),(2,A),(2,B),(2,C),(3,A)})");
-    test.runScript();
+    writeLinesToFile("input", "({(1,A),(1,B),(2,A),(2,B),(2,C),(3,A)})",
+                     "({(A,1),(B,1),(A,2),(B,2),(C,2),(A,3)})");
+    test.runScript(); 
     getLinesForAlias(test, "data2", true);
-    assertOutput(test, "data3", "({(1,{(1,A),(1,B)}),(2,{(2,A),(2,B),(2,C)}),(3,{(3,A)})})");
+    assertOutput(test, "data3", "({(1,{(1,A),(1,B)}),(2,{(2,A),(2,B),(2,C)}),(3,{(3,A)})})",
+                 "({(A,{(A,1),(A,2),(A,3)}),(B,{(B,1),(B,2)}),(C,{(C,2)})})");
   }
   
   /**
