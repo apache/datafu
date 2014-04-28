@@ -11,7 +11,7 @@ https://cwiki.apache.org/confluence/display/DATAFU/Contributing+to+Apache+DataFu
 
 ## Common Tasks
 
-Common tasks for working with the DataFu Pig code can be found below.  For information on how to contribute patches, please
+Common tasks for working with the DataFu Hourglass code can be found below.  For information on how to contribute patches, please
 follow the wiki link above.
 
 ### Build the JAR
