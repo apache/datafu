@@ -14,7 +14,7 @@ DataFu includes UDFs for common statistics tasks, PageRank, set operations, bag 
 Here's a taste of what you can do with DataFu:
 
 * Run [PageRank](/docs/datafu/1.2.0/datafu/pig/linkanalysis/PageRank.html) on a large number of independent graphs.
-* Perform set operations such as [intersect](/docs/datafu/1.2.0/datafu/pig/sets/SetIntersect.html) and [union](http://localhost:4567/docs/datafu/1.2.0/datafu/pig/sets/SetUnion.html).
+* Perform set operations such as [intersect](/docs/datafu/1.2.0/datafu/pig/sets/SetIntersect.html) and [union](/docs/datafu/1.2.0/datafu/pig/sets/SetUnion.html).
 * Compute the [haversine distance](/docs/datafu/1.2.0/datafu/pig/geo/HaversineDistInMiles.html) between two points on the globe.
 * Create an [assertion](/docs/datafu/1.2.0/datafu/pig/util/Assert.html) on input data which will cause the script to fail if the condition is not met.
 * Perform various operations on bags such as [append a tuple](/docs/datafu/1.2.0/datafu/pig/bags/AppendToBag.html), [prepend a tuple](/docs/datafu/1.2.0/datafu/pig/bags/PrependToBag.html), [concatenate bags](/docs/datafu/1.2.0/datafu/pig/bags/BagConcat.html), [generate unordered pairs](/docs/datafu/1.2.0/datafu/pig/bags/UnorderedPairs.html), etc.
