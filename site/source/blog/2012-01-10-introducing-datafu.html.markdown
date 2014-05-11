@@ -13,12 +13,12 @@ DataFu includes UDFs for common statistics tasks, PageRank, set operations, bag 
 
 Here's a taste of what you can do with DataFu:
 
-* Run [PageRank](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/linkanalysis/PageRank.html) on a large number of independent graphs.
-* Perform set operations such as [intersect](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/bags/sets/SetIntersect.html) and [union](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/bags/sets/SetUnion.html).
-* Compute the [haversine](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/geo/HaversineDistInMiles.html) distance between two points on the globe.
-* Create an [assertion](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/util/ASSERT.html) on input data which will cause the script to fail if the condition is not met.
-* Perform various operations on bags such as [append a tuple](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/bags/AppendToBag.html), [prepend a tuple](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/bags/PrependToBag.html), [concatenate bags](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/bags/BagConcat.html), [generate unordered pairs](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/bags/UnorderedPairs.html), etc.
-* And [lots more](http://sna-projects.com/datafu/javadoc/0.0.4/).
+* Run [PageRank](/docs/datafu/1.2.0/datafu/pig/linkanalysis/PageRank.html) on a large number of independent graphs.
+* Perform set operations such as [intersect](/docs/datafu/1.2.0/datafu/pig/sets/SetIntersect.html) and [union](http://localhost:4567/docs/datafu/1.2.0/datafu/pig/sets/SetUnion.html).
+* Compute the [haversine distance](/docs/datafu/1.2.0/datafu/pig/geo/HaversineDistInMiles.html) between two points on the globe.
+* Create an [assertion](/docs/datafu/1.2.0/datafu/pig/util/Assert.html) on input data which will cause the script to fail if the condition is not met.
+* Perform various operations on bags such as [append a tuple](/docs/datafu/1.2.0/datafu/pig/bags/AppendToBag.html), [prepend a tuple](/docs/datafu/1.2.0/datafu/pig/bags/PrependToBag.html), [concatenate bags](/docs/datafu/1.2.0/datafu/pig/bags/BagConcat.html), [generate unordered pairs](/docs/datafu/1.2.0/datafu/pig/bags/UnorderedPairs.html), etc.
+* And [lots more](/docs/datafu/1.2.0/).
 
 ### Example: Computing Quantiles
 
@@ -28,7 +28,7 @@ Let’s imagine that we collected 10,000 temperature readings from three sensors
 
 ![box plot](/images/boxplot.png)
 
-We can use DataFu to compute quantiles using the [Quantile UDF])(http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/stats/Quantile.html). The constructor for the UDF takes the quantiles to be computed. In this case we provide 0.25, 0.5, and 0.75 to compute the 25th, 50th, and 75th percentiles (a.k.a [quartiles](http://en.wikipedia.org/wiki/Quartile)). We also provide 0.0 and 1.0 to compute the min and max.
+We can use DataFu to compute quantiles using the [Quantile UDF](/docs/datafu/1.2.0/datafu/pig/stats/Quantile.html). The constructor for the UDF takes the quantiles to be computed. In this case we provide 0.25, 0.5, and 0.75 to compute the 25th, 50th, and 75th percentiles (a.k.a [quartiles](http://en.wikipedia.org/wiki/Quartile)). We also provide 0.0 and 1.0 to compute the min and max.
 
 Quantile UDF example script:
 
@@ -57,7 +57,7 @@ The values in each row of the output are the min, 25th percentile, 50th percenti
 
 ### StreamingQuantile UDF
 
-The Quantile UDF determines the quantiles by reading the input values for a key in sorted order and picking out the quantiles based on the size of the input DataBag. Alternatively we can estimate quantiles using the [StreamingQuantile UDF](http://sna-projects.com/datafu/javadoc/0.0.4/index.html?datafu/pig/stats/StreamingQuantile.html), contributed to DataFu by [Josh Wills of Cloudera](http://www.linkedin.com/pub/josh-wills/0/82b/138), which does not require that the input data be sorted.
+The Quantile UDF determines the quantiles by reading the input values for a key in sorted order and picking out the quantiles based on the size of the input DataBag. Alternatively we can estimate quantiles using the [StreamingQuantile UDF](/docs/datafu/1.2.0/datafu/pig/stats/StreamingQuantile.html), contributed to DataFu by [Josh Wills of Cloudera](http://www.linkedin.com/pub/josh-wills/0/82b/138), which does not require that the input data be sorted.
 
 StreamingQuantile UDF example script:
 
