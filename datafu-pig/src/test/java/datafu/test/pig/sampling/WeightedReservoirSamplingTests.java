@@ -39,40 +39,40 @@ import datafu.test.pig.PigTests;
 /**
  * Tests for {@link WeightedReservoirSample}.
  *
- * @author wjian 
+ * @author wjian
  *
  */
 public class WeightedReservoirSamplingTests extends PigTests
 {
   /**
-  
+
 
   DEFINE ReservoirSample datafu.pig.sampling.WeightedReservoirSample('$RESERVOIR_SIZE','2');
-  DEFINE Assert datafu.pig.util.Assert();
-  
+  DEFINE AssertUDF datafu.pig.util.AssertUDF();
+
   data = LOAD 'input' AS (A_id:int, B_id:chararray, C:int, W:double);
   sampled = FOREACH (GROUP data BY A_id) GENERATE group as A_id, ReservoirSample(data.(B_id,C,W)) as sample_data;
-  sampled = FILTER sampled BY Assert((SIZE(sample_data) <= $RESERVOIR_SIZE ? 1 : 0), 'must be <= $RESERVOIR_SIZE');
+  sampled = FILTER sampled BY AssertUDF((SIZE(sample_data) <= $RESERVOIR_SIZE ? 1 : 0), 'must be <= $RESERVOIR_SIZE');
   sampled = FOREACH sampled GENERATE A_id, FLATTEN(sample_data);
   STORE sampled INTO 'output';
 
    */
   @Multiline
   private String weightedReservoirSampleGroupTest;
-  
+
   /**
    * Verifies that WeightedReservoirSample works when data grouped by a key.
    * In particular it ensures that the reservoir is not reused across keys.
-   * 
+   *
    * <p>
    * This confirms the fix for DATAFU-11.
    * </p>
-   * 
+   *
    * @throws Exception
    */
   @Test
   public void weightedReservoirSampleGroupTest() throws Exception
-  {    
+  {
     // first value is the key.  second to last value matches the key so we can
     // verify the register is reset for each key.  values should not
     // bleed across to other keys.
@@ -109,39 +109,39 @@ public class WeightedReservoirSamplingTests extends PigTests
                      "10\tB2\t10\t1.0",
                      "10\tB6\t10\t1.0",
                      "10\tB7\t10\t1.0");
-   
+
     for(int i=1; i<=3; i++) {
       int reservoirSize = i ;
       PigTest test = createPigTestFromString(weightedReservoirSampleGroupTest, "RESERVOIR_SIZE="+reservoirSize);
       test.runScript();
-      
+
       List<Tuple> tuples = getLinesForAlias(test, "sampled");
-      
+
       for (Tuple tuple : tuples)
       {
         Assert.assertEquals(((Number)tuple.get(0)).intValue(), ((Number)tuple.get(2)).intValue());
       }
     }
   }
-  
- /** 
-   
- 
-  define WeightedSample datafu.pig.sampling.WeightedReservoirSample('1','1'); 
+
+ /**
+
+
+  define WeightedSample datafu.pig.sampling.WeightedReservoirSample('1','1');
 
   data = LOAD 'input' AS (v1:chararray,v2:INT);
   data_g = group data all;
   sampled = FOREACH data_g GENERATE WeightedSample(data);
-  --describe sampled; 
-   
-  STORE sampled INTO 'output'; 
- 
-  */ 
-  @Multiline 
-  private String weightedSampleTest; 
-   
-  @Test 
-  public void weightedSampleTest() throws Exception 
+  --describe sampled;
+
+  STORE sampled INTO 'output';
+
+  */
+  @Multiline
+  private String weightedSampleTest;
+
+  @Test
+  public void weightedSampleTest() throws Exception
   {
      Map<String, Integer> count = new HashMap<String, Integer>();
 
@@ -150,9 +150,9 @@ public class WeightedReservoirSamplingTests extends PigTests
      count.put("c", 0);
      count.put("d", 0);
 
-     PigTest test = createPigTestFromString(weightedSampleTest); 
- 
-     writeLinesToFile("input",  
+     PigTest test = createPigTestFromString(weightedSampleTest);
+
+     writeLinesToFile("input",
                 "a\t100","b\t1","c\t5","d\t2");
 
      for(int i = 0; i < 10; i++) {
@@ -168,16 +168,16 @@ public class WeightedReservoirSamplingTests extends PigTests
            Tuple st = sampleIter.next();
            String key = (String)st.get(0);
            count.put(key, count.get(key) + 1);
-        }              
+        }
      }
 
      String maxKey = "";
      int maxCount = 0;
      for(String key : count.keySet()) {
         if(maxCount < count.get(key)) {
-           maxKey = key; 
+           maxKey = key;
            maxCount = count.get(key);
-        } 
+        }
      }
 
      Assert.assertEquals(maxKey, "a");
@@ -200,7 +200,7 @@ public class WeightedReservoirSamplingTests extends PigTests
      }
 
      DataBag result = sampler.getValue();
-     verifyNoRepeatAllFound(result, 10, 0, 100); 
+     verifyNoRepeatAllFound(result, 10, 0, 100);
   }
 
   @Test
@@ -209,7 +209,7 @@ public class WeightedReservoirSamplingTests extends PigTests
     WeightedReservoirSample.Initial initialSampler = new WeightedReservoirSample.Initial("10", "1");
     WeightedReservoirSample.Intermediate intermediateSampler = new WeightedReservoirSample.Intermediate("10", "1");
     WeightedReservoirSample.Final finalSampler = new WeightedReservoirSample.Final("10", "1");
-    
+
     DataBag bag = BagFactory.getInstance().newDefaultBag();
     for (int i=0; i<100; i++)
     {
@@ -218,15 +218,15 @@ public class WeightedReservoirSamplingTests extends PigTests
       t.set(1, i + 1);
       bag.add(t);
     }
-    
+
     Tuple input = TupleFactory.getInstance().newTuple(bag);
-    
-    Tuple intermediateTuple = initialSampler.exec(input);  
+
+    Tuple intermediateTuple = initialSampler.exec(input);
     DataBag intermediateBag = BagFactory.getInstance().newDefaultBag(Arrays.asList(intermediateTuple));
-    intermediateTuple = intermediateSampler.exec(TupleFactory.getInstance().newTuple(intermediateBag));  
+    intermediateTuple = intermediateSampler.exec(TupleFactory.getInstance().newTuple(intermediateBag));
     intermediateBag = BagFactory.getInstance().newDefaultBag(Arrays.asList(intermediateTuple));
     DataBag result = finalSampler.exec(TupleFactory.getInstance().newTuple(intermediateBag));
-    verifyNoRepeatAllFound(result, 10, 0, 100); 
+    verifyNoRepeatAllFound(result, 10, 0, 100);
    }
 
   private void verifyNoRepeatAllFound(DataBag result,
@@ -235,7 +235,7 @@ public class WeightedReservoirSamplingTests extends PigTests
                                       int right) throws ExecException
   {
     Assert.assertEquals(expectedResultSize, result.size());
-    
+
     // all must be found, no repeats
     Set<Integer> found = new HashSet<Integer>();
     for (Tuple t : result)
@@ -251,7 +251,7 @@ public class WeightedReservoirSamplingTests extends PigTests
   public void weightedReservoirSampleLimitExecTest() throws IOException
   {
     WeightedReservoirSample sampler = new WeightedReservoirSample("100", "1");
-   
+
     DataBag bag = BagFactory.getInstance().newDefaultBag();
     for (int i=0; i<10; i++)
     {
@@ -260,13 +260,13 @@ public class WeightedReservoirSamplingTests extends PigTests
       t.set(1, 1); // score is equal for all
       bag.add(t);
     }
-   
+
     Tuple input = TupleFactory.getInstance().newTuple(1);
     input.set(0, bag);
-   
+
     DataBag result = sampler.exec(input);
-   
-    verifyNoRepeatAllFound(result, 10, 0, 10); 
+
+    verifyNoRepeatAllFound(result, 10, 0, 10);
 
     Set<Integer> found = new HashSet<Integer>();
     for (Tuple t : result)
@@ -297,7 +297,7 @@ public class WeightedReservoirSamplingTests extends PigTests
   {
     PigTest test = createPigTestFromString(weightedSampleTest);
 
-    writeLinesToFile("input",  
+    writeLinesToFile("input",
                 "a\t100","b\t1","c\t0","d\t2");
     try {
          test.runScript();
@@ -307,28 +307,28 @@ public class WeightedReservoirSamplingTests extends PigTests
     }
   }
 
- /** 
-   
- 
-  define WeightedSample datafu.pig.sampling.WeightedReservoirSample('1','1'); 
+ /**
+
+
+  define WeightedSample datafu.pig.sampling.WeightedReservoirSample('1','1');
 
   data = LOAD 'input' AS (v1:chararray);
   data_g = group data all;
   sampled = FOREACH data_g GENERATE WeightedSample(data);
-  describe sampled; 
-   
-  STORE sampled INTO 'output'; 
- 
-  */ 
-  @Multiline 
-  private String invalidInputTupleSizeTest; 
- 
+  describe sampled;
+
+  STORE sampled INTO 'output';
+
+  */
+  @Multiline
+  private String invalidInputTupleSizeTest;
+
   @Test
   public void invalidInputTupleSizeTest() throws Exception
   {
     PigTest test = createPigTestFromString(invalidInputTupleSizeTest);
 
-    writeLinesToFile("input",  
+    writeLinesToFile("input",
                 "a","b","c","d");
     try {
          test.runScript();
@@ -339,28 +339,28 @@ public class WeightedReservoirSamplingTests extends PigTests
     }
   }
 
- /** 
-   
- 
-  define WeightedSample datafu.pig.sampling.WeightedReservoirSample('1','0'); 
+ /**
+
+
+  define WeightedSample datafu.pig.sampling.WeightedReservoirSample('1','0');
 
   data = LOAD 'input' AS (v1:chararray, v2:INT);
   data_g = group data all;
   sampled = FOREACH data_g GENERATE WeightedSample(data);
-  describe sampled; 
-   
-  STORE sampled INTO 'output'; 
- 
-  */ 
-  @Multiline 
-  private String invalidWeightFieldSchemaTest; 
- 
+  describe sampled;
+
+  STORE sampled INTO 'output';
+
+  */
+  @Multiline
+  private String invalidWeightFieldSchemaTest;
+
   @Test
   public void invalidWeightFieldSchemaTest() throws Exception
   {
     PigTest test = createPigTestFromString(invalidWeightFieldSchemaTest);
 
-    writeLinesToFile("input",  
+    writeLinesToFile("input",
                 "a\t100","b\t1","c\t5","d\t2");
     try {
          test.runScript();

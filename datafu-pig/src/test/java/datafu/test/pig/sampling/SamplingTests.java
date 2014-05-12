@@ -47,69 +47,69 @@ import datafu.test.pig.PigTests;
 public class SamplingTests extends PigTests
 {
   /**
-  
+
 
   define WeightedSample datafu.pig.sampling.WeightedSample('1');
-  
+
   data = LOAD 'input' AS (A: bag {T: tuple(v1:chararray,v2:INT)});
-  
+
   data2 = FOREACH data GENERATE WeightedSample(A,1);
   --describe data2;
-  
+
   STORE data2 INTO 'output';
 
    */
   @Multiline
   private String weightedSampleTest;
-  
+
   @Test
   public void weightedSampleTest() throws Exception
   {
     PigTest test = createPigTestFromString(weightedSampleTest);
 
-    writeLinesToFile("input", 
+    writeLinesToFile("input",
                      "({(a, 100),(b, 1),(c, 5),(d, 2)})");
-                  
+
     test.runScript();
-            
+
     assertOutput(test, "data2",
         "({(a,100),(c,5),(b,1),(d,2)})");
   }
-  
+
   /**
-  
+
 
   define WeightedSample datafu.pig.sampling.WeightedSample('1');
-  
+
   data = LOAD 'input' AS (A: bag {T: tuple(v1:chararray,v2:INT)});
-  
+
   data2 = FOREACH data GENERATE WeightedSample(A,1,3);
   --describe data2;
-  
+
   STORE data2 INTO 'output';
    */
   @Multiline
   private String weightedSampleLimitTest;
-  
+
   @Test
   public void weightedSampleLimitTest() throws Exception
   {
     PigTest test = createPigTestFromString(weightedSampleLimitTest);
 
-    writeLinesToFile("input", 
+    writeLinesToFile("input",
                      "({(a, 100),(b, 1),(c, 5),(d, 2)})");
-                  
+
     test.runScript();
-            
+
     assertOutput(test, "data2",
         "({(a,100),(c,5),(b,1)})");
   }
-  
+
   @Test
   public void weightedSampleLimitExecTest() throws IOException
   {
     WeightedSample sampler = new WeightedSample();
-    
+
     DataBag bag = BagFactory.getInstance().newDefaultBag();
     for (int i=0; i<100; i++)
     {
@@ -118,16 +118,16 @@ public class SamplingTests extends PigTests
       t.set(1, 1); // score is equal for all
       bag.add(t);
     }
-    
+
     Tuple input = TupleFactory.getInstance().newTuple(3);
     input.set(0, bag);
     input.set(1, 1); // use index 1 for score
     input.set(2, 10); // get 10 items
-    
+
     DataBag result = sampler.exec(input);
-    
+
     Assert.assertEquals(10, result.size());
-    
+
     // all must be found, no repeats
     Set<Integer> found = new HashSet<Integer>();
     for (Tuple t : result)
@@ -139,26 +139,26 @@ public class SamplingTests extends PigTests
       found.add(i);
     }
   }
-  
+
   /**
-  
-  
+
+
   DEFINE SampleByKey datafu.pig.sampling.SampleByKey('0.5', 'salt2.5');
-  
+
   data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
   sampled = FILTER data BY SampleByKey(A_id);
-  
+
   STORE sampled INTO 'output';
 
    */
   @Multiline
   private String sampleByKeyTest;
-  
+
   @Test
   public void sampleByKeyTest() throws Exception
   {
     PigTest test = createPigTestFromString(sampleByKeyTest);
-    
+
     writeLinesToFile("input",
                      "A1\tB1\t1","A1\tB1\t4","A1\tB3\t4","A1\tB4\t4",
                      "A2\tB1\t4","A2\tB2\t4",
@@ -170,9 +170,9 @@ public class SamplingTests extends PigTests
                      "A8\tB1\t4","A8\tB2\t45",
                      "A9\tB3\t92", "A9\tB1\t42","A9\tB2\t1","A9\tB3\t0",
                      "A10\tB1\t7","A10\tB2\t23","A10\tB3\t1","A10\tB4\t41","A10\tB5\t52");
-    
+
     test.runScript();
-    assertOutput(test, "sampled", 
+    assertOutput(test, "sampled",
                  "(A4,B1,3)","(A4,B2,3)","(A4,B3,59)","(A4,B4,29)",
                  "(A5,B1,4)",
                  "(A6,B2,3)","(A6,B2,55)","(A6,B3,1)",
@@ -181,24 +181,24 @@ public class SamplingTests extends PigTests
   }
 
   /**
-  
-  
+
+
   DEFINE SampleByKey datafu.pig.sampling.SampleByKey('0.5', 'salt2.5');
-  
+
   data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
   sampled = FILTER data BY SampleByKey(A_id, B_id);
-  
+
   STORE sampled INTO 'output';
 
    */
   @Multiline
   private String sampleByKeyMultipleKeyTest;
-  
+
   @Test
   public void sampleByKeyMultipleKeyTest() throws Exception
   {
     PigTest test = createPigTestFromString(sampleByKeyMultipleKeyTest);
-    
+
     writeLinesToFile("input",
                      "A1\tB1\t1","A1\tB1\t4",
                      "A1\tB3\t4",
@@ -226,7 +226,7 @@ public class SamplingTests extends PigTests
                      "A10\tB6\t41",
                      "A10\tB7\t52");
     test.runScript();
-    assertOutput(test, "sampled", 
+    assertOutput(test, "sampled",
                  "(A1,B1,1)","(A1,B1,4)",
                  "(A1,B4,4)",
                  "(A2,B1,4)",
@@ -240,16 +240,16 @@ public class SamplingTests extends PigTests
                  "(A9,B3,92)","(A9,B3,0)",
                  "(A10,B2,23)","(A10,B2,1)","(A10,B2,31)"
                  );
-                   
+
   }
-  
+
   @Test
   public void sampleByKeyExecTest() throws Exception
   {
     SampleByKey sampler = new SampleByKey("0.10", "thesalt");
-    
+
     Map<Integer,Integer> valuesPerKey = new HashMap<Integer,Integer>();
-    
+
     // 10,000 keys total
     for (int i=0; i<10000; i++)
     {
@@ -259,7 +259,7 @@ public class SamplingTests extends PigTests
         Tuple t = TupleFactory.getInstance().newTuple(1);
         t.set(0, i);
         if (sampler.exec(t))
-        {          
+        {
           if (valuesPerKey.containsKey(i))
           {
             valuesPerKey.put(i, valuesPerKey.get(i)+1);
@@ -271,22 +271,22 @@ public class SamplingTests extends PigTests
         }
       }
     }
-    
+
     // 10% sample, so should have roughly 1000 keys
     Assert.assertTrue(Math.abs(1000-valuesPerKey.size()) < 50);
-    
+
     // every value should be present for the same key
     for (Map.Entry<Integer, Integer> pair : valuesPerKey.entrySet())
     {
       Assert.assertEquals(5, pair.getValue().intValue());
     }
   }
-  
+
   /**
-  
+
 
   DEFINE ReservoirSample datafu.pig.sampling.ReservoirSample('$RESERVOIR_SIZE');
-  
+
   data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
   sampled = FOREACH (GROUP data ALL) GENERATE ReservoirSample(data) as sample_data;
   sampled = FOREACH sampled GENERATE COUNT(sample_data) AS sample_count;
@@ -295,11 +295,11 @@ public class SamplingTests extends PigTests
    */
   @Multiline
   private String reservoirSampleTest;
-  
+
   @Test
   public void reservoirSampleTest() throws Exception
   {
-    
+
     writeLinesToFile("input",
                      "A1\tB1\t1",
                      "A1\tB1\t4",
@@ -333,7 +333,7 @@ public class SamplingTests extends PigTests
                      "A10\tB2\t31",
                      "A10\tB6\t41",
                      "A10\tB7\t52");
-   
+
     for(int i=10; i<=30; i=i+10){
       int reservoirSize = i ;
       PigTest test = createPigTestFromString(reservoirSampleTest, "RESERVOIR_SIZE="+reservoirSize);
@@ -341,36 +341,36 @@ public class SamplingTests extends PigTests
       assertOutput(test, "sampled", "("+reservoirSize+")");
     }
   }
-  
+
   /**
-  
+
 
   DEFINE ReservoirSample datafu.pig.sampling.ReservoirSample('$RESERVOIR_SIZE');
-  DEFINE Assert datafu.pig.util.Assert();
-  
+  DEFINE AssertUDF datafu.pig.util.AssertUDF();
+
   data = LOAD 'input' AS (A_id:int, B_id:chararray, C:int);
   sampled = FOREACH (GROUP data BY A_id) GENERATE group as A_id, ReservoirSample(data.(B_id,C)) as sample_data;
-  sampled = FILTER sampled BY Assert((SIZE(sample_data) <= $RESERVOIR_SIZE ? 1 : 0), 'must be <= $RESERVOIR_SIZE');
+  sampled = FILTER sampled BY AssertUDF((SIZE(sample_data) <= $RESERVOIR_SIZE ? 1 : 0), 'must be <= $RESERVOIR_SIZE');
   sampled = FOREACH sampled GENERATE A_id, FLATTEN(sample_data);
   STORE sampled INTO 'output';
 
    */
   @Multiline
   private String reservoirSampleGroupTest;
-  
+
   /**
    * Verifies that ReservoirSample works when data grouped by a key.
    * In particular it ensures that the reservoir is not reused across keys.
-   * 
+   *
    * <p>
    * This confirms the fix for DATAFU-11.
    * </p>
-   * 
+   *
    * @throws Exception
    */
   @Test
   public void reservoirSampleGroupTest() throws Exception
-  {    
+  {
     // first value is the key.  last value matches the key so we can
     // verify the register is reset for each key.  values should not
     // bleed across to other keys.
@@ -407,26 +407,26 @@ public class SamplingTests extends PigTests
                      "10\tB2\t10",
                      "10\tB6\t10",
                      "10\tB7\t10");
-   
+
     for(int i=1; i<=3; i++) {
       int reservoirSize = i ;
       PigTest test = createPigTestFromString(reservoirSampleGroupTest, "RESERVOIR_SIZE="+reservoirSize);
       test.runScript();
-      
+
       List<Tuple> tuples = getLinesForAlias(test, "sampled");
-      
+
       for (Tuple tuple : tuples)
       {
         Assert.assertEquals(((Number)tuple.get(0)).intValue(), ((Number)tuple.get(2)).intValue());
       }
     }
   }
-  
+
   @Test
   public void reservoirSampleExecTest() throws IOException
   {
     ReservoirSample sampler = new ReservoirSample("10");
-    
+
     DataBag bag = BagFactory.getInstance().newDefaultBag();
     for (int i=0; i<100; i++)
     {
@@ -434,13 +434,13 @@ public class SamplingTests extends PigTests
       t.set(0, i);
       bag.add(t);
     }
-    
+
     Tuple input = TupleFactory.getInstance().newTuple(bag);
-    
+
     DataBag result = sampler.exec(input);
-    
+
     Assert.assertEquals(10, result.size());
-    
+
     // all must be found, no repeats
     Set<Integer> found = new HashSet<Integer>();
     for (Tuple t : result)
@@ -452,12 +452,12 @@ public class SamplingTests extends PigTests
       found.add(i);
     }
   }
-  
+
   @Test
   public void reservoirSampleAccumulateTest() throws IOException
   {
     ReservoirSample sampler = new ReservoirSample("10");
-    
+
     for (int i=0; i<100; i++)
     {
       Tuple t = TupleFactory.getInstance().newTuple(1);
@@ -467,11 +467,11 @@ public class SamplingTests extends PigTests
       Tuple input = TupleFactory.getInstance().newTuple(bag);
       sampler.accumulate(input);
     }
-        
+
     DataBag result = sampler.getValue();
-    
+
     Assert.assertEquals(10, result.size());
-    
+
     // all must be found, no repeats
     Set<Integer> found = new HashSet<Integer>();
     for (Tuple t : result)
@@ -483,14 +483,14 @@ public class SamplingTests extends PigTests
       found.add(i);
     }
   }
-  
+
   @Test
   public void reservoirSampleAlgebraicTest() throws IOException
   {
     ReservoirSample.Initial initialSampler = new ReservoirSample.Initial("10");
     ReservoirSample.Intermediate intermediateSampler = new ReservoirSample.Intermediate("10");
     ReservoirSample.Final finalSampler = new ReservoirSample.Final("10");
-    
+
     DataBag bag = BagFactory.getInstance().newDefaultBag();
     for (int i=0; i<100; i++)
     {
@@ -498,17 +498,17 @@ public class SamplingTests extends PigTests
       t.set(0, i);
       bag.add(t);
     }
-    
+
     Tuple input = TupleFactory.getInstance().newTuple(bag);
-    
-    Tuple intermediateTuple = initialSampler.exec(input);  
+
+    Tuple intermediateTuple = initialSampler.exec(input);
     DataBag intermediateBag = BagFactory.getInstance().newDefaultBag(Arrays.asList(intermediateTuple));
-    intermediateTuple = intermediateSampler.exec(TupleFactory.getInstance().newTuple(intermediateBag));  
+    intermediateTuple = intermediateSampler.exec(TupleFactory.getInstance().newTuple(intermediateBag));
     intermediateBag = BagFactory.getInstance().newDefaultBag(Arrays.asList(intermediateTuple));
     DataBag result = finalSampler.exec(TupleFactory.getInstance().newTuple(intermediateBag));
-    
+
     Assert.assertEquals(10, result.size());
-    
+
     // all must be found, no repeats
     Set<Integer> found = new HashSet<Integer>();
     for (Tuple t : result)

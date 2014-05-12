@@ -168,7 +168,7 @@ public class LSHPigTest extends PigTests
  describe NEAR_NEIGHBORS;
   NEIGHBORS_PROJ = foreach NEAR_NEIGHBORS {
    
-   generate query_pt as query_pt, neighbor.pt as matching_pts;
+   generate TOTUPLE(query_pt) as query_pt, neighbor.pt as matching_pts;
   };
   describe NEIGHBORS_PROJ;
   NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) > 0;
