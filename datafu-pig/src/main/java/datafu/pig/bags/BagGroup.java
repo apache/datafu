@@ -40,22 +40,45 @@ import datafu.pig.util.AliasableEvalFunc;
 
 /**
  * Performs an in-memory group operation on a bag.  The first argument is the bag.
- * The second argument is a projection of that bag to the group keys.
+ * The second argument is a projection of that bag to the keys to group by.
  *
  * <p>
- * Example:
- * <code>
+ * The following example groups input_bag by k.  The output is a bag having tuples
+ * consisting of the group key k and a bag with the corresponding (k,v) tuples from input_bag
+ * for that key.
+ * <pre>
+ * {@code
  * define BagGroup datafu.pig.bags.BagGroup();
- * 
+ *
  * data = LOAD 'input' AS (input_bag: bag {T: tuple(k: int, v: chararray)});
  * -- ({(1,A),(1,B),(2,A),(2,B),(2,C),(3,A)})
- * 
+ *
+ * -- Group input_bag by k
  * data2 = FOREACH data GENERATE BagGroup(input_bag, input_bag.(k)) as grouped;
  * -- data2: {grouped: {(group: int,input_bag: {T: (k: int,v: chararray)})}}
  * -- ({(1,{(1,A),(1,B)}),(2,{(2,A),(2,B),(2,C)}),(3,{(3,A)})})
- * </code>
+ * }
+ * </pre>
  * </p>
- * 
+ *
+ * <p>
+ * If the key k is not needed within the input_bag for the output, it can be projected
+ * out like so:
+ * <pre>
+ * {@code
+ *
+ * data3 = FOREACH data2 {
+ *   -- project only the value
+ *   projected = FOREACH grouped GENERATE group, input_bag.(v);
+ *   GENERATE projected as grouped;
+ * }
+ *
+ * -- data3: {grouped: {(group: int,input_bag: {T: (k: int,v: chararray)})}}
+ * -- ({(1,{(A),(B)}),(2,{(A),(B),(C)}),(3,{(A)})})
+ * }
+ * </pre>
+ * </p>
+ *
  * @author wvaughan
  *
  */
@@ -63,14 +86,14 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
 {
   private final String FIELD_NAMES_PROPERTY = "FIELD_NAMES";
   private List<String> fieldNames;
-  
+
   @Override
   public Schema getOutputSchema(Schema input)
   {
     try {
       if (input.size() != 2) {
         throw new RuntimeException(String.format("Expected input of format (BAG, PROJECTED_BAG...). Got %d field.", input.size()));
-      }      
+      }
       // Expect the first field to be a bag
       FieldSchema bagFieldSchema = input.getField(0);
       if (bagFieldSchema.type != DataType.BAG) {
@@ -81,7 +104,7 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
       if (projectedBagFieldSchema.type != DataType.BAG) {
         throw new RuntimeException(String.format("Expected input of format (BAG, PROJECTED_BAG...). Got %s as second field.", DataType.findTypeName(projectedBagFieldSchema.type)));
       }
-      
+
       String bagName = bagFieldSchema.alias;
       // handle named tuples
       if (bagFieldSchema.schema.size() == 1) {
@@ -89,14 +112,14 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
         if (bagTupleFieldSchema.type == DataType.TUPLE && bagTupleFieldSchema.alias != null) {
           bagName = getPrefixedAliasName(bagName, bagTupleFieldSchema.alias);
         }
-      }      
+      }
       if (projectedBagFieldSchema.schema.size() == 1) {
         FieldSchema projectedBagTupleFieldSchema = projectedBagFieldSchema.schema.getField(0);
         if (projectedBagTupleFieldSchema.type == DataType.TUPLE && projectedBagTupleFieldSchema.schema != null) {
           projectedBagFieldSchema = projectedBagTupleFieldSchema;
         }
       }
-      
+
       // create the output schema for the 'group'
       // store the field names for the group keys
       Schema groupTupleSchema = new Schema();
@@ -108,7 +131,7 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
         groupTupleSchema.add(new FieldSchema(fieldSchema.alias, fieldSchema.type));
       }
       getInstanceProperties().put(FIELD_NAMES_PROPERTY, fieldNames);
-      
+
       Schema outputTupleSchema = new Schema();
       if (projectedBagFieldSchema.schema.size() > 1) {
         // multiple group keys
@@ -117,17 +140,17 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
         // single group key
         outputTupleSchema.add(new FieldSchema("group", groupTupleSchema.getField(0).type));
       }
-      outputTupleSchema.add(bagFieldSchema);      
-      
+      outputTupleSchema.add(bagFieldSchema);
+
       return new Schema(new Schema.FieldSchema(
             getSchemaName(this.getClass().getName().toLowerCase(), input),
-            outputTupleSchema, 
+            outputTupleSchema,
             DataType.BAG));
     } catch (FrontendException e) {
       throw new RuntimeException(e);
     }
   }
-  
+
   TupleFactory tupleFactory = TupleFactory.getInstance();
   BagFactory bagFactory = BagFactory.getInstance();
 
@@ -137,20 +160,20 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
   {
     Map<Tuple, List<Tuple>> groups = new HashMap<Tuple, List<Tuple>>();
     fieldNames = (List<String>)getInstanceProperties().get(FIELD_NAMES_PROPERTY);
-    
-    DataBag inputBag = (DataBag)input.get(0);    
-    
+
+    DataBag inputBag = (DataBag)input.get(0);
+
     for (Tuple tuple : inputBag) {
       Tuple key = extractKey(tuple);
       addGroup(groups, key, tuple);
     }
-    
+
     DataBag outputBag = bagFactory.newDefaultBag();
     for (Tuple key : groups.keySet()) {
       Tuple outputTuple = tupleFactory.newTuple();
       if (fieldNames.size() > 1) {
         outputTuple.append(key);
-      } else {        
+      } else {
         outputTuple.append(key.get(0));
       }
       DataBag groupBag = bagFactory.newDefaultBag();
@@ -160,10 +183,10 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
       outputTuple.append(groupBag);
       outputBag.add(outputTuple);
     }
-    
+
     return outputBag;
   }
-  
+
   private Tuple extractKey(Tuple tuple) throws ExecException {
     Tuple key = tupleFactory.newTuple();
     for (String field : fieldNames) {
@@ -171,7 +194,7 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
     }
     return key;
   }
-  
+
   private void addGroup (Map<Tuple, List<Tuple>> groups, Tuple key, Tuple value) {
     if (!groups.containsKey(key)) {
       groups.put(key, new LinkedList<Tuple>());

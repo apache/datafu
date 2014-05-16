@@ -71,6 +71,47 @@ input = LOAD 'input' AS (A: bag{T: tuple(bag{T2: tuple(v:INT)})});
 output = FOREACH input GENERATE BagConcat(A);
 ```
 
+### Grouping Within a Bag
+
+Pig has a `GROUP` operation that can be applied to a relation.  It produces a new relation where the input
+tuples are grouped by a particular key.  A bag in the relation contains the grouped tuples for that key.  The key
+is represented by a `group` parameter.
+
+[BagGroup](/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagGroup.html) mimics the `GROUP`
+operation from Pig.  The difference between them is that `BagGroup` operates within a bag, rather than on a relation.
+This can be useful when operating on bags that are not very large in size.  We can operate on the tuples within
+this bag without involving `GROUP`, which would result in another MapReduce job.  With `BagGroup` we can avoid this.
+
+In the following example we take an `input_bag` consisting of key-value pairs `(k,v)` and group the tuples by `k`.
+This produces a new bag having tuples consisting of `group` and `input_bag`.  The `group` corresponds to the grouping
+key `k`.  The `input_bag` is a bag containing the tuples from the original `input_bag` that have the same `k` as `group`.
+
+```pig
+ define BagGroup datafu.pig.bags.BagGroup();
+ 
+ data = LOAD 'input' AS (input_bag: bag {T: tuple(k: int, v: chararray)});
+ -- ({(1,A),(1,B),(2,A),(2,B),(2,C),(3,A)})
+ 
+ -- Group input_bag by k
+ data2 = FOREACH data GENERATE BagGroup(input_bag, input_bag.(k)) as grouped;
+ -- data2: {grouped: {(group: int,input_bag: {T: (k: int,v: chararray)})}}
+ -- ({(1,{(1,A),(1,B)}),(2,{(2,A),(2,B),(2,C)}),(3,{(3,A)})})
+```
+
+We could also project out the key from the final `input_bag` using a nested `FOREACH` so that the bag only
+consists of the value `v`:
+
+```pig
+data3 = FOREACH data2 {
+  -- project only the value
+  projected = FOREACH grouped GENERATE group, input_bag.(v);
+  GENERATE projected as grouped;
+}
+
+-- data3: {grouped: {(group: int,input_bag: {T: (k: int,v: chararray)})}}
+-- ({(1,{(A),(B)}),(2,{(A),(B),(C)}),(3,{(A)})})
+```
+
 ### Append to Bag
 
 [AppendToBag](/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/AppendToBag.html) can be
