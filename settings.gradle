@@ -1,1 +1,1 @@
-include "build-plugin","datafu-pig"
+include "build-plugin","datafu-pig","datafu-hourglass"

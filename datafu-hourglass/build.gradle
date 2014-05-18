@@ -1,0 +1,123 @@
+apply plugin: 'java'
+apply plugin: 'license'
+apply plugin: 'maven-publish'
+
+import groovy.xml.MarkupBuilder
+
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+  dependencies {
+  }
+}
+
+cleanEclipse { 
+  doLast { 
+    delete ".apt_generated"
+    delete ".settings"
+    delete ".factorypath"
+    delete "bin"
+  }
+}
+
+task sourcesJar(type: Jar) {
+  description 'Creates the sources jar'
+
+  classifier = 'sources'
+  from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  description 'Creates the javadoc jar'
+
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+artifacts {
+  archives sourcesJar
+  archives javadocJar
+  archives jar
+}
+
+// Note: alternate way to publish: https://github.com/Netflix/gradle-template
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifact sourcesJar
+      artifact javadocJar
+      artifact jar
+
+      pom.withXml {
+        asNode().appendNode("packaging","jar")
+        asNode().appendNode("name","Apache DataFu Hourglass")        
+        asNode().appendNode("description","A framework for incrementally processing data in Hadoop.")
+        asNode().appendNode("url","http://datafu.incubator.apache.org/")
+
+        def licenseNode = asNode().appendNode("licenses").appendNode("license")
+        licenseNode.appendNode("name","The Apache Software License, Version 2.0")
+        licenseNode.appendNode("url","http://www.apache.org/licenses/LICENSE-2.0.txt")
+        licenseNode.appendNode("distribution","repo")
+
+        def dependenciesNode = asNode().appendNode("dependencies")
+        def dependency = dependenciesNode.appendNode("dependency")
+        dependency.appendNode("groupId","log4j")
+        dependency.appendNode("artifactId","log4j")
+        dependency.appendNode("version","$log4jVersion")
+
+        dependency = dependenciesNode.appendNode("dependency")
+        dependency.appendNode("groupId","org.apache.avro")
+        dependency.appendNode("artifactId","avro")
+        dependency.appendNode("version","$avroVersion")
+
+        dependency = dependenciesNode.appendNode("dependency")
+        dependency.appendNode("groupId","org.apache.avro")
+        dependency.appendNode("artifactId","avro-mapred")
+        dependency.appendNode("version","$avroVersion")
+
+        dependency = dependenciesNode.appendNode("dependency")
+        dependency.appendNode("groupId","org.apache.avro")
+        dependency.appendNode("artifactId","avro-compiler")
+        dependency.appendNode("version","$avroVersion")
+      }
+    }
+  }
+}
+
+// create tasks to automatically add the license header
+license {
+  header rootProject.file('HEADER')
+  skipExistingHeaders = true
+}
+
+dependencies {
+  // core dependencies, listed as dependencies in pom
+  compile "log4j:log4j:$log4jVersion"
+  compile "org.json:json:$jsonVersion"
+  compile "org.apache.avro:avro:$avroVersion"
+  compile "org.apache.avro:avro-mapred:$avroVersion"
+  compile "org.apache.avro:avro-compiler:$avroVersion"
+
+  // needed for compilation and testing, not listed as a dependencies in pom
+  compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+  compile "org.apache.hadoop:hadoop-tools:$hadoopVersion"
+
+  // needed for testing, not listed as a dependencies in pom
+  testCompile "org.apache.hadoop:hadoop-test:$hadoopVersion"
+  testCompile "com.clearspring.analytics:stream:$streamVersion"
+  testCompile "javax.ws.rs:jsr311-api:$jsr311Version"
+  testCompile "org.slf4j:slf4j-log4j12:$slf4jVersion"
+  testCompile "commons-io:commons-io:$commonsIoVersion"
+  testCompile "org.apache.avro:avro-tools:$avroVersion"
+  testCompile "org.testng:testng:$testngVersion"
+}
+
+
+test {
+  // enable TestNG support (default is JUnit)
+  useTestNG()
+
+  maxHeapSize = "2G"
+}

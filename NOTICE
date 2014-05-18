@@ -14,3 +14,9 @@ This product includes/uses stream (https://github.com/addthis/stream-lib), licen
 This product includes/uses jsr-305 (http://code.google.com/p/jsr-305/), licensed under BSD.
 
 This product includes/uses StreamingQuantile, copyright Cloudera (http://cloudera.com), licensed under Apache 2.
+
+This product includes/uses log4j (http://logging.apache.org/log4j/), licensed under Apache 2.
+
+This product includes/uses json (http://json.org/), licensed under The JSON License (http://json.org/license.html).
+
+This product includes/uses avro (http://avro.apache.org/), licensed under Apache 2.
