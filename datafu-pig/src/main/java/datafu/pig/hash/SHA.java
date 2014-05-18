@@ -27,6 +27,7 @@ import datafu.pig.util.SimpleEvalFunc;
 
 public class SHA extends SimpleEvalFunc<String> {
 	private final MessageDigest sha;
+	private final String        hex_format;
 
 	public SHA(){
 		this("256");
@@ -38,9 +39,16 @@ public class SHA extends SimpleEvalFunc<String> {
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
 		}
-	}
+        if      (algorithm.equals(  "1")) { hex_format =  "%040x"; }
+        else if (algorithm.equals("256")) { hex_format =  "%064x"; }
+        else if (algorithm.equals("384")) { hex_format =  "%096x"; }
+        else if (algorithm.equals("512")) { hex_format = "%0128x"; }
+        else { throw new RuntimeException("Don't know how to format output for SHA-"+algorithm); }
+    }
+
 	
 	public String call(String value){
-		return new BigInteger(1, sha.digest(value.getBytes())).toString(16);
+        return String.format(hex_format,
+                             new BigInteger(1, sha.digest(value.getBytes())));
 	}
 }

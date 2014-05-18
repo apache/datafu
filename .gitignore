@@ -22,3 +22,4 @@ pigunit-input-overriden.txt
 *.iml
 .idea
 .DS_Store
+datafu-pig/input*

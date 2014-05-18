@@ -72,7 +72,8 @@ public class MD5 extends SimpleEvalFunc<String>
     }
     else
     {
-      return new BigInteger(1, md5er.digest(val.getBytes())).toString(16);
+      return String.format("%032x",
+                           new BigInteger(1, md5er.digest(val.getBytes())));
     }
   }
 }
