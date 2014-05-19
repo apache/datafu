@@ -1,14 +1,16 @@
-REGISTER datafu-0.0.6.jar;
+REGISTER '../../datafu-pig/build/libs/datafu-pig-1.2.1.jar';
 
-define Quartile datafu.pig.stats.Quantile('0.0','0.25','0.5','0.75','1.0');
+define ExactQuartile datafu.pig.stats.Quantile('0.0','0.25','0.5','0.75','1.0');
  
-temperature = LOAD 'temperature.txt' AS (id:chararray, temp:double);
- 
+temperature = LOAD 'temperature.tsv' AS (id:chararray, temp:double);
 temperature = GROUP temperature BY id;
  
-temperature_quartiles = FOREACH temperature {
-  sorted = ORDER temperature by temp; -- must be sorted
-  GENERATE group as id, Quartile(sorted.temp) as quartiles;
-}
+quartiles_slow = FOREACH temperature {
+  -- sort is necessary, because exact
+  sorted = ORDER temperature by temp;
+  GENERATE group as id, COUNT_STAR(temperature) AS n_recs, ExactQuartile(sorted.temp) AS qvals:tuple(q0,q1,q2,q3,q4);
+};
+DESCRIBE quartiles_slow;
  
-DUMP temperature_quartiles
+rmf                        /tmp/quartiles-exact;
+STORE quartiles_slow INTO '/tmp/quartiles-exact';

@@ -1,8 +1,5 @@
-REGISTER piggybank.jar;
-REGISTER datafu-0.0.6.jar;
-REGISTER guava-13.0.1.jar; -- needed by StreamingQuantile
+REGISTER           '../../datafu-pig/build/libs/datafu-pig-1.2.1.jar';
  
-DEFINE UnixToISO   org.apache.pig.piggybank.evaluation.datetime.convert.UnixToISO();
 DEFINE Sessionize  datafu.pig.sessions.Sessionize('10m');
 DEFINE Median      datafu.pig.stats.Median();
 DEFINE Quantile    datafu.pig.stats.StreamingQuantile('0.75','0.90','0.95');
@@ -12,10 +9,10 @@ pv = LOAD 'clicks.csv' USING PigStorage(',') AS (memberId:int, time:long, url:ch
  
 pv = FOREACH pv
      -- Sessionize expects an ISO string
-     GENERATE UnixToISO(time) as isoTime,
+     GENERATE ToString(ToDate(time)) as isoTime,
               time,
               memberId;
- 
+
 pv_sessionized = FOREACH (GROUP pv BY memberId) {
   ordered = ORDER pv BY isoTime;
   GENERATE FLATTEN(Sessionize(ordered)) AS (isoTime, time, memberId, sessionId);
