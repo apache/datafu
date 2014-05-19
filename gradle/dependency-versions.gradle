@@ -5,7 +5,7 @@ ext {
   commonsMathVersion="2.2"
   commonsIoVersion="2.4"
   fastutilVersion="6.5.7"
-  guavaVersion="11.0"
+  guavaVersion="17.0"
   hadoopVersion="1.0.4"
   jodaTimeVersion="1.6"
   log4jVersion="1.2.17"
