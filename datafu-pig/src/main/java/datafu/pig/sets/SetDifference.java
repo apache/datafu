@@ -71,7 +71,7 @@ public class SetDifference extends SetOperationsBase
    * </p>
    *  
    * @param input
-   * @return
+   * @return priority queue ordered
    * @throws IOException
    */
   private PriorityQueue<Pair> loadBags(Tuple input) throws IOException

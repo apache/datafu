@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import org.apache.pig.EvalFunc;
+import datafu.pig.util.ContextualEvalFunc;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.impl.logicalLayer.FrontendException;
@@ -98,7 +98,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 */
 
-public abstract class SimpleEvalFunc<T> extends EvalFunc<T>
+public abstract class SimpleEvalFunc<T> extends ContextualEvalFunc<T>
 {
   // TODO Add support for other UDF types (e.g., FilterFunc)
   // TODO Algebraic EvalFuncs 

@@ -23,12 +23,15 @@ import java.util.Properties;
 
 import org.apache.pig.EvalFunc;
 import org.apache.pig.impl.util.UDFContext;
+import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
  * An abstract class which enables UDFs to store instance properties
  * on the front end which will be available on the back end.
- * For example, properties may be set in the call to outputSchema(),
- * which will be available when exec() is called.
+ *
+ * For example, you can override the onSchemaReady hook method to set properties
+ * at front-end (i.e. at launch time) which will be available when exec() is
+ * called (on the workers themselves.
  * 
  * @param <T>
  */
@@ -79,5 +82,37 @@ public abstract class ContextualEvalFunc<T> extends EvalFunc<T>
   
   private void setInstanceName(String instanceName) {
     this.instanceName = instanceName;
+  }
+
+  /**
+   * Hook method, called once the input and output schema are prepared.
+   *
+   * Subclasses may override to set properties on the front end (i.e. at script
+   * run time) that may be played with later (e.g. at execution time).
+   *
+   * Child classes must (a) call super.onReady(in_schema, out_schema) so
+   * that the hook chains, and (b) not mess with the schema.
+   *
+   * @param in_schema input schema
+   * @param out_schema output schema
+   */
+  protected void onReady(Schema in_schema, Schema out_schema)
+  {
+    /* ze goggles! zey do nussing! */
+  }
+
+  /**
+   * Override outputSchema only to add the onSchemaReady hook method. In all
+   * other respects delegates to the superclass outputSchema preparation.
+   *
+   * @param in_schema input schema
+   * @return call to super.outputSchema
+   */
+  @Override
+  public Schema outputSchema(Schema in_schema)
+  {
+    Schema out_schema = super.outputSchema(in_schema);
+    onReady(in_schema, out_schema);
+    return out_schema;
   }
 }
