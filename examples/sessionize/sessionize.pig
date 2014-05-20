@@ -8,14 +8,12 @@ DEFINE VAR         datafu.pig.stats.VAR();
 pv = LOAD 'clicks.csv' USING PigStorage(',') AS (memberId:int, time:long, url:chararray);
  
 pv = FOREACH pv
-     -- Sessionize expects an ISO string
-     GENERATE ToString(ToDate(time)) as isoTime,
-              time,
+     GENERATE time,
               memberId;
 
 pv_sessionized = FOREACH (GROUP pv BY memberId) {
-  ordered = ORDER pv BY isoTime;
-  GENERATE FLATTEN(Sessionize(ordered)) AS (isoTime, time, memberId, sessionId);
+  ordered = ORDER pv BY time;
+  GENERATE FLATTEN(Sessionize(ordered)) AS (time, memberId, sessionId);
 };
  
 pv_sessionized = FOREACH pv_sessionized GENERATE sessionId, time;

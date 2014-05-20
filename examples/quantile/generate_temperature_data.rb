@@ -7,7 +7,7 @@ sensors << {:id => 1, :mean => 60.0, :stdev => 5.0}
 sensors << {:id => 2, :mean => 50.0, :stdev => 10.0}
 sensors << {:id => 3, :mean => 40.0, :stdev => 3.0}
 
-File.open('temperature.txt','w') do |file|
+File.open('temperature.tsv','w') do |file|
   sensors.each do |sensor|
     id = sensor[:id]
     dist = Rubystats::NormalDistribution.new(sensor[:mean],sensor[:stdev])
