@@ -29,7 +29,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * An abstract class which enables UDFs to store instance properties
  * on the front end which will be available on the back end.
  *
- * For example, you can override the onSchemaReady hook method to set properties
+ * For example, you can override the onReady hook method to set properties
  * at front-end (i.e. at launch time) which will be available when exec() is
  * called (on the workers themselves.
  * 
@@ -102,7 +102,7 @@ public abstract class ContextualEvalFunc<T> extends EvalFunc<T>
   }
 
   /**
-   * Override outputSchema only to add the onSchemaReady hook method. In all
+   * Override outputSchema only to add the onReady hook method. In all
    * other respects delegates to the superclass outputSchema preparation.
    *
    * @param in_schema input schema
