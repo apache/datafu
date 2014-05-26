@@ -90,12 +90,12 @@ public abstract class AliasableEvalFunc<T> extends ContextualEvalFunc<T>
   }
   
   /**
-   * Hook to capture the input schema aliases
+   * A wrapper method which captures the schema and then calls getOutputSchema
    */
   @Override
-  public void onReady(Schema in_schema, Schema out_schema) {
-    storeFieldAliases(in_schema);
-    super.onReady(in_schema, out_schema);
+  public Schema outputSchema(Schema input) {
+    storeFieldAliases(input);
+    return getOutputSchema(input);
   }
   
   /**
