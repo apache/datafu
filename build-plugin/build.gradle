@@ -5,8 +5,8 @@ repositories {
 }
 
 dependencies {
-  compile files("../staticlibs/org.eclipse.jdt.core_3.8.3.v20130121-145325.jar")
-  compile files("../staticlibs/org.eclipse.jdt.compiler.apt_1.0.500.v20120522-1651.jar")
+  compile "org.eclipse.tycho:org.eclipse.jdt.compiler.apt:1.1.0.v20140509-1235"
+  compile "org.eclipse.jdt:core:3.3.0-v_771"
   compile files(getToolsJar())
 }
 

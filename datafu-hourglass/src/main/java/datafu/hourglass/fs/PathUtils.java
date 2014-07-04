@@ -314,8 +314,8 @@ public class PathUtils
    * Gets the root path for a path in the "yyyy/MM/dd" format.  This is part of the path preceding the
    * "yyyy/MM/dd" portion.
    * 
-   * @param path
-   * @return
+   * @param path in "yyyy/MM/dd" format
+   * @return root of input path
    */
   public static Path getNestedPathRoot(Path path)
   {
