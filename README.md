@@ -78,7 +78,7 @@ To run all the tests:
 To run tests for a single class, use the `test.single` property.  For example, to run only the QuantileTests:
 
 ```
-/gradlew :datafu-pig:test -Dtest.single=QuantileTests
+./gradlew :datafu-pig:test -Dtest.single=QuantileTests
 ```
 
 The tests can also be run from within eclipse.
