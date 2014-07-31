@@ -78,10 +78,10 @@ To run all the tests:
 To run tests for a single class, use the `test.single` property.  For example, to run only the QuantileTests:
 
 ```
-/gradlew :datafu-pig:test -Dtest.single=QuantileTests
+./gradlew :datafu-pig:test -Dtest.single=QuantileTests
 ```
 
-The tests can also be run from within eclipse.
+The tests can also be run from within eclipse.  Note that you may run out of heap when executing tests in Eclipse. To fix this adjust your heap settings for the TestNG plugin. Go to Eclipse->Preferences. Select TestNG->Run/Debug. Add "-Xmx1G" to the JVM args.
 
 ### DataFu Hourglass
 
