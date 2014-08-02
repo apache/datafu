@@ -60,7 +60,7 @@ public class DataFuException extends RuntimeException
   /**
    * Gets data relevant to this exception.
    * 
-   * @return data
+   * @return data the data relevant to this exception
    */
   public Object getData()
   {
@@ -70,7 +70,7 @@ public class DataFuException extends RuntimeException
   /**
    * Sets field aliases for a UDF which may be relevant to this exception.
    * 
-   * @param fieldAliases
+   * @param fieldAliases field aliases
    */
   public void setFieldAliases(Map<String, Integer> fieldAliases)
   {
@@ -79,7 +79,7 @@ public class DataFuException extends RuntimeException
 
   /**
    * Sets data relevant to this exception.
-   * @param data
+   * @param data data relevant to this exception
    */
   public void setData(Object data)
   {

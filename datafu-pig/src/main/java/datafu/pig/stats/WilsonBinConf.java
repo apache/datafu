@@ -35,13 +35,15 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 import datafu.pig.util.SimpleEvalFunc;
 
 /**
- * Computes the {@link <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval" target="_blank">Wilsonian binomial proportion confidence interval</a>}
+ * Computes the <a href="http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval" target="_blank">Wilsonian binomial proportion confidence interval</a>.
+ *
  * <p>
  * Constructor requires the confidence interval (alpha) parameter, and the
  * parameters are the number of positive (success) outcomes and the total
  * number of observations. The UDF returns the (lower,upper) confidence
- * interval. 
- * <p>
+ * interval.
+ * </p>
+ *
  * Example:
  * <pre>
  * {@code
@@ -54,7 +56,7 @@ import datafu.pig.util.SimpleEvalFunc;
  * quux = ORDER bar BY score DESC;
  * top = LIMIT quux 10;
  * }
- * </pre></p>
+ * </pre>
  */
 public class WilsonBinConf extends SimpleEvalFunc<Tuple>
 {
@@ -82,6 +84,7 @@ public class WilsonBinConf extends SimpleEvalFunc<Tuple>
    * @param x The number of positive (success) outcomes
    * @param n The number of observations
    * @return The (lower,upper) confidence interval
+   * @throws IOException IOException
    */
   public Tuple binconf(Long x, Long n) throws IOException
   {

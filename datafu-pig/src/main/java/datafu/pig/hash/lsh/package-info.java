@@ -18,6 +18,6 @@
  */
 
 /**
- * UDFs for {@link <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>}
+ * UDFs for <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>.
  */
 package datafu.pig.hash.lsh;

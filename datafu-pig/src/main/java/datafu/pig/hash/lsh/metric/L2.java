@@ -22,12 +22,14 @@ package datafu.pig.hash.lsh.metric;
 import org.apache.commons.math.linear.RealVector;
 /**
  * A UDF used to find a vector v in a bag such that for query point q, metric m and threshold t
- * m(v,q) < t.  In other words, find the first vector in the bag within a threshold distance away.
- * 
- *  It returns one of the tuples of the bag of vectors using {@link <a href="http://en.wikipedia.org/wiki/Lp_space" target="_blank">L2 distance</a>}, 
+ * m(v,q) &lt; t.  In other words, find the first vector in the bag within a threshold distance away.
+ *
+ * <p>
+ * It returns one of the tuples of the bag of vectors using <a href="http://en.wikipedia.org/wiki/Lp_space" target="_blank">L2 distance</a>, 
  * distance between two vectors.  This is otherwise known as
  * the Euclidean distance.
- * 
+ * </p>
+ *
  * @see datafu.pig.hash.lsh.L2PStableHash L2PStableHash for an example
  * @author cstella
  *
@@ -37,7 +39,7 @@ public class L2 extends MetricUDF {
   /**
    * Create a new L2 Metric UDF with a given dimension.
    * 
-   * @param sDim
+   * @param sDim dimension
    */
   public L2(String sDim) {
     super(sDim);

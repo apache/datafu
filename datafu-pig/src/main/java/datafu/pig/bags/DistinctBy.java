@@ -56,8 +56,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * -- ({(a,1),(b,2),(c,3),(d,4)})
  * } 
  * </pre>
- * 
- * @param map Any number of strings specifying field positions
  */
 public class DistinctBy extends AccumulatorEvalFunc<DataBag>
 {

@@ -23,12 +23,14 @@ import org.apache.commons.math.linear.RealVector;
 
 /**
  * A UDF used to find a vector v in a bag such that for query point q, metric m and threshold t
- * m(v,q) < t.  In other words, find the first vector in the bag within a threshold distance away.
- * 
- *  It returns one of the tuples of the bag of vectors using {@link <a href="http://en.wikipedia.org/wiki/Taxicab_geometry" target="_blank">L1 distance</a>}, 
+ * m(v,q) &lt; t.  In other words, find the first vector in the bag within a threshold distance away.
+ *
+ * <p>
+ * It returns one of the tuples of the bag of vectors using <a href="http://en.wikipedia.org/wiki/Taxicab_geometry" target="_blank">L1 distance</a>, 
  * distance between two vectors.  This is otherwise known as
  * the manhattan distance, taxicab distance or city block distance.
- * 
+ * </p>
+ *
  * @see datafu.pig.hash.lsh.L1PStableHash L1PStableHash for an example
  * @author cstella
  *
@@ -37,14 +39,14 @@ public class L1 extends MetricUDF {
 
   /**
    * Create a new L1 Metric UDF with a given dimension.
-   * 
-   * @param sDim
+   *
+   * @param sDim dimension
    */
   public L1(String sDim) {
     super(sDim);
-   
+
   }
-  
+
   public static double distance(RealVector v1, RealVector v2) {
     return v1.getL1Distance(v2);
   }

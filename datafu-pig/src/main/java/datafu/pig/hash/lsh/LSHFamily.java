@@ -48,7 +48,7 @@ public class LSHFamily {
   /**
    * Compute the family of k-hashes for a vector.
    * 
-   * @param vector
+   * @param vector the vector
    * @return An iterable of hashes
    */
   public Iterable<Long> apply(final RealVector vector) {

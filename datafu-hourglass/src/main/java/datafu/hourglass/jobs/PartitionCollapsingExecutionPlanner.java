@@ -197,7 +197,7 @@ public class PartitionCollapsingExecutionPlanner extends ExecutionPlanner
   /**
    * Create the execution plan.
    * 
-   * @throws IOException
+   * @throws IOException IOException
    */
   public void createPlan() throws IOException
   {

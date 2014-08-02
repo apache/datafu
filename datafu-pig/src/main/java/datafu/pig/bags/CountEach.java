@@ -34,8 +34,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
  * Generates a count of the number of times each distinct tuple appears in a bag.
- * 
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
@@ -55,7 +54,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * output_flatten = FOREACH input GENERATE CountEachFlatten(B);
  * } 
  * </pre>
- * </p>
  */
 public class CountEach extends AccumulatorEvalFunc<DataBag>
 {

@@ -55,7 +55,7 @@ public class PartitionCollapsingIncrementalJob extends AbstractPartitionCollapsi
    * Initializes the job.  The job name is derived from the name of a provided class.
    * 
    * @param cls class to base job name on
-   * @throws IOException
+   * @throws IOException IOException
    */
   public PartitionCollapsingIncrementalJob(@SuppressWarnings("rawtypes") Class cls) throws IOException
   {
@@ -113,7 +113,7 @@ public class PartitionCollapsingIncrementalJob extends AbstractPartitionCollapsi
   /**
    * Set the mapper.
    * 
-   * @param mapper
+   * @param mapper the mapper
    */
   public void setMapper(Mapper<GenericRecord,GenericRecord,GenericRecord> mapper)
   {
@@ -179,7 +179,7 @@ public class PartitionCollapsingIncrementalJob extends AbstractPartitionCollapsi
    * This is only needed when reusing previous output where the intermediate and output schemas are different.
    * New partial output is produced by the reducer from new input that is after the previous output.
    * 
-   * @param merger
+   * @param merger the merger
    */
   public void setMerger(Merger<GenericRecord> merger)
   {

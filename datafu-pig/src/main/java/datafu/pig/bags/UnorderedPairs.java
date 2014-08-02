@@ -33,23 +33,21 @@ import org.apache.pig.tools.pigstats.PigStatusReporter;
 
 /**
  * Generates pairs of all items in a bag.
- * 
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
  * define UnorderedPairs datafu.pig.bags.UnorderedPairs();
- * 
+ *
  * -- input:
  * -- ({(1),(2),(3),(4)})
  * input = LOAD 'input' AS (B: bag {T: tuple(v:INT)});
- * 
+ *
  * -- output:
  * -- ({((1),(2)),((1),(3)),((1),(4)),((2),(3)),((2),(4)),((3),(4))})
  * output = FOREACH input GENERATE UnorderedPairs(B);
- * } 
+ * }
  * </pre>
- * </p>
  */
 public class UnorderedPairs extends EvalFunc<DataBag>
 {

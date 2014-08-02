@@ -214,7 +214,7 @@ public class CollapsingReducer extends ObjectReducer implements DateRangeConfigu
   /**
    * Sets the Avro schemas.
    * 
-   * @param schemas
+   * @param schemas the schemas
    */
   public void setSchemas(PartitionCollapsingSchemas schemas)
   {
@@ -224,7 +224,7 @@ public class CollapsingReducer extends ObjectReducer implements DateRangeConfigu
   /**
    * Gets the Avro schemas.
    * 
-   * @return
+   * @return the schemas
    */
   private PartitionCollapsingSchemas getSchemas()
   {

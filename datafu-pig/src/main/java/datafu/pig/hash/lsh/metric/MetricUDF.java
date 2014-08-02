@@ -34,10 +34,12 @@ import datafu.pig.hash.lsh.util.DataTypeUtil;
 
 /**
  * A base UDF used to find a vector v in a bag such that for query point q, metric m and threshold t
- * m(v,q) < t.  In other words, find the first vector in the bag within a threshold distance away.
- * 
- *  It returns one of the tuples of the bag of vectors.  For an example of its use, please see datafu.pig.hash.lsh.CosineDistanceHash.
- * 
+ * m(v,q) &lt; t.  In other words, find the first vector in the bag within a threshold distance away.
+ *
+ * <p>
+ * It returns one of the tuples of the bag of vectors.  For an example of its use, please see datafu.pig.hash.lsh.CosineDistanceHash.
+ * </p>
+ *
  * @see datafu.pig.hash.lsh.CosineDistanceHash
  * @author cstella
  *
@@ -49,7 +51,7 @@ public abstract class MetricUDF extends EvalFunc<Tuple>
   /**
    * Create a new Metric UDF with a given dimension.
    * 
-   * @param sDim
+   * @param sDim dimension
    */
   public MetricUDF(String sDim)
   {
@@ -58,8 +60,8 @@ public abstract class MetricUDF extends EvalFunc<Tuple>
   
   /**
    * The distance metric used.  Given v1 and v2, compute the distance between those vectors.
-   * @param v1 vector
-   * @param v2 vector
+   * @param v1 first vector
+   * @param v2 second vector
    * @return the distance between v1 and v2
    */
   protected abstract double dist(RealVector v1, RealVector v2);
@@ -68,9 +70,11 @@ public abstract class MetricUDF extends EvalFunc<Tuple>
    * This UDF expects a query vector as the first element, a threshold (double) as the second, and a bag of vectors.
    * Vectors are represented by tuples with doubles as elements or bags of tuples representing position and value
    * in the case of sparse vectors.
-   * 
+   *
+   * <p>
    * It returns one of the tuples of the bag of vectors.  For an example of its use, please see datafu.pig.hash.lsh.CosineDistanceHash.
-   * 
+   * </p>
+   *
    * @see datafu.pig.hash.lsh.CosineDistanceHash
    */
   @Override
@@ -109,10 +113,10 @@ public abstract class MetricUDF extends EvalFunc<Tuple>
     }
     return null;
   }
-  
+
   /**
    * Create the output schema, based on the input schema.
-   * 
+   *
    * @return the output schema, which is a tuple matching the schema of the third input field.
    */
    public Schema outputSchema(Schema input) {
@@ -120,15 +124,14 @@ public abstract class MetricUDF extends EvalFunc<Tuple>
             validateInputSchema(input);
             FieldSchema fieldSchema = input.getField(2);
             return fieldSchema.schema;
-             
-          }catch (Exception e){
+          }catch (Exception e) {
                  throw new RuntimeException("Unable to create output schema", e);
           }
    }
-   
+
    /**
     * Validate the input schema to ensure that our input is consistent and that we fail fast.
-    * @param input
+    * @param input input schema
     * @throws FrontendException
     */
    private void validateInputSchema(Schema input) throws FrontendException
@@ -140,18 +143,18 @@ public abstract class MetricUDF extends EvalFunc<Tuple>
          throw new FrontendException("Invalid vector element: Expected either a tuple or a bag, but found " + vectorSchema);
        }
      }
-     
+
      {
        FieldSchema distanceSchema = input.getField(1);
-       if(distanceSchema.type != DataType.DOUBLE 
-       && distanceSchema.type != DataType.INTEGER 
-       && distanceSchema.type != DataType.LONG 
+       if(distanceSchema.type != DataType.DOUBLE
+       && distanceSchema.type != DataType.INTEGER
+       && distanceSchema.type != DataType.LONG
        )
        {
          throw new FrontendException("Invalid distance element: Expected a number, but found " + distanceSchema);
        }
      }
-     
+
      {
        FieldSchema pointsSchema = input.getField(2);
        if( pointsSchema.type != DataType.BAG)
@@ -166,5 +169,4 @@ public abstract class MetricUDF extends EvalFunc<Tuple>
        }
      }
    }
-   
 }

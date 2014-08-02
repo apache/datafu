@@ -145,7 +145,7 @@ public class PartitioningReducer extends ObjectReducer implements Serializable
   /**
    * Sets the Avro schemas.
    * 
-   * @param schemas
+   * @param schemas the schemas
    */
   public void setSchemas(PartitionPreservingSchemas schemas)
   {
@@ -155,7 +155,7 @@ public class PartitioningReducer extends ObjectReducer implements Serializable
   /**
    * Gets the Avro schemas
    * 
-   * @return schemas
+   * @return schemas the schemas
    */
   public PartitionPreservingSchemas getSchemas()
   {

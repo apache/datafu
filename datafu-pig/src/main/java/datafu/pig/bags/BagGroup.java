@@ -46,6 +46,8 @@ import datafu.pig.util.AliasableEvalFunc;
  * The following example groups input_bag by k.  The output is a bag having tuples
  * consisting of the group key k and a bag with the corresponding (k,v) tuples from input_bag
  * for that key.
+ * </p>
+ *
  * <pre>
  * {@code
  * define BagGroup datafu.pig.bags.BagGroup();
@@ -59,9 +61,7 @@ import datafu.pig.util.AliasableEvalFunc;
  * -- ({(1,{(1,A),(1,B)}),(2,{(2,A),(2,B),(2,C)}),(3,{(3,A)})})
  * }
  * </pre>
- * </p>
  *
- * <p>
  * If the key k is not needed within the input_bag for the output, it can be projected
  * out like so:
  * <pre>
@@ -77,7 +77,6 @@ import datafu.pig.util.AliasableEvalFunc;
  * -- ({(1,{(A),(B)}),(2,{(A),(B),(C)}),(3,{(A)})})
  * }
  * </pre>
- * </p>
  *
  * @author wvaughan
  *

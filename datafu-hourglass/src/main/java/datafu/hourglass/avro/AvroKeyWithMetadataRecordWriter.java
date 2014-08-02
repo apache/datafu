@@ -50,6 +50,7 @@ public class AvroKeyWithMetadataRecordWriter<T> extends RecordWriter<AvroKey<T>,
    * @param writerSchema The writer schema for the records in the Avro container file.
    * @param compressionCodec A compression codec factory for the Avro container file.
    * @param outputStream The output stream to write the Avro container file to.
+   * @param conf the configuration
    * @throws IOException If the record writer cannot be opened.
    */
   public AvroKeyWithMetadataRecordWriter(Schema writerSchema, CodecFactory compressionCodec,

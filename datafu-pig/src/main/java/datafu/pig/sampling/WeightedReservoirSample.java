@@ -29,28 +29,27 @@ import org.apache.pig.builtin.Nondeterministic;
 import org.apache.pig.backend.executionengine.ExecException;
 
 /**
- * <p>
  * Performs a weighted random sample using an in-memory reservoir to produce
  * a weighted random sample of a given size based on the A-Res algorithm described in 
- * {@link <a href="http://utopia.duth.gr/~pefraimi/research/data/2007EncOfAlg.pdf" target="_blank">paper</a>}. 
- * </p>
+ * <a href="http://utopia.duth.gr/~pefraimi/research/data/2007EncOfAlg.pdf" target="_blank">paper</a>.
+ *
  * <p>
  * Species with larger weight have higher probability to be selected in the final sample set.
  * </p>
+ *
  * <p>
  * This UDF inherits from {@link ReservoirSample} and it is guaranteed to produce
  * a sample of the given size.  Similarly it comes at the cost of scalability.
  * since it uses internal storage with size equaling the desired sample to guarantee the exact sample size.
  * </p>
- * <p>
- * Its constructor takes 2 arguments. 
+ *
+ * Its constructor takes 2 arguments:
  * <ul>
  *     <li>The 1st argument specifies the sample size which should be a string of positive integer.
  *     <li>The 2nd argument specifies the index of the weight field in the input tuple, 
  *     which should be a string of non-negative integer that is no greater than the input tuple size. 
  * </ul>
- * </p>
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
@@ -60,7 +59,6 @@ import org.apache.pig.backend.executionengine.ExecException;
  * sampled = FOREACH input_g GENERATE WeightedSample(input);
  * }
  * </pre>
- * </p>
  * @author wjian
  */
 

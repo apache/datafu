@@ -35,57 +35,69 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
  * Scalable simple random sampling (ScaSRS).
- * <p/>
+ *
+ * <p>
  * This UDF implements a scalable simple random sampling algorithm described in
- * 
+ * </p>
+ *
  * <pre>
  * X. Meng, Scalable Simple Random Sampling and Stratified Sampling, ICML 2013.
  * </pre>
- * 
+ *
+ * <p>
  * It takes a bag of n items and a sampling probability p as the inputs, and outputs a
  * simple random sample of size exactly ceil(p*n) in a bag, with probability at least
  * 99.99%. For example, the following script generates a simple random sample with
  * sampling probability 0.1:
- * 
+ * </p>
+ *
  * <pre>
  * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
- * 
- * item    = LOAD 'input' AS (x:double); 
+ *
+ * item    = LOAD 'input' AS (x:double);
  * sampled = FOREACH (GROUP item ALL) GENERATE FLATTEN(SRS(item, 0.01));
  * </pre>
- * 
+ *
+ * <p>
  * Optionally, user can provide a good lower bound of n as the third argument to help
  * reduce the size of intermediate data, for example:
- * 
+ * </p>
+ *
  * <pre>
  * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
- * 
- * item    = LOAD 'input' AS (x:double); 
+ *
+ * item    = LOAD 'input' AS (x:double);
  * summary = FOREACH (GROUP item ALL) GENERATE COUNT(item) AS count;
  * sampled = FOREACH (GROUP item ALL) GENERATE FLATTEN(SRS(item, 0.01, summary.count));
  * </pre>
- * 
+ *
+ * <p>
  * This UDF is very useful for stratified sampling. For example, the following script
  * keeps all positive examples while downsampling negatives with probability 0.1:
- * 
+ * </p>
+ *
  * <pre>
  * DEFINE SRS datafu.pig.sampling.SimpleRandomSample();
- * 
+ *
  * item    = LOAD 'input' AS (x:double, label:int);
- * grouped = FOREACH (GROUP item BY label) GENERATE item, (group == 1 ? 1.0 : 0.1) AS p; 
+ * grouped = FOREACH (GROUP item BY label) GENERATE item, (group == 1 ? 1.0 : 0.1) AS p;
  * sampled = FOREACH grouped GENERATE FLATTEN(SRS(item, p));
  * </pre>
- * 
+ *
+ * <p>
  * In a Java Hadoop MapReduce job, we can output selected items directly using
  * MultipleOutputs. However, this feature is not available in a Pig UDF. So we still let
  * selected items go through the sort phase. However, as long as the sample size is not
  * huge, this should not be a big problem.
- * 
- * In the first version, the sampling probability is specified in the constructor. This 
+ * </p>
+ *
+ * <p>
+ * In the first version, the sampling probability is specified in the constructor. This
  * method is deprecated now and will be removed in the next release.
- * 
+ * </p>
+ *
  * @author ximeng
- * 
+ *
  */
 public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
 {
@@ -104,7 +116,8 @@ public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
 
   /**
    * Constructs this UDF with a sampling probability.
-   * 
+   *
+   * @param samplingProbability sampling probability
    * @deprecated Should specify the sampling probability in the function call.
    */
   @Deprecated

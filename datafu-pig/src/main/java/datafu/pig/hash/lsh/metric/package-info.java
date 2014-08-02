@@ -18,7 +18,7 @@
  */
 
 /**
- * UDFs for different {@link <a href="http://en.wikipedia.org/wiki/Metric_(mathematics)" target="_blank">distance functions</a>} (and some similarity functions)
+ * UDFs for different <a href="http://en.wikipedia.org/wiki/Metric_(mathematics)" target="_blank">distance functions</a> (and some similarity functions)
  * used with Locality Sensitive Hashing.
  */
 package datafu.pig.hash.lsh.metric;

@@ -53,7 +53,7 @@ public class AvroDateRangeMetadata
    * @param fs file system to access path
    * @param path path to get date range for
    * @return date range
-   * @throws IOException
+   * @throws IOException IOException
    */
   public static DateRange getOutputFileDateRange(FileSystem fs, Path path) throws IOException
   {

@@ -35,21 +35,21 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 
 /**
- * Computes approximate {@link <a href="http://en.wikipedia.org/wiki/Quantile" target="_blank">quantiles</a>} 
+ * Computes approximate <a href="http://en.wikipedia.org/wiki/Quantile" target="_blank">quantiles</a>
  * for a (not necessarily sorted) input bag, using the Munro-Paterson algorithm.
  * 
  * <p>
  * The algorithm is described here:
- * {@link <a href="http://www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf" target="_blank">http://www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf</a>}
+ * <a href="http://www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf" target="_blank">http://www.cs.ucsb.edu/~suri/cs290/MunroPat.pdf</a>
  * </p>
  * 
  * <p>
  * The implementation is based on the one in Sawzall, available here:
- * {@link <a href="http://szl.googlecode.com/svn-history/r41/trunk/src/emitters/szlquantile.cc">szlquantile.cc</a>}
+ * <a href="http://szl.googlecode.com/svn-history/r41/trunk/src/emitters/szlquantile.cc">szlquantile.cc</a>
  * </p>
  * 
  * <p>
- * N.B., all the data is pushed to a single reducer per key, so make sure some partitioning is 
+ * N.B., all the data is pushed to a single reducer per key, so make sure some partitioning is
  * done (e.g., group by 'day') if the data is too large.  That is, this isn't distributed quantiles.
  * </p>
  * 
@@ -95,12 +95,10 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  *       GCD of 0.2, 0.7, and 1.0.</li>
  *   <li>If 0.999 is requested the quantiles 0.0, 0.001, 0.002, ... , 0.998, 0.999, 1.0 are computed because 0.001 is
  *       the GCD of 0.999 and 1.0.</li> 
- *  </p>  
  * </ul>
- * 
+ *
  * <p>The error on the approximation goes down as the number of buckets computed goes up.</p>
- * 
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
@@ -115,7 +113,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  * -- produces: (1.0,3.0,5.0,8.0,10.0)
  * quantiles = FOREACH grouped generate Quantile(input);
  * }
- * </pre></p>
+ * </pre>
  *
  * @see StreamingMedian
  * @see Quantile

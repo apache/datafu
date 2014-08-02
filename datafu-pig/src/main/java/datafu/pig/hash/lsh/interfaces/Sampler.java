@@ -30,10 +30,10 @@ import org.apache.commons.math.random.RandomDataImpl;
 public interface Sampler {
   /**
    * Generate a sample
-   * 
+   *
    * @param randomData The distribution used
    * @return A sample
-   * @throws MathException
+   * @throws MathException MathException
    */
   public double sample(RandomDataImpl randomData) throws MathException ;
 }

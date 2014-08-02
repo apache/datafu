@@ -26,16 +26,15 @@ import datafu.pig.util.SimpleEvalFunc;
 
 /**
  * Computes the distance (in miles) between two latitude-longitude pairs 
- * using the {@link <a href="http://en.wikipedia.org/wiki/Haversine_formula" target="_blank">Haversine formula</a>}.
+ * using the <a href="http://en.wikipedia.org/wiki/Haversine_formula" target="_blank">Haversine formula</a>.
  *
- * <p>
  * Example:
  * <pre>
  * {@code
  * -- input is a TSV of two latitude and longitude pairs
  * input = LOAD 'input' AS (lat1 : double, long1 : double, lat2 : double, long2 : double);
  * output = FOREACH input GENERATE datafu.pig.geo.HaversineDistInMiles(lat1, long1, lat2, long2) as distance;
- * }</pre></p>
+ * }</pre>
  */
 public class HaversineDistInMiles extends SimpleEvalFunc<Double>
 {

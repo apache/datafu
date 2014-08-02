@@ -82,10 +82,10 @@ public class PathUtils
   /**
    * Delete all but the last N days of paths matching the "yyyyMMdd" format.
    * 
-   * @param fs
-   * @param path
-   * @param retentionCount
-   * @throws IOException
+   * @param fs the filesystem
+   * @param path path to delete file from
+   * @param retentionCount how many days to keep
+   * @throws IOException IOException
    */
   public static void keepLatestDatedPaths(FileSystem fs, Path path, int retentionCount) throws IOException
   {
@@ -102,10 +102,10 @@ public class PathUtils
   /**
    * Delete all but the last N days of paths matching the "yyyy/MM/dd" format.
    * 
-   * @param fs
-   * @param path
-   * @param retentionCount
-   * @throws IOException
+   * @param fs the filesystem
+   * @param path path to delete files from
+   * @param retentionCount how many days to keep
+   * @throws IOException IOException
    */
   public static void keepLatestNestedDatedPaths(FileSystem fs, Path path, int retentionCount) throws IOException
   {
@@ -128,8 +128,8 @@ public class PathUtils
    * 
    * @param fs file system
    * @param input path to search under
-   * @return paths
-   * @throws IOException
+   * @return paths paths matching pattern
+   * @throws IOException IOException
    */
   public static List<DatePath> findNestedDatedPaths(FileSystem fs, Path input) throws IOException
   {
@@ -174,8 +174,8 @@ public class PathUtils
    * 
    * @param fs file system
    * @param path path to search under
-   * @return paths
-   * @throws IOException
+   * @return paths paths matching pattern
+   * @throws IOException IOException
    */
   public static List<DatePath> findDatedPaths(FileSystem fs, Path path) throws IOException
   {
@@ -209,10 +209,10 @@ public class PathUtils
   /**
    * Gets the schema from a given Avro data file.
    * 
-   * @param fs 
-   * @param path
+   * @param fs the filesystem
+   * @param path path to get schema from
    * @return The schema read from the data file's metadata.
-   * @throws IOException
+   * @throws IOException IOException
    */
   public static Schema getSchemaFromFile(FileSystem fs, Path path) throws IOException
   {
@@ -232,9 +232,10 @@ public class PathUtils
   /**
    * Gets the schema for the first Avro file under the given path.
    * 
+   * @param fs the filesystem
    * @param path path to fetch schema for
    * @return Avro schema
-   * @throws IOException
+   * @throws IOException IOException
    */
   public static Schema getSchemaFromPath(FileSystem fs, Path path) throws IOException
   {
@@ -247,7 +248,7 @@ public class PathUtils
    * @param fs file system
    * @param path path to count bytes for
    * @return total bytes under path
-   * @throws IOException
+   * @throws IOException IOException
    */
   public static long countBytes(FileSystem fs, Path path) throws IOException
   {

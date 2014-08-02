@@ -236,7 +236,7 @@ public abstract class AbstractJob extends Configured
   /**
    * Overridden to provide custom configuration before the job starts.
    * 
-   * @param conf
+   * @param conf configuration
    */
   public void config(Configuration conf)
   {    
@@ -318,7 +318,7 @@ public abstract class AbstractJob extends Configured
    * Only the latest will be kept.  Older paths will be removed.
    * Can also be set with <em>retention.count</em>.
    * 
-   * @param retentionCount
+   * @param retentionCount retention count
    */
   public void setRetentionCount(Integer retentionCount)
   {
@@ -391,7 +391,6 @@ public abstract class AbstractJob extends Configured
    * Gets the file system.
    * 
    * @return File system
-   * @throws IOException 
    */
   protected FileSystem getFileSystem()
   {
@@ -423,7 +422,7 @@ public abstract class AbstractJob extends Configured
    * Creates a random temporary path within the file system.
    * 
    * @return Random temporary path
-   * @throws IOException
+   * @throws IOException IOException
    */
   protected Path createRandomTempPath() throws IOException
   {
@@ -435,7 +434,7 @@ public abstract class AbstractJob extends Configured
    * 
    * @param path Path to create
    * @return The same path that was provided
-   * @throws IOException
+   * @throws IOException IOException
    */
   protected Path ensurePath(Path path) throws IOException
   {
@@ -472,9 +471,9 @@ public abstract class AbstractJob extends Configured
   /**
    * Run the job.
    * 
-   * @throws IOException
-   * @throws InterruptedException
-   * @throws ClassNotFoundException
+   * @throws IOException IOException
+   * @throws InterruptedException InterruptedException
+   * @throws ClassNotFoundException ClassNotFoundException
    */
   public abstract void run() throws IOException, InterruptedException, ClassNotFoundException;
   

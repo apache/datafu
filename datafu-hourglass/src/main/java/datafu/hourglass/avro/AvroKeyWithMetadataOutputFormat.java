@@ -73,6 +73,9 @@ public class AvroKeyWithMetadataOutputFormat<T> extends AvroOutputFormatBase<Avr
      * @param writerSchema The writer schema for the records to write.
      * @param compressionCodec The compression type for the writer file.
      * @param outputStream The target output stream for the records.
+     * @param conf the configuration
+     * @throws IOException IOException
+     * @return record writer
      */
     protected RecordWriter<AvroKey<T>, NullWritable> create(
         Schema writerSchema, CodecFactory compressionCodec, OutputStream outputStream, Configuration conf)

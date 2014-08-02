@@ -18,7 +18,7 @@
  */
 
 /**
- * Implementation of {@link <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>} 
- * for {@link <a href="http://en.wikipedia.org/wiki/Cosine_similarity" target="_blank">Cosine Similarity</a>}
+ * Implementation of <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>
+ * for <a href="http://en.wikipedia.org/wiki/Cosine_similarity" target="_blank">Cosine Similarity</a>.
  */
 package datafu.pig.hash.lsh.cosine;

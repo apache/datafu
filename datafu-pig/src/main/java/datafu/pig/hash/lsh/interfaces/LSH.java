@@ -23,23 +23,24 @@ import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.random.RandomGenerator;
 
 /**
- * An abstract class representing a locality sensitive hash. From wikipedia's article on {@link <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>}:
- * <pre>
- * Locality-sensitive hashing (LSH) is a method of performing probabilistic dimension reduction of high-dimensional data. 
- * The basic idea is to hash the input items so that similar items are mapped to the same buckets with high probability 
+ * An abstract class representing a locality sensitive hash. From wikipedia's article on <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>:
+ *
+ * <p>
+ * Locality-sensitive hashing (LSH) is a method of performing probabilistic dimension reduction of high-dimensional data.
+ * The basic idea is to hash the input items so that similar items are mapped to the same buckets with high probability
  * (the number of buckets being much smaller than the universe of possible input items).
- * </pre>
+ * </p>
  * @author cstella
  *
  */
-public abstract class LSH 
+public abstract class LSH
 {
   protected RandomGenerator rg;
   protected int dim;
-  
+
   /**
    * Construct a locality sensitive hash.  Note, one may pass a pre-seeded generator.
-   * 
+   *
    * @param dim The dimension of the vectors which are to be hashed
    * @param rg The random generator to use internally.
    */
@@ -48,24 +49,24 @@ public abstract class LSH
     this.dim = dim;
     this.rg = rg;
   }
-  
+
   /**
-   * 
+   *
    * @return The random generator from this LSH
    */
   public RandomGenerator getRandomGenerator() { return rg;}
   /**
-   * 
+   *
    * @return The dimension of the vectors which this LSh supports
    */
   public int getDim() { return dim; }
-  
+
   /**
    * Hash a vector.
-   * 
+   *
    * @param vector A vector to be hashed
    * @return A hash which collides with vectors close according to some metric (implementation dependent).
    */
   public abstract long apply(RealVector vector);
-  
+
 }

@@ -27,7 +27,7 @@ import datafu.pig.hash.lsh.interfaces.LSH;
 import datafu.pig.hash.lsh.interfaces.LSHCreator;
 
 /**
- * From wikipedia's article on {@link <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>}:
+ * From wikipedia's article on <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>:
  * <pre>
  * Locality-sensitive hashing (LSH) is a method of performing probabilistic dimension reduction of high-dimensional data. 
  * The basic idea is to hash the input items so that similar items are mapped to the same buckets with high probability 
@@ -35,7 +35,7 @@ import datafu.pig.hash.lsh.interfaces.LSHCreator;
  * </pre>
  * 
  * In particular, this implementation implements a locality sensitive hashing scheme which maps high-dimensional vectors which are
- * close together (with high probability) according to {@link <a href="http://en.wikipedia.org/wiki/Cosine_similarity" target="_blank">Cosine Similarity</a>}
+ * close together (with high probability) according to <a href="http://en.wikipedia.org/wiki/Cosine_similarity" target="_blank">Cosine Similarity</a>
  * into the same buckets.  Each LSH maps a vector onto one side or the other of a random hyperplane, thereby producing a single
  * bit as the hash value.  Multiple, independent, hashes can be run on the same input and aggregated together to form a more
  * broad domain than a single bit.
@@ -123,7 +123,7 @@ public class CosineDistanceHash extends LSHFunc
      * };
      * 
      * -- Filter out the hashes which resulted in no matches
-     * NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) > 0;
+     * NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) &gt; 0;
      * 
      * -- group by the query
      * NEIGHBORS_GRP = group NOT_NULL by query_pt;

@@ -30,24 +30,24 @@ import org.apache.pig.data.Tuple;
  * This is essentially equivalent to grouping on the fields, applying SAMPLE,
  * and then flattening.  It is much more efficient though because it does not require
  * a reduce step.
- * 
+ *
  * <p>
  * The method of sampling is to convert the key to a hash, derive a double value
  * from this, and then test this against a supplied probability.  The double value
  * derived from a key is uniformly distributed between 0 and 1.
  * </p>
- * 
+ *
  * <p>
  * The only required parameter is the sampling probability.  This may be followed
  * by an optional seed value to control the random number generation.  
  * </p>
- * 
+ *
  * <p>
  * SampleByKey will work deterministically as long as the same seed is provided.  
  * </p>
- * 
- * <p>
+ *
  * Example:
+ *
  * <pre>
  * {@code
  * DEFINE SampleByKey datafu.pig.sampling.SampleByKey('0.5');
@@ -58,12 +58,10 @@ import org.apache.pig.data.Tuple;
  * output = FILTER data BY SampleByKey(A_id);
  * 
  * --output: (B,1), (B,3)
- * } 
- * 
+ * }
  * </pre>
- * </p>
- * @author evion 
- * 
+ *
+ * @author evion
  */
 
 public class SampleByKey extends FilterFunc

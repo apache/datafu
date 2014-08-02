@@ -1,0 +1,92 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+project(':') {
+  apply plugin: 'base'
+  apply plugin: 'signing'
+}
+
+task sourceRelease(type: Tar) {
+  description = "Build a source release, specifically excluding the build directories and gradle wrapper files"
+  compression = Compression.GZIP
+
+  baseName = "datafu-sources-${project.version}-incubating"
+
+  from(project.rootDir) {
+    exclude '**/build'
+    exclude 'build'
+    exclude '.gradle'
+    exclude 'gradlew'
+    exclude 'gradlew.bat'
+    exclude 'gradle/wrapper/gradle-wrapper.jar'
+    exclude 'gradle/wrapper/gradle-wrapper.properties'
+  }
+
+  into(baseName)
+
+  // Set destination directory.
+  destinationDir = file("${project.buildDir}/distribution/source")
+
+  archiveName = "${baseName}.tgz"
+  doLast { // generate md5 checksum
+    ant.checksum file:"$destinationDir/$archiveName"
+  }
+}
+
+signing {
+  // TODO: this doesn't show up in the 'tasks' for some reason, need to figure out why.
+  // This creates a task 'signSourceRelease' that builds the source release and signs it.
+  sign sourceRelease
+}
+
+// Publishing to Apache's Maven repository (Nexus). To install the archives in the
+// local repository, run the 'install' task.
+subprojects {
+  apply plugin: 'nexus'
+
+  nexus {
+    attachSources = true
+    attachTests = false
+    attachJavadoc = true
+    sign = true
+    repositoryUrl = 'https://repository.apache.org/service/local/staging/deploy/maven2'
+    snapshotRepositoryUrl = 'https://repository.apache.org/content/repositories/snapshots'
+  }
+
+  modifyPom {
+    project {
+      name 'Apache DataFu (incubating)'
+      description 'Librares that make easier to solve data problems using Hadoop and higher level languages based on it.'
+      url 'http://datafu.incubator.apache.org/'
+
+      scm {
+        url 'https://git-wip-us.apache.org/repos/asf?p=incubator-datafu.git;a=tree'
+        connection 'scm:http://git-wip-us.apache.org/repos/asf/incubator-datafu.git'
+        developerConnection 'scm:https://git-wip-us.apache.org/repos/asf/incubator-datafu.git'
+      }
+
+      licenses {
+        license {
+          name 'The Apache Software License, Version 2.0'
+          url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        }
+      }
+    }
+  }
+}

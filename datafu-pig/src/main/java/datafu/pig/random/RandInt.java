@@ -35,10 +35,12 @@ import datafu.pig.util.SimpleEvalFunc;
 public class RandInt extends SimpleEvalFunc<Integer> 
 {
   private final Random rand = new Random();
-  
+
   /**
    * @param min lower bound for random number
    * @param max upper bound for random number
+   * @return random integer between min and max
+   * @throws IOException IOException
    */
   public Integer call(Integer min, Integer max) throws IOException
   {
@@ -60,6 +62,5 @@ public class RandInt extends SimpleEvalFunc<Integer>
   {
     return new Schema(new Schema.FieldSchema("rand", DataType.INTEGER));
   }
-  
 }
 

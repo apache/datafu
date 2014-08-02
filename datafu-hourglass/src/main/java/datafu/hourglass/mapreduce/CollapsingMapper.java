@@ -120,7 +120,7 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
   /**
    * Gets the mapper.
    * 
-   * @return mapper
+   * @return mapper the mapper
    */
   public Mapper<GenericRecord,GenericRecord,GenericRecord> getMapper()
   {
@@ -130,7 +130,7 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
   /**
    * Sets the mapper.
    * 
-   * @param mapper
+   * @param mapper the mapper
    */
   public void setMapper(Mapper<GenericRecord,GenericRecord,GenericRecord> mapper)
   {
@@ -140,7 +140,7 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
   /**
    * Sets the Avro schemas.
    * 
-   * @param schemas
+   * @param schemas the schemas
    */
   public void setSchemas(PartitionCollapsingSchemas schemas)
   {
@@ -150,7 +150,7 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
   /**
    * Gets the Avro schemas.
    * 
-   * @return schemas
+   * @return schemas the schemas
    */
   public PartitionCollapsingSchemas getSchemas()
   {
@@ -178,7 +178,7 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
    * Gets a collector that maps key-value pairs, where each value
    * is tagged with the partition from which it was derived. 
    * 
-   * @return collector
+   * @return collector the collector
    */
   private TimeMapCollector getTimeMapCollector()
   {
@@ -193,7 +193,7 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
   /**
    * Gets a collector that maps key-value pairs as-is.
    * 
-   * @return collector
+   * @return collector the collector
    */
   private IdentityMapCollector getIdentityMapCollector()
   {

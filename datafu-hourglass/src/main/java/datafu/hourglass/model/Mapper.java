@@ -38,8 +38,8 @@ public interface Mapper<In,OutKey,OutVal> extends Serializable
    * 
    * @param input Input value
    * @param collector Collects output key-value pairs
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException IOException
+   * @throws InterruptedException InterruptedException
    */
   void map(In input, KeyValueCollector<OutKey,OutVal> collector)  throws IOException, InterruptedException;
 }

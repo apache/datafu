@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package datafu.pig.stats;
 
 /**
- * Computes the {@link <a href="http://en.wikipedia.org/wiki/Median" target="_blank">median</a>} 
+ * Computes the <a href="http://en.wikipedia.org/wiki/Median" target="_blank">median</a>
  * for a <b>sorted</b> input bag, using type R-2 estimation.  This is a convenience wrapper around Quantile.
  *
  * <p>
- * N.B., all the data is pushed to a single reducer per key, so make sure some partitioning is 
+ * N.B., all the data is pushed to a single reducer per key, so make sure some partitioning is
  * done (e.g., group by 'day') if the data is too large.  That is, this isn't distributed median.
  * </p>
- * 
+ *
  * @see Quantile
  */
 public class Median extends Quantile

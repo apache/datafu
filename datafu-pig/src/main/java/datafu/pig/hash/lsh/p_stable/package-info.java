@@ -18,8 +18,8 @@
  */
 
 /**
- * Implementation of {@link <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>} for 
- * {@link <a href="http://en.wikipedia.org/wiki/Lp_space" target="_blank">L1 and L2 metrics</a>}.
+ * Implementation of <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a> for 
+ * <a href="http://en.wikipedia.org/wiki/Lp_space" target="_blank">L1 and L2 metrics</a>.
  * 
  * See Datar, M.; Immorlica, N.; Indyk, P.; Mirrokni, V.S. (2004). "Locality-Sensitive Hashing Scheme Based on p-Stable Distributions". Proceedings of the Symposium on Computational Geometry.
  * 

@@ -28,7 +28,7 @@ import datafu.pig.hash.lsh.interfaces.Sampler;
 /**
  * A locality sensitive hash associated with the L1 metric.  This uses a 1-stable distribution
  * to construct the hash.
- * 
+ *
  * @author cstella
  *
  */
@@ -36,25 +36,29 @@ public class L1LSH extends AbstractStableDistributionFunction implements Sampler
 {
   /**
    * Constructs a new instance.
-   * @throws MathException 
+   *
+   * @param dim The dimension of the vectors to be hashed
+   * @param w A double representing the quantization parameter (also known as the projection width)
+   * @param rand The random generator used
+   * @throws MathException MathException
    */
-  public L1LSH(int dim, double d, RandomGenerator rand) throws MathException {
-    super(dim, d, rand);
+  public L1LSH(int dim, double w, RandomGenerator rand) throws MathException {
+    super(dim, w, rand);
   }
 
   /**
    * Draw a sample s ~ Cauchy(0,1), which is 1-stable.
-   * 
+   *
+   * @param randomData random data generator
    * @return a sample from a cauchy distribution with median 0 and scale 1
+   * @throws MathException MathException
    */
   public double sample(RandomDataImpl randomData) throws MathException {
-    
     return randomData.nextCauchy(0, 1);
-    
   }
+
   @Override
   protected Sampler getSampler() {
     return this;
   }
-
 }

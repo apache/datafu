@@ -174,6 +174,7 @@ public abstract class AbstractPartitionPreservingIncrementalJob extends Incremen
   
   /**
    * Initializes the job.
+   * @throws IOException IOException
    */
   public AbstractPartitionPreservingIncrementalJob() throws IOException
   {     
@@ -184,6 +185,7 @@ public abstract class AbstractPartitionPreservingIncrementalJob extends Incremen
    * 
    * @param name job name
    * @param props configuration properties
+   * @throws IOException IOException
    */
   public AbstractPartitionPreservingIncrementalJob(String name, Properties props) throws IOException
   { 
@@ -217,9 +219,9 @@ public abstract class AbstractPartitionPreservingIncrementalJob extends Incremen
   /**
    * Run the job.
    * 
-   * @throws IOException
-   * @throws InterruptedException
-   * @throws ClassNotFoundException
+   * @throws IOException IOException
+   * @throws InterruptedException InterruptedException
+   * @throws ClassNotFoundException ClassNotFoundException
    */
   @Override
   public void run() throws IOException, InterruptedException, ClassNotFoundException

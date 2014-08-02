@@ -96,7 +96,7 @@ public class PartitioningMapper extends ObjectMapper implements Serializable
   /**
    * Gets the mapper.
    * 
-   * @return mapper
+   * @return mapper the mapper
    */
   public Mapper<GenericRecord,GenericRecord,GenericRecord> getMapper()
   {
@@ -106,7 +106,7 @@ public class PartitioningMapper extends ObjectMapper implements Serializable
   /**
    * Sets the mapper.
    * 
-   * @param mapper
+   * @param mapper the mapper
    */
   public void setMapper(Mapper<GenericRecord,GenericRecord,GenericRecord> mapper)
   {
@@ -116,7 +116,7 @@ public class PartitioningMapper extends ObjectMapper implements Serializable
   /**
    * Sets the Avro schemas.
    * 
-   * @param schemas
+   * @param schemas the schemas
    */
   public void setSchemas(PartitionPreservingSchemas schemas)
   {
@@ -126,7 +126,7 @@ public class PartitioningMapper extends ObjectMapper implements Serializable
   /**
    * Gets the Avro schemas.
    * 
-   * @return schemas
+   * @return schemas the schemas
    */
   public PartitionPreservingSchemas getSchemas()
   {

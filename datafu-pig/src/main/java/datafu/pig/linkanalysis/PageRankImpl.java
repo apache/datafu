@@ -39,9 +39,8 @@ import java.util.Map;
 import com.google.common.collect.AbstractIterator;
 
 /**
- * An implementation of {@link <a href="http://en.wikipedia.org/wiki/PageRank" target="_blank">PageRank</a>}, used by the {@link PageRank} UDF.
- * It is not intended to be used directly.   
- * </p>
+ * An implementation of <a href="http://en.wikipedia.org/wiki/PageRank" target="_blank">PageRank</a>, used by the {@link PageRank} UDF.
+ * It is not intended to be used directly.
  */
 public class PageRankImpl
 {    
@@ -104,7 +103,7 @@ public class PageRankImpl
    
    /**
     * Sets the page rank alpha value (default is 0.85);
-    * @param alpha 
+    * @param alpha page rank alpha value
     */
    public void setAlpha(float alpha)
    {

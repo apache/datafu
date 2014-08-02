@@ -45,7 +45,7 @@ public class DistributedCacheHelper
    * @param conf Hadoop configuration
    * @param path Path to deserialize from
    * @return Deserialized object
-   * @throws IOException
+   * @throws IOException IOException
    */
   public static Object readObject(Configuration conf, org.apache.hadoop.fs.Path path) throws IOException
   {
@@ -87,7 +87,7 @@ public class DistributedCacheHelper
    * @param conf Hadoop configuration
    * @param obj Object to serialize
    * @param path Path to serialize object to
-   * @throws IOException
+   * @throws IOException IOException
    */
   public static void writeObject(Configuration conf, Object obj, org.apache.hadoop.fs.Path path) throws IOException
   {

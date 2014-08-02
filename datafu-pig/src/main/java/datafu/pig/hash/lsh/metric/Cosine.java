@@ -23,10 +23,10 @@ import org.apache.commons.math.linear.RealVector;
 
 /**
  * A UDF used to find a vector v in a bag such that for query point q, metric m and threshold t
- * m(v,q) < t.  In other words, find the first vector in the bag within a threshold distance away.
+ * m(v,q) &lt; t.  In other words, find the first vector in the bag within a threshold distance away.
  * 
  *  It returns one of the tuples of the bag of vectors.  The metric used is 
- * {@link <a href="http://en.wikipedia.org/wiki/Cosine_similarity" target="_blank">Cosine Similarity</a>}, 
+ * <a href="http://en.wikipedia.org/wiki/Cosine_similarity" target="_blank">Cosine Similarity</a>, 
  * which technically does not form a metric, but I'm stretching the definition here.
  * 
  * @see datafu.pig.hash.lsh.CosineDistanceHash CosineDistanceHash for an example
@@ -38,7 +38,7 @@ public class Cosine extends MetricUDF {
   /**
    * Create a new Cosine Metric UDF with a given dimension.
    * 
-   * @param sDim
+   * @param sDim dimension
    */
   public Cosine(String sDim) {
     super(sDim); 
@@ -46,8 +46,8 @@ public class Cosine extends MetricUDF {
   
   /**
    * Cosine similarity.
-   * @param v1
-   * @param v2
+   * @param v1 first vector
+   * @param v2 second vector
    * @return The cosine of the angle between the vectors
    */
   public static double distance(RealVector v1, RealVector v2) {
@@ -56,8 +56,8 @@ public class Cosine extends MetricUDF {
 
   /**
    * Cosine similarity.
-   * @param v1
-   * @param v2
+   * @param v1 first vector
+   * @param v2 second vector
    * @return Roughly the cosine of the angle between the vectors
    */
   @Override

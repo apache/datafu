@@ -32,17 +32,17 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
  * Enumerate a bag, appending to each tuple its index within the bag.
- * 
- * <p>
+ *
  * For example:
  * <pre>
- *   {(A),(B),(C),(D)} => {(A,0),(B,1),(C,2),(D,3)}
+ *   {(A),(B),(C),(D)} =&gt; {(A,0),(B,1),(C,2),(D,3)}
  * </pre>
+ *
+ * <p>
  * The first constructor parameter (optional) dictates the starting index of the counting.
  * This UDF implements the accumulator interface, reducing DataBag materialization costs.
  * </p>
  *
- * <p>
  * Example:
  * <pre>
  * {@code

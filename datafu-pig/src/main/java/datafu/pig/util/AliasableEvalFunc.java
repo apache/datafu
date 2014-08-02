@@ -49,8 +49,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * such as transposing two fields of the same type.  If this contract is violated, say, by attempting to reference 
  * a field that is not present, a meaningful error message may be thrown.
  * </p>
- * 
- * <p>
+ *
  * Example:  This example computes the monthly payments for mortgages depending on interest rate.
  * <pre>
  * {@code
@@ -58,11 +57,11 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  *    ...
  *    public DataBag exec(Tuple input) throws IOException {
  *      DataBag output = BagFactory.getInstance().newDefaultBag();
- *      
+ *
  *      Double principal = getDouble(input, "principal"); // get a value from the input tuple by alias
  *      Integer numPayments = getInteger(input, "num_payments");
  *      DataBag interestRates = getBag(input, "interest_rates");
- *    
+ *
  *      for (Tuple interestTuple : interestRates) {
  *        Double interest = getDouble(interestTuple, getPrefixedAliasName("interest_rates", "interest_rate"));  // get a value from the inner bag tuple by alias
  *        double monthlyPayment = computeMonthlyPayment(principal, numPayments, interest);
@@ -73,11 +72,10 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  *  }
  * }
  * </pre>
- * </p>
- * 
+ *
  * @author wvaughan
  *
- * @param <T>
+ * @param <T> type that the eval func returns
  */
 public abstract class AliasableEvalFunc<T> extends ContextualEvalFunc<T>
 {
@@ -101,8 +99,8 @@ public abstract class AliasableEvalFunc<T> extends ContextualEvalFunc<T>
   /**
    * Specify the output schema as in {link EvalFunc#outputSchema(Schema)}.
    * 
-   * @param input
-   * @return outputSchema
+   * @param input input schema
+   * @return outputSchema output schema
    */
   public abstract Schema getOutputSchema(Schema input);
 
@@ -151,10 +149,10 @@ public abstract class AliasableEvalFunc<T> extends ContextualEvalFunc<T>
   }
   
   /**
-   * Field aliases are generated from the input schema<br/>
-   * Each alias maps to a bag position<br/>
+   * Field aliases are generated from the input schema.
+   * Each alias maps to a bag position.
    * Inner bags/tuples will have alias of outer.inner.foo
-   * 
+   *
    * @return A map of field alias to field position
    */
   public Map<String, Integer> getFieldAliases()

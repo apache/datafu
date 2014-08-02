@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package datafu.pig.util;
 
 import java.io.IOException;
@@ -26,28 +26,26 @@ import org.apache.pig.data.Tuple;
 
 /**
  * Filter function which asserts that a value is true.
- * 
+ *
  * <p>
  * Unfortunately, the Pig interpreter doesn't recognize boolean expressions nested as function
  * arguments, so this uses C-style booleans.  That is, the first argument should be
  * an integer.  0 is interpreted as "false", and anything else is considered "true".
  * The function will cause the Pig script to fail if a "false" value is encountered.
  * </p>
- * 
+ *
  * <p>
  * There is a unary and a binary version. The unary version just takes a boolean, and throws out a generic exception message when the
  * assertion is violated.  The binary version takes a String as a second argument and throws that out when the assertion
  * is violated.
  * </p>
- * 
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
  * FILTER members BY AssertUDF( (member_id >= 0 ? 1 : 0), 'Doh! Some member ID is negative.' );
  * }
  * </pre>
- * </p>
  */
 public class AssertUDF extends FilterFunc
 {

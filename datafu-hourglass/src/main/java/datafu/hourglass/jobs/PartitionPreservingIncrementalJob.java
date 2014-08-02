@@ -52,7 +52,7 @@ public class PartitionPreservingIncrementalJob extends AbstractPartitionPreservi
    * Initializes the job.  The job name is derived from the name of a provided class.
    * 
    * @param cls class to base job name on
-   * @throws IOException
+   * @throws IOException IOException
    */
   public PartitionPreservingIncrementalJob(@SuppressWarnings("rawtypes") Class cls) throws IOException
   {
@@ -98,7 +98,7 @@ public class PartitionPreservingIncrementalJob extends AbstractPartitionPreservi
   /**
    * Set the mapper.
    * 
-   * @param mapper
+   * @param mapper the mapper
    */
   public void setMapper(Mapper<GenericRecord,GenericRecord,GenericRecord> mapper)
   {

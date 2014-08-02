@@ -35,7 +35,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 import datafu.pig.util.SimpleEvalFunc;
 
 /**
- * Computes {@link <a href="http://en.wikipedia.org/wiki/Quantile" target="_blank">quantiles</a>} 
+ * Computes <a href="http://en.wikipedia.org/wiki/Quantile" target="_blank">quantiles</a>
  * for a <b>sorted</b> input bag, using type R-2 estimation.
  *
  * <p>
@@ -74,7 +74,6 @@ import datafu.pig.util.SimpleEvalFunc;
  *   <li>Quantile('0.0013','0.0228','0.1587','0.5','0.8413','0.9772','0.9987') yields the 0.13th, 2.28th, 15.87th, 50th, 84.13th, 97.72nd, and 99.87th percentiles
  * </ul>
  * 
- * <p>
  * Example:
  * <pre>
  * {@code
@@ -91,7 +90,7 @@ import datafu.pig.util.SimpleEvalFunc;
  *   sorted = ORDER input BY val;
  *   GENERATE Quantile(sorted);
  * }
- * }</pre></p>
+ * }</pre>
  *
  * @see Median
  * @see StreamingQuantile

@@ -1,6 +1,5 @@
 apply plugin: 'java'
 apply plugin: 'license'
-apply plugin: 'maven-publish'
 
 import groovy.xml.MarkupBuilder
 
@@ -12,77 +11,12 @@ buildscript {
   }
 }
 
-cleanEclipse { 
-  doLast { 
+cleanEclipse {
+  doLast {
     delete ".apt_generated"
     delete ".settings"
     delete ".factorypath"
     delete "bin"
-  }
-}
-
-task sourcesJar(type: Jar) {
-  description 'Creates the sources jar'
-
-  classifier = 'sources'
-  from sourceSets.main.allJava
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  description 'Creates the javadoc jar'
-
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
-
-artifacts {
-  archives sourcesJar
-  archives javadocJar
-  archives jar
-}
-
-// Note: alternate way to publish: https://github.com/Netflix/gradle-template
-
-publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      artifact sourcesJar
-      artifact javadocJar
-      artifact jar
-
-      pom.withXml {
-        asNode().appendNode("packaging","jar")
-        asNode().appendNode("name","Apache DataFu Hourglass")        
-        asNode().appendNode("description","A framework for incrementally processing data in Hadoop.")
-        asNode().appendNode("url","http://datafu.incubator.apache.org/")
-
-        def licenseNode = asNode().appendNode("licenses").appendNode("license")
-        licenseNode.appendNode("name","The Apache Software License, Version 2.0")
-        licenseNode.appendNode("url","http://www.apache.org/licenses/LICENSE-2.0.txt")
-        licenseNode.appendNode("distribution","repo")
-
-        def dependenciesNode = asNode().appendNode("dependencies")
-        def dependency = dependenciesNode.appendNode("dependency")
-        dependency.appendNode("groupId","log4j")
-        dependency.appendNode("artifactId","log4j")
-        dependency.appendNode("version","$log4jVersion")
-
-        dependency = dependenciesNode.appendNode("dependency")
-        dependency.appendNode("groupId","org.apache.avro")
-        dependency.appendNode("artifactId","avro")
-        dependency.appendNode("version","$avroVersion")
-
-        dependency = dependenciesNode.appendNode("dependency")
-        dependency.appendNode("groupId","org.apache.avro")
-        dependency.appendNode("artifactId","avro-mapred")
-        dependency.appendNode("version","$avroVersion")
-
-        dependency = dependenciesNode.appendNode("dependency")
-        dependency.appendNode("groupId","org.apache.avro")
-        dependency.appendNode("artifactId","avro-compiler")
-        dependency.appendNode("version","$avroVersion")
-      }
-    }
   }
 }
 
@@ -114,6 +48,38 @@ dependencies {
   testCompile "org.testng:testng:$testngVersion"
 }
 
+// modify the pom dependencies so we don't include hadoop and the testing related artifacts
+modifyPom {
+  project {
+    dependencies {
+      dependency {
+        groupId 'log4j'
+        artifactId 'log4j'
+        version "$log4jVersion"
+      }
+      dependency {
+        groupId 'org.json'
+        artifactId 'json'
+        version "$jsonVersion"
+      }
+      dependency {
+        groupId 'org.apache.avro'
+        artifactId 'avro'
+        version "$avroVersion"
+      }
+      dependency {
+        groupId 'org.apache.avro'
+        artifactId 'avro-mapred'
+        version "$avroVersion"
+      }
+      dependency {
+        groupId 'org.apache.avro'
+        artifactId 'avro-compiler'
+        version "$avroVersion"
+      }
+    }
+  }
+}
 
 test {
   // enable TestNG support (default is JUnit)

@@ -196,6 +196,7 @@ public abstract class AbstractPartitionCollapsingIncrementalJob extends Incremen
   
   /**
    * Initializes the job.
+   * @throws IOException IOException
    */
   public AbstractPartitionCollapsingIncrementalJob() throws IOException
   {    
@@ -206,6 +207,7 @@ public abstract class AbstractPartitionCollapsingIncrementalJob extends Incremen
    * 
    * @param name job name
    * @param props configuration properties
+   * @throws IOException IOException
    */
   public AbstractPartitionCollapsingIncrementalJob(String name, Properties props) throws IOException
   { 

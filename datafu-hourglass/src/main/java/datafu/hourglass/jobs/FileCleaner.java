@@ -51,7 +51,7 @@ public class FileCleaner
   /**
    * Add a path to be removed later.
    * 
-   * @param path
+   * @param path path to be removed later
    * @return added path
    */
   public Path add(Path path)
@@ -63,7 +63,7 @@ public class FileCleaner
   /**
    * Add a path to be removed later.
    * 
-   * @param path
+   * @param path path to be removed later
    * @return added path
    */
   public String add(String path)
@@ -75,7 +75,7 @@ public class FileCleaner
   /**
    * Removes added paths from the file system.
    * 
-   * @throws IOException
+   * @throws IOException IOException
    */
   @SuppressWarnings("unchecked")
   public void clean() throws IOException

@@ -88,7 +88,7 @@ public abstract class LSHCreator
    * 
    * @param rg The random generator to use when constructing the family
    * @return The family of locality sensitive hashes
-   * @throws MathException
+   * @throws MathException MathException
    */
   public  LSHFamily constructFamily(RandomGenerator rg) throws MathException
     { 

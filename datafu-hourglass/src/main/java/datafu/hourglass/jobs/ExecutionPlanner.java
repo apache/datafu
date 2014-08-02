@@ -280,7 +280,7 @@ public abstract class ExecutionPlanner
    * 
    * @param path path to search under
    * @return map of date to path
-   * @throws IOException
+   * @throws IOException IOException
    */
   protected SortedMap<Date,DatePath> getDailyData(Path path) throws IOException
   {
@@ -297,7 +297,7 @@ public abstract class ExecutionPlanner
    * 
    * @param path path to search under
    * @return map of date to path
-   * @throws IOException
+   * @throws IOException IOException
    */
   protected SortedMap<Date,DatePath> getDatedData(Path path) throws IOException
   {
@@ -312,7 +312,7 @@ public abstract class ExecutionPlanner
   /**
    * Determine what input data is available.
    * 
-   * @throws IOException
+   * @throws IOException IOException
    */
   protected void loadInputData() throws IOException
   {

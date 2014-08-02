@@ -26,9 +26,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
  * Base class for set operations.
- * 
- * @author "Matthew Hayes <mhayes@linkedin.com>"
- *
  */
 public abstract class SetOperationsBase extends EvalFunc<DataBag>
 {

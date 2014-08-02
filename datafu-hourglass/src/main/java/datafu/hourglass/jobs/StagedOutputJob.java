@@ -128,7 +128,7 @@ public class StagedOutputJob extends Job implements Callable<Boolean>
    * @param conf configuration
    * @param stagingPrefix where to stage output temporarily
    * @param log logger
-   * @throws IOException
+   * @throws IOException IOException
    */
   public StagedOutputJob(Configuration conf, String stagingPrefix, Logger log) throws IOException
   {

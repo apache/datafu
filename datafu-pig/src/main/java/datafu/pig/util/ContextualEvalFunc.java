@@ -29,8 +29,8 @@ import org.apache.pig.impl.util.UDFContext;
  * on the front end which will be available on the back end.
  * For example, properties may be set in the call to outputSchema(),
  * which will be available when exec() is called.
- * 
- * @param <T>
+ *
+ * @param <T> the type the eval function returns
  */
 public abstract class ContextualEvalFunc<T> extends EvalFunc<T>
 {

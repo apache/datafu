@@ -31,28 +31,26 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import datafu.pig.util.SimpleEvalFunc;
 
 /**
- * Prepends a tuple to a bag. 
- * 
+ * Prepends a tuple to a bag.
+ *
  * <p>N.B. this copies the entire input bag, so don't use it for large bags.</p>
- * 
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
  * define PrependToBag datafu.pig.bags.PrependToBag();
- * 
+ *
  * -- input:
  * -- ({(1),(2),(3)},(4))
  * -- ({(10),(20),(30),(40),(50)},(60))
  * input = LOAD 'input' AS (B: bag{T: tuple(v:INT)}, T: tuple(v:INT));
-
+ *
  * -- output:
  * -- ({(4),(1),(2),(3)})
  * -- ({(60),(10),(20),(30),(40),(50)})
  * output = FOREACH input GENERATE PrependToBag(B,T) as B;
  * }
  * </pre>
- * </p>
  */
 public class PrependToBag extends SimpleEvalFunc<DataBag>
 {

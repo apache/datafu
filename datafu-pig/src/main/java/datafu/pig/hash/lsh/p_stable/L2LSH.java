@@ -28,15 +28,17 @@ import datafu.pig.hash.lsh.interfaces.Sampler;
 /**
  * A locality sensitive hash associated with the L2 metric.  This uses a 2-stable distribution
  * to construct the hash.
- * 
- * @author cstella
  *
+ * @author cstella
  */
 public class L2LSH extends AbstractStableDistributionFunction implements Sampler {
 
   /**
    * Constructs a new instance.
-   * @throws MathException 
+   * @param dim the dimension of the vectors to be hashed
+   * @param w a double representing the quantization parameter (also known as the projection width)
+   * @param rand the random generator
+   * @throws MathException MathException
    */
   public L2LSH(int dim, double w, RandomGenerator rand) throws MathException {
     super(dim, w, rand);
@@ -44,7 +46,8 @@ public class L2LSH extends AbstractStableDistributionFunction implements Sampler
 
   /**
    * Draw a sample s ~ Gaussian(0,1), which is 2-stable.
-   * 
+   *
+   * @param randomData random data generator
    * @return a sample from a Gaussian distribution with mu of 0 and sigma of 1
    */
    public double sample(RandomDataImpl randomData)

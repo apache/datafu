@@ -18,6 +18,14 @@
  */
 
 /**
- * Interfaces used in the implementation of <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>.
+ * This file allows a source release of DataFu, which is prohibited
+ * from containing jars, to be able to download the gradle wrapper
+ * and its accompanying jars.
  */
-package datafu.pig.hash.lsh.interfaces;
+
+defaultTasks 'downloadWrapper'
+
+task downloadWrapper(type: Wrapper) {
+    description = "Download the gradle wrapper and requisite files. Overwrites existing wrapper files."
+    gradleVersion = project.gradleVersion
+}

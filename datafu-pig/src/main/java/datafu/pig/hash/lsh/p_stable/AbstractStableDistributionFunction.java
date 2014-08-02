@@ -29,22 +29,25 @@ import datafu.pig.hash.lsh.interfaces.Sampler;
 
 /**
  * This is the base-class for all p-stable based locality sensitive hashes. p-stable locality sensitive
- * hashes are defined by a few parameters: a dimension, d , a vector taken from a 
- * {@link <a href="http://en.wikipedia.org/wiki/Stable_distribution" target="_blank">k-stable distribution</a>} 
+ * hashes are defined by a few parameters: a dimension, d , a vector taken from a
+ * <a href="http://en.wikipedia.org/wiki/Stable_distribution" target="_blank">k-stable distribution</a>
  * (where k is 1 or 2) and a width of projection, w.
+ *
  * <p>
  * All p-stable LSH functions are parameterized with a quantization parameter (w or r in
  * the literature , depending on where you look). Consider the following excerpt
  * from Datar, M.; Immorlica, N.; Indyk, P.; Mirrokni, V.S. (2004).
  * "Locality-Sensitive Hashing Scheme Based on p-Stable Distributions".
  * Proceedings of the Symposium on Computational Geometry.
- * 
- * <pre>
- * Decreasing the width of the projection (w) decreases the probability of collision for any two points. 
+ * </p>
+ *
+ * <p>
+ * Decreasing the width of the projection (w) decreases the probability of collision for any two points.
  * Thus, it has the same effect as increasing k . As a result, we would like to set w as small as possible
  * and in this way decrease the number of projections we need to make.
- * </pre>
- * 
+ * </p>
+ *
+ * <p>
  * In the literature, the quantization parameter (or width of the projection) is
  * found empirically given a sample of the data and the likely threshold for
  * the metric. Tuning this parameter is very important for the performance of
@@ -52,24 +55,23 @@ import datafu.pig.hash.lsh.interfaces.Sampler;
  * P.; Mirrokni, V.S. (2004).
  * "Locality-Sensitive Hashing Scheme Based on p-Stable Distributions".
  * Proceedings of the Symposium on Computational Geometry.
- * 
+ * </p>
+ *
  * @author cstella
- * 
+ *
  */
 public abstract class AbstractStableDistributionFunction extends LSH
 {
-  
    private double[] a;
    private double b;
    double w;
 
- 
    /**
     * Constructs a new instance.
     * @param dim The dimension of the vectors to be hashed
     * @param w A double representing the quantization parameter (also known as the projection width)
-    * @param rand The random generator used 
-    * @throws MathException 
+    * @param rand The random generator used
+    * @throws MathException MathException
     */
    public AbstractStableDistributionFunction(int dim, double w, RandomGenerator rand) throws MathException
    {

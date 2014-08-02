@@ -40,15 +40,17 @@ public enum DataTypeUtil {
   /**
    * Convert a tuple t into a RealVector of dimension dim.
    * The tuple can be of a couple of forms:
+   *
    * <ul>
    * <li>A tuple composed of dim numeric types a la (1.0,2.0,3,5.0)</li>
    * <li>A tuple which contains as its first element a tuple like above a la ( (1.0,2.0,3,5.0), 5) ) would yield (1.0,2.0,3,5.0)</li>
    * <li>A bag containing tuples where the first element is the position and the second element is the value.  This is for sparse vectors and it looks like this ( { (0,1.0), (1, 2.0), (3,3), (4,5.0) } ).</li>
    * </ul>
+   *
    * @param t The tuple to convert to a vector
    * @param dim The dimension of the vector
    * @return The actual RealVector (which may or may not be sparse)
-   * @throws PigException
+   * @throws PigException PigException
    */
   public RealVector convert(Tuple t, int dim) throws PigException
   {

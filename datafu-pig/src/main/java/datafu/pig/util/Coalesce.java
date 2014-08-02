@@ -27,9 +27,8 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 
 /**
- * Returns the first non-null value from a tuple, just like {@link <a href="http://msdn.microsoft.com/en-us/library/ms190349.aspx" target="_blank">COALESCE</a>} in SQL. 
- * 
- * <p>
+ * Returns the first non-null value from a tuple, just like <a href="http://msdn.microsoft.com/en-us/library/ms190349.aspx" target="_blank">COALESCE</a> in SQL. 
+ *
  * Example:
  * <pre>
  * {@code
@@ -44,10 +43,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  *
  * }
  * </pre>
- * </p>
- * 
- * @author "Matthew Hayes <mhayes@linkedin.com>"
- *
  */
 public class Coalesce extends AliasableEvalFunc<Object>
 {

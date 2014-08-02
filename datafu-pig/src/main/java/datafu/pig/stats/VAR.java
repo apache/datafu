@@ -40,25 +40,23 @@ import org.apache.pig.backend.executionengine.ExecException;
 
 
 /**
-* Generates the {@link <a href="http://en.wikipedia.org/wiki/Variance" target="_blank">Variance</a>} 
+* Generates the <a href="http://en.wikipedia.org/wiki/Variance" target="_blank">Variance</a>
 * of a set of Values. This UDF uses the fact that variance(x) = average(x^2) - average(x)^2
 * This class implements * {@link org.apache.pig.Algebraic}, so if possible the execution will performed in a distributed fashion.
 * VAR implements the {@link org.apache.pig.Accumulator} interface as well.
-* 
+*
 * Input: Bag of int, long, double, float or bytearray
 * Output: Double
-* 
-* <p>
+*
 * Example:
 * <pre>
 * define VAR datafu.pig.stats.VAR();
-* 
+*
 * -- input: 1,2,3,4,10,5,6,7,8,9
 * input = LOAD 'input' AS (val:int);
 * grouped = GROUP input ALL;
 * variance = FOREACH grouped GENERATE VAR(input.val) AS variance;
 * </pre>
-* </p>
 */
 public class VAR extends EvalFunc<Double> implements Algebraic, Accumulator<Double> {
     private static TupleFactory mTupleFactory = TupleFactory.getInstance();
@@ -68,7 +66,7 @@ public class VAR extends EvalFunc<Double> implements Algebraic, Accumulator<Doub
         try {
             Double sum = sum(input);
             Double sumSquare = sumSquare(input);
-            
+
             if(sum == null) {
                 // either we were handed an empty bag or a bag
                 // filled with nulls - return null in this case

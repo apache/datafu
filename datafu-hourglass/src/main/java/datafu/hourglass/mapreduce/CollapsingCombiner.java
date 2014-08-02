@@ -145,7 +145,7 @@ public class CollapsingCombiner extends ObjectReducer implements DateRangeConfig
   /**
    * Sets the schemas.
    * 
-   * @param schemas
+   * @param schemas schemas used by the combiner
    */
   public void setSchemas(PartitionCollapsingSchemas schemas)
   {
@@ -155,7 +155,7 @@ public class CollapsingCombiner extends ObjectReducer implements DateRangeConfig
   /**
    * Gets the schemas.
    * 
-   * @return schemas
+   * @return schemas schemas used by the combiner
    */
   public PartitionCollapsingSchemas getSchemas()
   {

@@ -34,8 +34,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 /**
  * Performs a transpose on a tuple, resulting in a bag of key, value fields where
  * the key is the column name and the value is the value of that column in the tuple.
- * 
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
@@ -50,10 +49,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  *
  * }
  * </pre>
- * </p>
- * 
- * @author "William Vaughan <wvaughan@linkedin.com>"
- *
  */
 public class TransposeTupleToBag extends AliasableEvalFunc<DataBag>
 {

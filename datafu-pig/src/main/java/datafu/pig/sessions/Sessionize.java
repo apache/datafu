@@ -47,13 +47,12 @@ import org.joda.time.Period;
  * session_id, that is a GUID indicating the session of the request.
  * </p>
  *
- * <p>
  * Example:
  * <pre>
  * {@code
- * 
+ *
  * %declare TIME_WINDOW  30m
- * 
+ *
  * define Sessionize datafu.pig.sessions.Sessionize('$TIME_WINDOW');
  *
  * views = LOAD 'views.tsv' AS (visit_date:chararray, member_id:int, url:chararray);
@@ -62,7 +61,7 @@ import org.joda.time.Period;
  * views = GROUP views BY member_id;
  * sessions = FOREACH views {
  *   visits = ORDER views BY visit_date;
- *   GENERATE FLATTEN(Sessionize(VISITS)) AS (visit_date,member_id,url,session_id); 
+ *   GENERATE FLATTEN(Sessionize(VISITS)) AS (visit_date,member_id,url,session_id);
  * }
  *
  * -- count the number of sessions hitting the url
@@ -70,7 +69,6 @@ import org.joda.time.Period;
  * result = FOREACH rollup GENERATE group AS url, COUNT(SESSIONS) AS session_cnt;
  * }
  * </pre>
- * </p>
  */
 @Nondeterministic
 public class Sessionize extends AccumulatorEvalFunc<DataBag>

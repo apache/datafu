@@ -34,34 +34,38 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 
 /**
- * Calculate conditional entropy H(Y|X) of random variables X and Y following conditional entropy's 
- * {@link <a href="http://en.wikipedia.org/wiki/Conditional_entropy" target="_blank">wiki definition</a>}, 
+ * Calculate conditional entropy H(Y|X) of random variables X and Y following conditional entropy's
+ * <a href="http://en.wikipedia.org/wiki/Conditional_entropy" target="_blank">wiki definition</a>,
  * X is the conditional variable and Y is the variable that conditions on X.
+ *
  * <p>
  * Each tuple of the input bag has 2 fields, the 1st field is an object instance of variable X and
  * the 2nd field is an object instance of variable Y. An exception will be thrown if the number of fields is not 2.
- * </p> 
+ * </p>
+ *
  * <p>
  * This UDF's constructor definition and parameters are the same as that of {@link datafu.pig.stats.entropy.Entropy}
  * </p>
- * <p>
+ *
  * Note:
  * <ul>
  *     <li>The input bag to this UDF must be <b>sorted</b> on X and Y, with X in the first sort order.
  *     An exception will be thrown if the input bag is not sorted.
  *     <li>The returned entropy value is of double type.
  * </ul>
- * </p>
+ *
  * <p>
- * How to use: 
+ * How to use:
  * </p>
+ *
  * <p>
  * This UDF calculates conditional entropy given raw data tuples of X and Y without the need to pre-compute per tuple occurrence frequency.
  * </p>
+ *
  * <p>
  * It could be used in a nested FOREACH after a GROUP BY, in which we sort the inner bag and use the sorted bag as this UDF's input.
  * </p>
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
@@ -79,21 +83,20 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * }
  * }
  * </pre>
- * </p>
+ *
  * Use case to calculate mutual information:
- * <p>
  * <pre>
  * {@code
  * ------------
  * -- calculate mutual information I(X, Y) using conditional entropy UDF and entropy UDF
  * -- I(X, Y) = H(Y) - H(Y|X)
  * ------------
- * 
+ *
  * define CondEntropy datafu.pig.stats.entropy.CondEntropy();
  * define Entropy datafu.pig.stats.entropy.Entropy();
- * 
+ *
  * input = LOAD 'input' AS (grp: chararray, valX: double, valY: double);
- * 
+ *
  * -- calculate the I(X,Y) in each group
  * input_group_g = GROUP input BY grp;
  * mutual_information = FOREACH input_group_g {
@@ -107,7 +110,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * }
  * }
  * </pre>
- * </p>
  * @see Entropy
  */
 public class CondEntropy extends AccumulatorEvalFunc<Double> {

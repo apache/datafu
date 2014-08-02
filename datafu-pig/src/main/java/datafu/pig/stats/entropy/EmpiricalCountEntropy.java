@@ -41,37 +41,40 @@ import datafu.pig.stats.entropy.EntropyUtil;
 
 /**
  * Calculate the empirical entropy of random variable X given its occurrence frequencies, following entropy's
- * {@link <a href="http://en.wikipedia.org/wiki/Entropy_%28information_theory%29" target="_blank">wiki definition</a>}
+ * <a href="http://en.wikipedia.org/wiki/Entropy_%28information_theory%29" target="_blank">wiki definition</a>.
+ *
  * <p>
  * This UDF's constructor takes 1 argument: the logarithm base, whose definition is the same as that defined in {@link datafu.pig.stats.entropy.Entropy}
  * </p>
- * <p>
- * Note: 
+ *
+ * Note:
  * <ul>
  *     <li>Unlike {@link datafu.pig.stats.entropy.Entropy}, which calculates entropy from sorted raw data bag in accumulative mode,
- *     this UDF calculates entropy from the data's occurrence frequencies which does not need to be sorted, either in accumulative or algebraic mode.
+ *     this UDF calculates entropy from the data's occurrence frequencies which does not need to be sorted, either in accumulative or algebraic mode.</li>
  *     <li>Each tuple of the UDF's input bag <b>must only</b> have 1 field, the occurrence frequency of a data instance,
- *     and the data type of this field <b>must</b> be int or long. Otherwise, an exception will be thrown.
- *     <li>Negative frequency number will be silently discarded and a warning message will be logged in the job's log file.
- *     <li>The returned entropy value is of double type.
+ *     and the data type of this field <b>must</b> be int or long. Otherwise, an exception will be thrown.</li>
+ *     <li>Negative frequency number will be silently discarded and a warning message will be logged in the job's log file.</li>
+ *     <li>The returned entropy value is of double type.</li>
  * </ul>
- * </p>
+ *
  * <p>
- * How to use: 
+ * How to use:
  * </p>
+ *
  * <p>
  * To use this UDF, customer needs to pre-compute the occurrence frequency of each data instance, often in an outer GROUP BY
  * , and then use this UDF to calculate entropy with those frequency numbers in another outer GROUP BY.
  * </p>
+ *
  * <p>
  * Compared with {@link datafu.pig.stats.entropy.Entropy}, this UDF is more scalable when we need to handle a very large data set, 
  * since it could distribute computation onto mappers and take advantage of combiners to reduce intermedidate output from mappers to reducers.
  * </p>
- * <p>
+ *
  * Example:
  * <pre>
  * {@code
- * 
+ *
  * define Entropy datafu.pig.stats.entropy.EmpiricalCountEntropy();
  *
  * input = LOAD 'input' AS (val: double);
@@ -79,48 +82,48 @@ import datafu.pig.stats.entropy.EntropyUtil;
  * -- calculate the occurrence of each instance
  * counts_g = GROUP input BY val;
  * counts = FOREACh counts_g GENERATE COUNT(input) AS cnt;
- * 
- * -- calculate entropy 
+ *
+ * -- calculate entropy
  * input_counts_g = GROUP counts ALL;
  * entropy = FOREACH input_counts_g GENERATE Entropy(counts) AS entropy;
  * }
  * </pre>
- * </p>
+ *
  * Use case to calculate mutual information using EmpiricalCountEntropy:
- * <p>
+ *
  * <pre>
  * {@code
- * 
+ *
  * define Entropy datafu.pig.stats.entropy.EmpiricalCountEntropy();
- * 
+ *
  * input = LOAD 'input' AS (valX: double, valY: double);
- * 
+ *
  * ------------
  * -- calculate mutual information I(X, Y) using entropy
  * -- I(X, Y) = H(X) + H(Y) -  H(X, Y)
  * ------------
- * 
+ *
  * input_x_y_g = GROUP input BY (valX, valY);
  * input_x_y_cnt = FOREACH input_x_y_g GENERATE flatten(group) as (valX, valY), COUNT(input) AS cnt;
- * 
+ *
  * input_x_g = GROUP input_x_y_cnt BY valX;
  * input_x_cnt = FOREACH input_x_g GENERATE flatten(group) as valX, SUM(input_x_y_cnt.cnt) AS cnt;
- * 
+ *
  * input_y_g = GROUP input_x_y_cnt BY valY;
  * input_y_cnt = FOREACH input_y_g GENERATE flatten(group) as valY, SUM(input_x_y_cnt.cnt) AS cnt;
- * 
+ *
  * input_x_y_entropy_g = GROUP input_x_y_cnt ALL;
  * input_x_y_entropy = FOREACH input_x_y_entropy_g {
  *                         input_x_y_entropy_cnt = input_x_y_cnt.cnt;
  *                         GENERATE Entropy(input_x_y_entropy_cnt) AS x_y_entropy;
  *                     }
- *                         
+ *
  * input_x_entropy_g = GROUP input_x_cnt ALL;
  * input_x_entropy = FOREACH input_x_entropy_g {
  *                         input_x_entropy_cnt = input_x_cnt.cnt;
  *                         GENERATE Entropy(input_x_entropy_cnt) AS x_entropy;
  *                   }
- *                       
+ *
  * input_y_entropy_g = GROUP input_y_cnt ALL;
  * input_y_entropy = FOREACH input_y_entropy_g {
  *                         input_y_entropy_cnt = input_y_cnt.cnt;
@@ -133,7 +136,6 @@ import datafu.pig.stats.entropy.EntropyUtil;
  *                                             input_x_y_entropy::x_y_entropy) AS mi;
  * }
  * </pre>
- * </p>
  * @see Entropy
  */
 

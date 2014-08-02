@@ -27,7 +27,7 @@ import datafu.pig.hash.lsh.interfaces.LSHCreator;
 import datafu.pig.hash.lsh.p_stable.L2LSH;
 
 /**
- * From wikipedia's article on {@link <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>}:
+ * From wikipedia's article on <a href="http://en.wikipedia.org/wiki/Locality-sensitive_hashing" target="_blank">Locality Sensitive Hashing</a>:
  * <pre>
  * Locality-sensitive hashing (LSH) is a method of performing probabilistic dimension reduction of high-dimensional data. 
  * The basic idea is to hash the input items so that similar items are mapped to the same buckets with high probability 
@@ -35,7 +35,7 @@ import datafu.pig.hash.lsh.p_stable.L2LSH;
  * </pre>
  * 
  * In particular, this implementation implements a locality sensitive hashing scheme which maps high-dimensional vectors which are
- * close together (with high probability) according to the {@link <a href="http://en.wikipedia.org/wiki/Lp_space" target="_blank">L2</a>}
+ * close together (with high probability) according to the <a href="http://en.wikipedia.org/wiki/Lp_space" target="_blank">L2</a>
  * distance metric into the same buckets.  This implementation uses a 2-stable distribution (a Gaussian distribution) in order
  * to accomplish this.
  * 
@@ -136,7 +136,7 @@ public class L2PStableHash extends LSHFunc{
      * };
      * 
      * -- Filter out the hashes which resulted in no matches
-     * NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) > 0;
+     * NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) &gt; 0;
      * 
      * -- group by the query
      * NEIGHBORS_GRP = group NOT_NULL by query_pt;

@@ -39,39 +39,39 @@ import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
- * A UDF which implements {@link <a href="http://en.wikipedia.org/wiki/PageRank" target="_blank">PageRank</a>}.
- * 
- * <p>  
- * This is not a distributed implementation.  Each graph is stored in memory while running the algorithm, with edges optionally 
+ * A UDF which implements <a href="http://en.wikipedia.org/wiki/PageRank" target="_blank">PageRank</a>.
+ *
+ * <p>
+ * This is not a distributed implementation.  Each graph is stored in memory while running the algorithm, with edges optionally
  * spilled to disk to conserve memory.  This can be used to distribute the execution of PageRank on multiple
  * reasonably sized graphs.  It does not distribute execuion of PageRank for each individual graph.  Each graph is identified
  * by an integer valued topic ID.
  * </p>
- * 
+ *
  * <p>
  * If the graph is too large to fit in memory than an alternative method must be used, such as an iterative approach which runs
  * many MapReduce jobs in a sequence to complete the PageRank iterations.
  * </p>
- * 
+ *
  * <p>
  * Each graph is represented through a bag of (source,edges) tuples.  The 'source' is an integer ID representing the source node.
  * The 'edges' are the outgoing edges from the source node, represented as a bag of (dest,weight) tuples.  The 'dest' is an
  * integer ID representing the destination node.  The weight is a double representing how much the edge should be weighted.
  * For a standard PageRank implementation just use weight of 1.0.
  * </p>
- * 
+ *
  * <p>
  * The output of the UDF is a bag of (source,rank) pairs, where 'rank' is the PageRank value for that source in the graph.
  * </p>
- * 
+ *
  * <p>
  * There are several configurable options for this UDF, among them:
- * <p>
- * 
+ * </p>
+ *
  * <ul>
  * <li>
  * <b>alpha</b>: Controls the PageRank alpha value.  The default is 0.85.  A higher value reduces the "random jump"
- * factor and causes the rank to be influenced more by edges. 
+ * factor and causes the rank to be influenced more by edges.
  * </li>
  * <li>
  * <b>max_iters</b>: The maximum number of iterations to run.  The default is 150.
@@ -83,8 +83,8 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * <li>
  * <b>tolerance</b>: A threshold which causes iterations to cease.  It is measured from the total change in ranks from each of
  * the nodes in the graph.  As the ranks settle on their final values the total change decreases.  This can be used
- * to stop iterations early.  The default is 1e-16. 
- * </li> 
+ * to stop iterations early.  The default is 1e-16.
+ * </li>
  * <li>
  * <b>max_nodes_and_edges</b>: This is a control to prevent running out of memory.  As a graph is loaded, if the sum of edges
  * and nodes exceeds this value then it will stop.  It will not fail but PageRank will not be run on this graph.  Instead a null
@@ -92,52 +92,48 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * </li>
  * <li>
  * <b>spill_to_edge_disk_storage</b>: Used to conserve memory.  When "true" it causes the edge data to be written to disk in a temp file instead
- * of being held in memory when the number of edges exceeds a threshold.  The nodes are still held in memory however.  
+ * of being held in memory when the number of edges exceeds a threshold.  The nodes are still held in memory however.
  * Each iteration of PageRank will stream through the edges stored on disk.  The default is "false".
  * </li>
  * <li>
  * <b>max_edges_in_memory</b>: When spilling edges to disk is enabled, this is the threshold which triggers that behavior.  The default is 30M.
  * </li>
  * </ul>
- * 
+ *
  * <p>
  * Parameters are configured by passing them in as a sequence of pairs into the UDF constructor.  For example, below the alpha value is set to
  * 0.87 and dangling nodes are enabled.  All arguments must be strings.
  * </p>
- * 
- * <p>
+ *
  * <pre>
  * {@code
  * define PageRank datafu.pig.linkanalysis.PageRank('alpha','0.87','dangling_nodes','true');
  * }
  * </pre>
- * </p>
- * 
- * <p>
+ *
  * Full example:
  * <pre>
  * {@code
- * 
+ *
  * topic_edges = LOAD 'input_edges' as (topic:INT,source:INT,dest:INT,weight:DOUBLE);
- * 
+ *
  * topic_edges_grouped = GROUP topic_edges by (topic, source) ;
  * topic_edges_grouped = FOREACH topic_edges_grouped GENERATE
  *    group.topic as topic,
  *    group.source as source,
  *    topic_edges.(dest,weight) as edges;
- * 
- * topic_edges_grouped_by_topic = GROUP topic_edges_grouped BY topic; 
- * 
+ *
+ * topic_edges_grouped_by_topic = GROUP topic_edges_grouped BY topic;
+ *
  * topic_ranks = FOREACH topic_edges_grouped_by_topic GENERATE
  *    group as topic,
  *    FLATTEN(PageRank(topic_edges_grouped.(source,edges))) as (source,rank);
  *
  * topic_ranks = FOREACH topic_ranks GENERATE
  *    topic, source, rank;
- * 
+ *
  * }
  * </pre>
- * </p> 
  */
 public class PageRank extends AccumulatorEvalFunc<DataBag>
 {

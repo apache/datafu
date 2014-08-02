@@ -32,53 +32,57 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 
 /**
- * Calculate entropy H(X) of random variable X following entropy's 
- * {@link <a href="http://en.wikipedia.org/wiki/Entropy_%28information_theory%29" target="_blank">wiki definition</a>}
+ * Calculate entropy H(X) of random variable X following entropy's
+ * <a href="http://en.wikipedia.org/wiki/Entropy_%28information_theory%29" target="_blank">wiki definition</a>
+ *
  * <p>
  * This UDF's constructor takes 2 arguments. 
  * </p>
- * <p>
+ *
  * The 1st argument, the type of entropy estimator algorithm we currently support, includes:
  * <ul>
  *     <li>empirical (empirical entropy estimator)
  *     <li>chaosh (Chao-Shen entropy estimator) 
  * </ul>
- * </p>
+ *
  * <p>
  * The default estimation algorithm is empirical.
  * </p>
+ *
  * <p>
  * The 2nd argument, the logarithm base we currently support, includes:
  * </p>
- * <p>
+ *
  * <ul>
  *     <li>log (use Euler's number as the logarithm base)
  *     <li>log2 (use 2 as the logarithm base)
  *     <li>log10 (use 10 as the logarithm base) 
  * </ul>
- * </p>
+ *
  * <p>
  * The default logarithm base is log.
  * </p> 
- * <p>
+ *
  * Note:
  * <ul>
  *     <li>The input to this UDF must be a <b>sorted</b> bag of raw data tuples of X.
  *     An exception will be thrown if the input bag is not sorted 
  *     <li>The returned entropy value is of double type.
  * </ul>
- * </p>
+ *
  * <p>
  * How to use: 
  * </p>
+ *
  * <p>
  * This UDF calculates entropy from raw data tuples without the need to pre-compute per tuple occurrence frequency.
  * </p>
+ *
  * <p>
  * It could be used in a nested FOREACH after a GROUP BY, in which we sort the inner bag and use the sorted bag as this UDF's input.
  * </p>
+ *
  * Example:
- * <p>
  * <pre>
  * {@code
  * --calculate empirical entropy with Euler's number as the logarithm base
@@ -95,7 +99,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * }
  * }
  * </pre>
- * </p>
  * @see CondEntropy
  * @see EmpiricalCountEntropy
  */

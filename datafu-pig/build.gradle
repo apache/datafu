@@ -1,7 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'license'
 apply plugin: 'gradle-autojar'
-apply plugin: 'maven-publish'
 apply plugin: 'download-task'
 
 import groovy.xml.MarkupBuilder
@@ -79,21 +78,7 @@ jar
   classifier = "core"
 }
 
-task sourcesJar(type: Jar) {
-  description 'Creates the sources jar'
-
-  classifier = 'sources'
-  from sourceSets.main.allJava
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  description 'Creates the javadoc jar'
-
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
-
-ext 
+ext
 {
   autojarBuildDir = tasks.jar.destinationDir
 }
@@ -126,7 +111,7 @@ task jarWithDependenciesNamespaced(dependsOn: jarWithDependencies) {
 }
 
 task finalJar(type: Jar, dependsOn: jarWithDependenciesNamespaced) {
-  description 'Creates the final jar' 
+  description 'Creates the final jar'
 
   from(zipTree(jarWithDependenciesNamespaced.outputFile))
 }
@@ -135,39 +120,7 @@ task finalJar(type: Jar, dependsOn: jarWithDependenciesNamespaced) {
 configurations.archives.artifacts.removeAll { return it.classifier == "core"; }
 
 artifacts {
-  archives sourcesJar
-  archives javadocJar
   archives finalJar
-}
-
-// Note: alternate way to publish: https://github.com/Netflix/gradle-template
-
-publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      artifact sourcesJar
-      artifact javadocJar
-      artifact finalJar
-
-      pom.withXml {
-        asNode().appendNode("packaging","jar")
-        asNode().appendNode("name","Apache DataFu")        
-        asNode().appendNode("description","A collection of user-defined functions for working with large-scale data in Hadoop and Pig.")
-        asNode().appendNode("url","http://datafu.incubator.apache.org/")
-
-        def licenseNode = asNode().appendNode("licenses").appendNode("license")
-        licenseNode.appendNode("name","The Apache Software License, Version 2.0")
-        licenseNode.appendNode("url","http://www.apache.org/licenses/LICENSE-2.0.txt")
-        licenseNode.appendNode("distribution","repo")
-
-        def dependenciesNode = asNode().appendNode("dependencies")
-        def dependency = dependenciesNode.appendNode("dependency")
-        dependency.appendNode("groupId","joda-time")
-        dependency.appendNode("artifactId","joda-time")
-        dependency.appendNode("version","$jodaTimeVersion")
-      }
-    }
-  }
 }
 
 // create tasks to automatically add the license header
@@ -206,6 +159,16 @@ dependencies {
 
   testCompile "org.testng:testng:$testngVersion"
   testCompile project(":build-plugin")
+}
+
+modifyPom {
+  project {
+    dependencies {
+      // No dependencies because everything we need is autojarred.
+      // The only exception is joda-time, but this is already a pig dependency
+      // so it should already be available.
+    }
+  }
 }
 
 compileTestJava.doFirst {

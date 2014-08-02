@@ -32,3 +32,12 @@ cleanEclipse {
     delete "bin"
   }
 }
+
+// no need for source or javadoc jars to be published for build-plugin
+nexus {
+  attachSources = false
+  attachJavadoc = false
+}
+
+// don't publish the build plugin
+configurations.archives.artifacts.removeAll { return it.name == "build-plugin"; }

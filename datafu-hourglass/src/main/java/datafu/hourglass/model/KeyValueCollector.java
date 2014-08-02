@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * Provided to an instance of {@link Mapper} to collect key-value pairs.
- * 
+ *
  * @author "Matthew Hayes"
  *
  * @param <K> Key type
@@ -36,8 +36,8 @@ public interface KeyValueCollector<K,V>
    * 
    * @param key Key to be collected
    * @param value Value to be collected
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException IOException
+   * @throws InterruptedException InterruptedException
    */
   void collect(K key,V value)  throws IOException, InterruptedException;
 }

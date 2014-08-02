@@ -99,7 +99,7 @@ public abstract class AbstractNonIncrementalJob extends TimeBasedJob
    * 
    * @param name job name
    * @param props configuration properties
-   * @throws IOException
+   * @throws IOException IOException
    */
   public AbstractNonIncrementalJob(String name, Properties props) throws IOException
   {        
@@ -144,9 +144,9 @@ public abstract class AbstractNonIncrementalJob extends TimeBasedJob
   /**
    * Runs the job.
    * 
-   * @throws IOException
-   * @throws InterruptedException
-   * @throws ClassNotFoundException
+   * @throws IOException IOException
+   * @throws InterruptedException InterruptedException
+   * @throws ClassNotFoundException ClassNotFoundException
    */
   @Override
   public void run() throws IOException, InterruptedException, ClassNotFoundException

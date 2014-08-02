@@ -36,61 +36,52 @@ If you'd like to jump in and get started, check out the corresponding guides for
 
 ## Getting Help
 
-Bugs and feature requests can be filed [here](https://issues.apache.org/jira/browse/DATAFU).  For other help please see the [discussion group](http://groups.google.com/group/datafu).
+Bugs and feature requests can be filed [here](https://issues.apache.org/jira/browse/DATAFU).  For other help please see the [website](http://datafu.incubator.apache.org/).
 
 ## Developers
 
-### DataFu Pig
+### Building the Code
 
-#### Building the Code
+To build DataFu from a git checkout or binary release, run:
 
-The Apache DataFu Pig library can be built by running the command below.  More information about working with the source
-code can be found in the [DataFu Pig Contributing Guide](http://datafu.incubator.apache.org/docs/datafu/contributing.html).
+    ./gradlew clean assemble
 
-```
-./gradlew assemble
-```
+To build DataFu from a source release, it is first necessary to download the gradle wrapper script above. This bootstrapping process requires Gradle to be installed on the source machine.  Gradle is available through most package managers or directly from [its website](http://www.gradle.org/).  To bootstrap the wrapper, run:
 
-The built JAR can be found under `datafu-pig/build/libs` by the name `datafu-pig-x.y.z.jar`, where x.y.z is the version.
+    gradle -b bootstrap.gradle
 
-#### Generating Eclipse Files
+After the bootstrap script has completed, the regular gradlew instructions are available.
+
+The datafu-pig JAR can be found under `datafu-pig/build/libs` by the name `datafu-pig-x.y.z.jar`, where x.y.z is the version.  Similarly, the datafu-hourglass can be found in the `datafu-hourglass/build/libs` directory.
+
+### Generating Eclipse Files
 
 This command generates the eclipse project and classpath files:
 
-```
-./gradlew eclipse
-```
+    ./gradlew eclipse
 
 To clean up the eclipse files:
 
-```
-./gradlew cleanEclipse
-```
+    ./gradlew cleanEclipse
 
-#### Running the Tests
+### Running the Tests
 
 To run all the tests:
 
-```
-./gradlew test
-```
+    ./gradlew test
+
+To run only the DataFu Pig tests:
+
+    ./gradlew :datafu-pig:test
+
+To run only the DataFu Hourglass tests:
+
+    ./gradlew :datafu-hourglass:test
 
 To run tests for a single class, use the `test.single` property.  For example, to run only the QuantileTests:
 
-```
-./gradlew :datafu-pig:test -Dtest.single=QuantileTests
-```
+    ./gradlew :datafu-pig:test -Dtest.single=QuantileTests
 
 The tests can also be run from within eclipse.  Note that you may run out of heap when executing tests in Eclipse. To fix this adjust your heap settings for the TestNG plugin. Go to Eclipse->Preferences. Select TestNG->Run/Debug. Add "-Xmx1G" to the JVM args.
 
-### DataFu Hourglass
 
-#### Building the Code
-
-The Apache DataFu Pig library can be built by running the commands below.  More information about working with the source
-code can be found in the [DataFu Hourglass Contributing Guide](http://datafu.incubator.apache.org/docs/hourglass/contributing.html).
-
-```
-cd contrib/hourglass
-ant jar
-```
