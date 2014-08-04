@@ -186,6 +186,7 @@ dependencies {
   autojarred "org.apache.opennlp:opennlp-tools:$openNlpVersion"
   autojarred "org.apache.opennlp:opennlp-uima:$openNlpVersion"
   autojarred "org.apache.opennlp:opennlp-maxent:$openNlpMaxEntVersion"
+  autojarred "org.ahocorasick:ahocorasick:$ahocorasickVersion"
 
   // needed to run jarjar
   jarjar "com.googlecode.jarjar:jarjar:1.3"
