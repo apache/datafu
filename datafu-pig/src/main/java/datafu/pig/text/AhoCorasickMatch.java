@@ -51,14 +51,14 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * Example:
  * <pre>
  * {@code
- * define AhoCorasickMatch datafu.pig.text.AhoCorasickMatch();
+ * define AhoCorasickMatch datafu.pig.text.AhoCorasickMatch('REMOVE_OVERLAPS', 'ONLY_WHOLE_WORDS', 'CASE_INSENSITIVE');
  *
  * -- input:
- * -- (Hello mister. How are you, sport?,{(hello),(mister),(how),(are),(you)})
+ * -- (This is a sentence. This is another sentence,{(sent),(an),(his),(ten),(apple)})
  * input = LOAD 'input' AS (inputText:chararray,dictionary:bag{T:tuple(word:chararray)});
  *
  * -- output:
- * -- ()
+ * -- ({(an,28,29),(his,1,3),(his,21,23),(sent,10,13),(sent,36,39)})
  * output = FOREACH input GENERATE AhoCorasickMatch(inputText,dictionary);
  * }
  * </pre>
@@ -67,31 +67,73 @@ public class AhoCorasickMatch extends EvalFunc<DataBag>{
 
     private static final BagFactory bagFactory = BagFactory.getInstance();
     private static final TupleFactory tupleFactory = TupleFactory.getInstance();
+    private boolean REMOVE_OVERLAPS = false;
+    private boolean ONLY_WHOLE_WORDS = false;
+    private boolean CASE_INSENSITIVE = false;
+
+    public AhoCorasickMatch(String ... options)
+    {
+        for(String option : options)
+        {
+            if(option == "REMOVE_OVERLAPS")
+            {
+                this.REMOVE_OVERLAPS = true;
+            }
+            if(option == "ONLY_WHOLE_WORDS")
+            {
+                this.ONLY_WHOLE_WORDS = true;
+            }
+            if(option == "CASE_INSENSITIVE")
+            {
+                this.CASE_INSENSITIVE = true;
+            }
+        }
+    }
+
+    public AhoCorasickMatch() {}
 
     @Override
     public DataBag exec(Tuple input) throws IOException {
         DataBag outputBag = bagFactory.newDistinctBag();
-        Trie trie = new Trie().removeOverlaps();
+        Trie trie = new Trie();
+
+        // Handle options
+        if (REMOVE_OVERLAPS) {
+            trie = trie.removeOverlaps();
+        }
+        if (ONLY_WHOLE_WORDS)
+        {
+            trie = trie.onlyWholeWords();
+        }
+        if (CASE_INSENSITIVE)
+        {
+            trie = trie.caseInsensitive();
+        }
 
         // Must have both arguments specified
-        if (input.size() != 2) {
+        if (input.size() != 2)
+        {
             throw new IOException();
         }
 
         // chararray input text
         String inputString = input.get(0).toString();
-        if (inputString == null || inputString == "") {
+        if (inputString == null || inputString == "")
+        {
             return null;
         }
 
         // Bag of strings search dictionary
         Object o = input.get(1);
         if (!(o instanceof DataBag))
+        {
             throw new RuntimeException("parameters must be databags");
+        }
 
         // Build Trie dictionary
         DataBag inputBag = (DataBag) o;
-        for (Tuple elem : inputBag) {
+        for (Tuple elem : inputBag)
+        {
             String matchWord = elem.get(0).toString();
             trie.addKeyword(matchWord);
         }
@@ -100,7 +142,8 @@ public class AhoCorasickMatch extends EvalFunc<DataBag>{
         Collection<Emit> emits = trie.parseText(inputString);
 
         // Build a 3-tuple for each emit, (word, start, end), ex.: (bob, 10, 12)
-        for(Emit emit : emits) {
+        for(Emit emit : emits)
+        {
             Tuple t = tupleFactory.newTuple(3);
 
             t.set(0, emit.getKeyword());
@@ -137,11 +180,11 @@ public class AhoCorasickMatch extends EvalFunc<DataBag>{
                 throw new RuntimeException("Expected a BAG of TUPLEs as second input");
             }
 
-            Schema.FieldSchema tupleSchema = inputBagSchema.getField(0);
-            if (tupleSchema.type != DataType.CHARARRAY)
+            Schema tupleSchema = inputBagSchema.getField(0).schema;
+            if (tupleSchema.getField(0).type != DataType.CHARARRAY)
             {
-                throw new RuntimeException(String.format("Expected secodnd input to contain a BAG of TUPLES with a single CHARARRAY field, but instead found %s",
-                        DataType.findTypeName(inputBagSchema.getField(0).type)));
+                throw new RuntimeException(String.format("Expected second input to contain a BAG of TUPLES with a single " +
+                                "CHARARRAY field, but instead found %s", tupleSchema.toString()));
             }
 
             // Build output Schema - a bag of tuples with three fields: keyword/start/end
