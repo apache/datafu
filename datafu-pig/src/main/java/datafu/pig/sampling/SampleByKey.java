@@ -39,11 +39,11 @@ import org.apache.pig.data.Tuple;
  *
  * <p>
  * The only required parameter is the sampling probability.  This may be followed
- * by an optional seed value to control the random number generation.  
+ * by an optional seed value to control the random number generation.
  * </p>
  *
  * <p>
- * SampleByKey will work deterministically as long as the same seed is provided.  
+ * SampleByKey will work deterministically as long as the same seed is provided.
  * </p>
  *
  * Example:
@@ -51,12 +51,12 @@ import org.apache.pig.data.Tuple;
  * <pre>
  * {@code
  * DEFINE SampleByKey datafu.pig.sampling.SampleByKey('0.5');
- * 
+ *
  *-- input: (A,1), (A,2), (A,3), (B,1), (B,3)
- * 
+ *
  * data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
  * output = FILTER data BY SampleByKey(A_id);
- * 
+ *
  * --output: (B,1), (B,3)
  * }
  * </pre>
@@ -67,14 +67,14 @@ import org.apache.pig.data.Tuple;
 public class SampleByKey extends FilterFunc
 {
   final static int PRIME_NUMBER = 31;
-  
+
   Integer seed = null;
   double probability;
-  
+
   public SampleByKey(String probability) {
     this.probability = Double.parseDouble(probability);
   }
-  
+
   public SampleByKey(String probability, String salt) {
     this(probability);
     this.seed = salt.hashCode();
@@ -83,20 +83,21 @@ public class SampleByKey extends FilterFunc
   @Override
   public void setUDFContextSignature(String signature)
   {
-    if (this.seed == null)
-      this.seed = signature.hashCode();
+    if (this.seed == null && signature != null) {
+        this.seed = signature.hashCode();
+    }
     super.setUDFContextSignature(signature);
   }
 
   @Override
-  public Boolean exec(Tuple input) throws IOException 
+  public Boolean exec(Tuple input) throws IOException
   {
     int hashCode = 0;
     for(int i=0; i<input.size(); i++) {
       Object each = input.get(i);
       hashCode = hashCode*PRIME_NUMBER + each.hashCode();
     }
-      
+
     try {
       return intToRandomDouble(hashCode) <= probability;
     }
@@ -105,7 +106,7 @@ public class SampleByKey extends FilterFunc
       throw new RuntimeException("Exception on intToRandomDouble");
     }
   }
-  
+
   private Double intToRandomDouble(int input) throws Exception
   {
     MessageDigest hasher = MessageDigest.getInstance("sha-1");
@@ -113,7 +114,7 @@ public class SampleByKey extends FilterFunc
     ByteBuffer b = ByteBuffer.allocate(4+4);
     ByteBuffer b2 = ByteBuffer.allocate(20);
 
-    b.putInt(seed);
+    b.putInt(seed == null ? PRIME_NUMBER : seed);
     b.putInt(input);
     byte[] digest = hasher.digest(b.array());
     b.clear();
