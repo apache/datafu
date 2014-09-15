@@ -19,14 +19,11 @@
 
 package datafu.test.pig.bags;
 
-import static org.testng.Assert.assertEquals;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
+import datafu.pig.bags.CountEach;
+import datafu.pig.bags.DistinctBy;
+import datafu.pig.bags.Enumerate;
+import datafu.test.pig.PigTests;
 import junit.framework.Assert;
-
 import org.adrianwalker.multilinestring.Multiline;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataBag;
@@ -35,10 +32,11 @@ import org.apache.pig.data.TupleFactory;
 import org.apache.pig.pigunit.PigTest;
 import org.testng.annotations.Test;
 
-import datafu.pig.bags.CountEach;
-import datafu.pig.bags.DistinctBy;
-import datafu.pig.bags.Enumerate;
-import datafu.test.pig.PigTests;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import static org.testng.Assert.assertEquals;
 
 
 public class BagTests extends PigTests
