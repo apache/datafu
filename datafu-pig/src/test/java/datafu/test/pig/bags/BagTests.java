@@ -1156,6 +1156,44 @@ public class BagTests extends PigTests
         "(1,{(K1,A1,K1,A2,K1,A3),(K2,B1,K2,B2,,),(K2,B1,K2,B22,,),(K3,C1,,,K3,C3)},{(K1,A1,K1,A3,K1,A2),(K2,B1,,,K2,B2),(K2,B1,,,K2,B22),(K3,C1,K3,C3,,)})");
   }
 
+    /**
+
+
+     define BagFullOuterJoin datafu.pig.bags.BagJoin('full');
+
+     data = LOAD 'input' AS (outer_key:chararray, bag1:bag{T:tuple(k:chararray,v:chararray)}, bag2:bag{T:tuple(k:chararray,v:chararray)}, bag3:bag{T:tuple(k3:chararray,v3:chararray)});
+     describe data;
+
+     data2 = FOREACH data GENERATE
+     outer_key,
+     BagFullOuterJoin(bag1, 'k', bag2, 'k', bag3, 'k3') as joined1,
+     BagFullOuterJoin(bag1, 'k', bag3, 'k3', bag2, 'k') as joined2; --this will break without UDF signature and pig < 0.11
+     describe data2;
+
+     STORE data2 INTO 'output';
+
+     */
+    @Multiline
+    private String bagJoinFullOuterTest;
+
+    @Test
+    public void bagJoinFullOuterTest() throws Exception {
+        PigTest test = createPigTestFromString(bagJoinFullOuterTest);
+
+        writeLinesToFile("input",
+                "1\t{(K1,A1),(K2,B1),(K3,C1)}\t{(K1,A2),(K2,B2),(K2,B22)}\t{(K1,A3),(K3,C3),(K4,D3)}");
+
+        try {
+            test.runScript();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+        assertOutput(test, "data2",
+                "(1,{(K1,A1,K1,A2,K1,A3),(K2,B1,K2,B2,,),(K2,B1,K2,B22,,),(K3,C1,,,K3,C3),(,,,,K4,D3)},{(K1,A1,K1,A3,K1,A2),(K2,B1,,,K2,B2),(K2,B1,,,K2,B22),(K3,C1,K3,C3,,),(,,K4,D3,,)})");
+    }
+
   /**
 
 
