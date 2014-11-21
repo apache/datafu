@@ -36,15 +36,15 @@ import java.util.*;
  * <p>
  * The format for invocation is BagJoin(bag, 'key',....).
  * This UDF expects that all bags are non-null and that there is a corresponding key for each bag.  
- * The <em>key</em> that is expected is the alias of the key inside of the preceding bag.  By default, an inner
- * join is performed.  You can also perform 'left' and 'full' outer joins by specifying 'left' or 'full' in the
+ * The <em>key</em> that is expected is the alias of the key inside of the preceding bag.  By default, an 'inner'
+ * join is performed.  You can also perform 'left' or 'full' outer joins by specifying 'left' or 'full' in the
  * definition.
  * </p> 
  * 
  * <p>
  * Example:
  * <code>
- * define BagJoin datafu.pig.bags.BagJoin();
+ * define BagJoin datafu.pig.bags.BagJoin(); -- inner join
  * 
  * -- describe data: 
  * -- data: {bag1: {(key1: chararray,value1: chararray)},bag2: {(key2: chararray,value2: int)}} 
@@ -61,7 +61,6 @@ import java.util.*;
  */
 public class BagJoin extends AliasableEvalFunc<DataBag>
 {
-
   private static final String BAG_NAMES_PROPERTY = "BagFullOuterJoin_BAG_NAMES";
   private static final String BAG_NAME_TO_JOIN_PREFIX_PROPERTY = "BagFullOuterJoin_BAG_NAME_TO_JOIN_PREFIX";
   private static final String BAG_NAME_TO_SIZE_PROPERTY = "BagFullOuterJoin_BAG_NAME_TO_SIZE_PROPERTY";
@@ -76,7 +75,7 @@ public class BagJoin extends AliasableEvalFunc<DataBag>
   public enum JoinType { INNER,LEFT,FULL }
 
   public BagJoin() {
-    this.joinType = JoinType.INNER;
+    this("inner");
   }
 
   public BagJoin(String joinType) {
@@ -84,6 +83,8 @@ public class BagJoin extends AliasableEvalFunc<DataBag>
           this.joinType = JoinType.LEFT;
       } else if ("full".equals(joinType.toLowerCase())) {
           this.joinType = JoinType.FULL;
+      } else if ("inner".equals(joinType.toLowerCase())) {
+          this.joinType = JoinType.INNER;
     } else {
           throw new IllegalArgumentException("Invalid constructor argument.  Valid values are 'left' or 'full', found: " + joinType);
     }
