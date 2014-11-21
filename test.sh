@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 echo $$ > test.pid
-gradle test
+./gradlew clean test
 rm test.pid
