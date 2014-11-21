@@ -123,8 +123,8 @@ public class BagJoin extends AliasableEvalFunc<DataBag>
 
       // if this is the first list of tuples, then just add them all
       if (this.data == null) {
-        this.data = new HashMap<>();
-        this.keys = new HashSet<>();
+        this.data = new HashMap<Object, List<Tuple>>();
+        this.keys = new HashSet<Object>();
         for (Tuple tuple : tuples) {
           Object key = getObject(tuple, keyName);
           if (!this.data.containsKey(key)) {
@@ -141,8 +141,8 @@ public class BagJoin extends AliasableEvalFunc<DataBag>
       }
 
       // otherwise, join
-      HashMap<Object, List<Tuple>> joinedData = new HashMap<>(this.data.size());
-      Set<Object> joinedKeys = new HashSet<>();
+      HashMap<Object, List<Tuple>> joinedData = new HashMap<Object, List<Tuple>>(this.data.size());
+      Set<Object> joinedKeys = new HashSet<Object>();
       for (Tuple tuple : tuples) {
         Object key = getObject(tuple, keyName);
         if (data.containsKey(key)) {
@@ -216,7 +216,7 @@ public class BagJoin extends AliasableEvalFunc<DataBag>
   {
     retrieveContextValues();
 
-    HashMap<String,String> joinKeyNames = new HashMap<>();
+    HashMap<String,String> joinKeyNames = new HashMap<String,String>();
     for (int i = 1; i < input.size(); i += 2) {
       joinKeyNames.put(bagNames.get(i / 2), (String) input.get(i));
     }
