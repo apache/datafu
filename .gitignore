@@ -26,3 +26,4 @@ datafu-pig/input*
 datafu-pig/docs
 datafu-pig/queries
 datafu-pig/query
+*.patch

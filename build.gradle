@@ -14,6 +14,33 @@ allprojects {
 
 apply from: file("gradle/dependency-versions.gradle")
 apply from: file("gradle/release.gradle")
+apply from: file("gradle/rat.gradle")
+
+rat {
+  excludes = [
+    '**/.git/**',
+    '**/.gradle/**',
+    '**/.project',
+    '**/.factorypath',
+    '**/.settings/**',
+    '**/.classpath',
+    '**/*.iml',
+    '**/*.iws',
+    '**/*.ipr',
+    'gradle/wrapper/**',
+    '.reviewboardrc',
+    'gradlew',
+    'README.md',
+    'RELEASE.md',
+    '**/.DS_Store/**',
+    '**/.gitignore',
+    '**/build/**',
+    '**/target/**',
+    '**/bin/**',
+    '**/test-output/**',
+    'docs/Gemfile.lock'
+  ]
+}
 
 allprojects {
   apply plugin: 'eclipse'

@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'license'
 apply plugin: 'gradle-autojar'
 apply plugin: 'download-task'
 
@@ -121,12 +120,6 @@ configurations.archives.artifacts.removeAll { return it.classifier == "core"; }
 
 artifacts {
   archives finalJar
-}
-
-// create tasks to automatically add the license header
-license {
-  header rootProject.file('HEADER')
-  skipExistingHeaders = true
 }
 
 dependencies {

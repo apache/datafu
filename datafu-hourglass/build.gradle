@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'license'
 
 import groovy.xml.MarkupBuilder
 
@@ -18,12 +17,6 @@ cleanEclipse {
     delete ".factorypath"
     delete "bin"
   }
-}
-
-// create tasks to automatically add the license header
-license {
-  header rootProject.file('HEADER')
-  skipExistingHeaders = true
 }
 
 dependencies {

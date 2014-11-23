@@ -23,14 +23,9 @@ repositories {
       // For gradle-nexus-plugin
       url 'http://jcenter.bintray.com/'
     }
-    maven {
-      // For license plugin.
-      url 'http://dl.bintray.com/content/netflixoss/external-gradle-plugins/'
-    }
   }
 }
 
 dependencies {
-  classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.1'
   classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
 }
