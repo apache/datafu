@@ -60,7 +60,7 @@ import org.apache.pig.data.Tuple;
  * --output: (B,1), (B,3)
  * }
  * </pre>
- *
+ */
 
 public class SampleByKey extends FilterFunc
 {

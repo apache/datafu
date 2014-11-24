@@ -59,7 +59,7 @@ import org.apache.pig.backend.executionengine.ExecException;
  * sampled = FOREACH input_g GENERATE WeightedSample(input);
  * }
  * </pre>
-
+ */
 @Nondeterministic
 public class WeightedReservoirSample extends ReservoirSample {
     

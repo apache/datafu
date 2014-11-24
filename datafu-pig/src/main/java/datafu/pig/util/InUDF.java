@@ -41,7 +41,7 @@ import org.apache.pig.data.Tuple;
  *
  * }
  * </pre>
- *
+ */
 public class InUDF extends FilterFunc
 {
 
