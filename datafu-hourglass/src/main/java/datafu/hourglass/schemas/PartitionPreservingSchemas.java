@@ -34,8 +34,6 @@ import org.apache.avro.mapred.Pair;
 /**
  * Generates the Avro schemas used by {@link datafu.hourglass.jobs.AbstractPartitionPreservingIncrementalJob} and its derivations.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class PartitionPreservingSchemas implements Serializable
 {  

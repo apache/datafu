@@ -23,8 +23,6 @@ package datafu.hourglass.mapreduce;
  * Parameters used by the jobs to pass configuration settings 
  * to the mappers, combiners, and reducers.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class Parameters 
 {

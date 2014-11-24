@@ -39,8 +39,6 @@ import datafu.test.pig.PigTests;
 /**
  * Tests for {@link WeightedReservoirSample}.
  *
- * @author wjian
- *
  */
 public class WeightedReservoirSamplingTests extends PigTests
 {

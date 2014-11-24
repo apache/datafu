@@ -40,8 +40,6 @@ import datafu.hourglass.jobs.AbstractPartitionPreservingIncrementalJob;
 /**
  * A combined input format for reading Avro data.
  * 
- * @author "Matthew Hayes"
- *
  * @param <T> Type of data to be read
  */
 public class CombinedAvroKeyInputFormat<T> extends CombineFileInputFormat<AvroKey<T>, NullWritable> 

@@ -48,8 +48,6 @@ import datafu.hourglass.schemas.PartitionCollapsingSchemas;
  * output value.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class CollapsingReducer extends ObjectReducer implements DateRangeConfigurable, Serializable
 {  

@@ -33,8 +33,6 @@ import datafu.hourglass.fs.PathUtils;
 /**
  * Determines the date range of inputs which should be processed.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class DateRangePlanner
 {

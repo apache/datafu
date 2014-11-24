@@ -36,8 +36,6 @@ import datafu.pig.hash.lsh.interfaces.LSH;
  * range for the hash.
  * 
  * 
- * @author cstella
- *
  */
 public class RepeatingLSH extends LSH
 {

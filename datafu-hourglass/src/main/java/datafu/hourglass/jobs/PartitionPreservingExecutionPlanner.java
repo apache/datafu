@@ -61,8 +61,6 @@ import datafu.hourglass.fs.PathUtils;
  * Check {@link ReduceEstimator} for more details on how the properties are used.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class PartitionPreservingExecutionPlanner extends ExecutionPlanner
 {

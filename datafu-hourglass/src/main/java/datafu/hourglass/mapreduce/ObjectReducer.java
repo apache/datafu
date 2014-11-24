@@ -27,8 +27,6 @@ import org.apache.hadoop.mapreduce.ReduceContext;
  * Defines the interface for combiner and reducer implementations that {@link DelegatingCombiner} and
  * {@link DelegatingReducer} delegate to.
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class ObjectReducer extends ObjectProcessor {
   public abstract void reduce(Object key,

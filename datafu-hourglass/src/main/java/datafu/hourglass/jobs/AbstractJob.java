@@ -82,8 +82,6 @@ import org.apache.hadoop.fs.Path;
  * <em>hadoop-conf.mapred.min.split.size</em> to the desired value. 
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class AbstractJob extends Configured
 {

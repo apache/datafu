@@ -64,8 +64,6 @@ import datafu.pig.util.AliasableEvalFunc;
  * </code>
  * </p>
  * 
- * @author wvaughan
- * 
  */
 public class BagLeftOuterJoin extends BagJoin
 {

@@ -30,8 +30,6 @@ import org.apache.hadoop.mapreduce.Mapper;
  * It assumes the input is an Avro record having "key" and "value" fields.
  * The output is these exact same fields.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class AvroKeyValueIdentityMapper extends Mapper<Object, Object, Object, Object> 
 {

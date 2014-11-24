@@ -30,8 +30,6 @@ import org.apache.avro.Schema;
  * The reducer outputs key-value pairs conforming to the key and output value schemas.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class TaskSchemas
 {    

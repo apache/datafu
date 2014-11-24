@@ -39,8 +39,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * 
  * @see SimpleRandomSampleWithReplacementVote
  * 
- * @author ximeng
- * 
  */
 public class SimpleRandomSampleWithReplacementElect extends AlgebraicEvalFunc<DataBag>
 {

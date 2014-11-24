@@ -37,8 +37,6 @@ import org.apache.commons.lang.NullArgumentException;
 /**
  * Generates the Avro schemas used by {@link datafu.hourglass.jobs.AbstractPartitionCollapsingIncrementalJob} and its derivations.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class PartitionCollapsingSchemas implements Serializable
 {  

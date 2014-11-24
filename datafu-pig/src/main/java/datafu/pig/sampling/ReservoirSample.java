@@ -50,8 +50,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * to compensate for skew.
  * </p>
  * 
- * @author wvaughan
- *
  */
 @Nondeterministic
 public class ReservoirSample extends AccumulatorEvalFunc<DataBag> implements Algebraic

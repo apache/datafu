@@ -96,8 +96,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * method is deprecated now and will be removed in the next release.
  * </p>
  *
- * @author ximeng
- *
  */
 public class SimpleRandomSample extends AlgebraicEvalFunc<DataBag>
 {

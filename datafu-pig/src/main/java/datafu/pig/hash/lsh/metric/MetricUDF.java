@@ -41,8 +41,6 @@ import datafu.pig.hash.lsh.util.DataTypeUtil;
  * </p>
  *
  * @see datafu.pig.hash.lsh.CosineDistanceHash
- * @author cstella
- *
  */
 public abstract class MetricUDF extends EvalFunc<Tuple>
 {

@@ -46,8 +46,6 @@ import datafu.hourglass.schemas.PartitionCollapsingSchemas;
  * intermediate value.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class CollapsingCombiner extends ObjectReducer implements DateRangeConfigurable, Serializable
 {  

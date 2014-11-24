@@ -41,8 +41,6 @@ import datafu.pig.hash.lsh.util.DataTypeUtil;
 
 /**
  * The base UDF for locality sensitive hashing.  
- * @author cstella
- *
  */
 public abstract class LSHFunc extends EvalFunc<DataBag>
 {

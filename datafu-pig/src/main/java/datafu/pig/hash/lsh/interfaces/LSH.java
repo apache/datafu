@@ -30,8 +30,6 @@ import org.apache.commons.math.random.RandomGenerator;
  * The basic idea is to hash the input items so that similar items are mapped to the same buckets with high probability
  * (the number of buckets being much smaller than the universe of possible input items).
  * </p>
- * @author cstella
- *
  */
 public abstract class LSH
 {

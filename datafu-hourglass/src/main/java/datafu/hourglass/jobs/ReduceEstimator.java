@@ -61,8 +61,6 @@ import datafu.hourglass.fs.PathUtils;
  * <em>num.reducers.mydata.bytes.per.reducer</em>.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class ReduceEstimator
 {

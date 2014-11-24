@@ -30,8 +30,6 @@ import datafu.pig.hash.lsh.interfaces.LSH;
 
 /**
  * A family of k locality sensitive hashes.  For a given point, k hashes will be computed.
- * @author cstella
- *
  */
 public class LSHFamily {
 

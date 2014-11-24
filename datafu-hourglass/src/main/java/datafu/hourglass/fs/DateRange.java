@@ -24,8 +24,6 @@ import java.util.Date;
 /**
  * A date range, consisting of a start and end date.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class DateRange
 {

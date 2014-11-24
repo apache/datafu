@@ -28,8 +28,6 @@ import org.apache.hadoop.fs.Path;
 /**
  * Represents a path and the corresponding date that is associated with it.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class DatePath implements Comparable<DatePath>
 {

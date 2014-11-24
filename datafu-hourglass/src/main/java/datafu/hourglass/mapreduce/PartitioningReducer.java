@@ -54,8 +54,6 @@ import datafu.hourglass.schemas.PartitionPreservingSchemas;
  * where the named outputs have the form yyyyMMdd derived from the time. 
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class PartitioningReducer extends ObjectReducer implements Serializable 
 {  

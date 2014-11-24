@@ -48,8 +48,6 @@ import datafu.hourglass.schemas.PartitionPreservingSchemas;
  * that the input came from.  This enables the combiner and reducer to preserve the partitions.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class PartitioningMapper extends ObjectMapper implements Serializable
 {
@@ -159,8 +157,6 @@ public class PartitioningMapper extends ObjectMapper implements Serializable
    * A {@see KeyValueCollector} that writes to {@see MapContext} and tags each mapped key with the time for the partition
    * it was derived from.  This keeps the data partitioned so that the reducer may process each partition independently.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   private class MapCollector implements KeyValueCollector<GenericRecord,GenericRecord>
   {

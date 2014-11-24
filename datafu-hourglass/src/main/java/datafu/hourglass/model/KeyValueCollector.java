@@ -24,8 +24,6 @@ import java.io.IOException;
 /**
  * Provided to an instance of {@link Mapper} to collect key-value pairs.
  *
- * @author "Matthew Hayes"
- *
  * @param <K> Key type
  * @param <V> Value type
  */

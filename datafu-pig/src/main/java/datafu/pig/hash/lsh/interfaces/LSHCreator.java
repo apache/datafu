@@ -32,8 +32,6 @@ import datafu.pig.hash.lsh.RepeatingLSH;
 /**
  * Create a Locality sensitive hash.
  * 
- * @author cstella
- *
  */
 public abstract class LSHCreator 
 {

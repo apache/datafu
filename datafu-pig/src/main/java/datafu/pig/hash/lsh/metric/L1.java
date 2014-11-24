@@ -32,8 +32,6 @@ import org.apache.commons.math.linear.RealVector;
  * </p>
  *
  * @see datafu.pig.hash.lsh.L1PStableHash L1PStableHash for an example
- * @author cstella
- *
  */
 public class L1 extends MetricUDF {
 

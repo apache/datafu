@@ -24,8 +24,6 @@ import org.apache.commons.math.random.RandomDataImpl;
 
 /**
  * A helper interface to sample from a distribution specified by a RandomDataImpl
- * @author cstella
- *
  */
 public interface Sampler {
   /**

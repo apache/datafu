@@ -26,8 +26,6 @@ import org.apache.hadoop.mapreduce.TaskInputOutputContext;
 /**
  * Base class for {@link ObjectMapper} and {@link ObjectReducer}.
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class ObjectProcessor
 {

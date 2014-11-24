@@ -29,8 +29,6 @@ import datafu.pig.hash.lsh.interfaces.Sampler;
  * A locality sensitive hash associated with the L1 metric.  This uses a 1-stable distribution
  * to construct the hash.
  *
- * @author cstella
- *
  */
 public class L1LSH extends AbstractStableDistributionFunction implements Sampler
 {

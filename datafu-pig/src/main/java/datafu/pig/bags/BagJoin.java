@@ -56,8 +56,6 @@ import java.util.*;
  * </code>
  * </p>
  * 
- * @author wvaughan
- * 
  */
 public class BagJoin extends AliasableEvalFunc<DataBag>
 {

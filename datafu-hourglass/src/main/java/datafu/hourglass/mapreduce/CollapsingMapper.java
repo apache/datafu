@@ -50,8 +50,6 @@ import datafu.hourglass.schemas.PartitionCollapsingSchemas;
  * map operation, which produces key and intermediate value pairs from the input.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class CollapsingMapper extends ObjectMapper implements Serializable
 {
@@ -224,8 +222,6 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
    * A {@see KeyValueCollector} that outputs key-value pairs to {@link MapContext} 
    * and tags each mapped value with the time for the partition it was derived from.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   private class TimeMapCollector extends MapCollector
   {
@@ -299,8 +295,6 @@ public class CollapsingMapper extends ObjectMapper implements Serializable
   /**
    * A {@see KeyValueCollector} that outputs key-value pairs to {@link MapContext} as-is.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   private class IdentityMapCollector extends MapCollector
   {      

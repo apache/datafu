@@ -30,8 +30,6 @@ import org.apache.commons.math.linear.RealVector;
  * which technically does not form a metric, but I'm stretching the definition here.
  * 
  * @see datafu.pig.hash.lsh.CosineDistanceHash CosineDistanceHash for an example
- * @author cstella
- *
  */
 public class Cosine extends MetricUDF {
   

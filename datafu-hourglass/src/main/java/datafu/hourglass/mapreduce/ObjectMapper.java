@@ -26,8 +26,6 @@ import org.apache.hadoop.mapreduce.MapContext;
 /**
  * Defines the interface for a mapper implementation that {@link DelegatingMapper} delegates to.
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class ObjectMapper extends ObjectProcessor {
   public abstract void map(Object input,

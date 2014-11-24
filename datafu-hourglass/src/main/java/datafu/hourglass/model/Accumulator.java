@@ -24,8 +24,6 @@ import java.io.Serializable;
 /**
  * Collects a sequence of values and produces one value as a result.
  * 
- * @author "Matthew Hayes"
- *
  * @param <In> Input value type
  * @param <Out> Output value type
  */

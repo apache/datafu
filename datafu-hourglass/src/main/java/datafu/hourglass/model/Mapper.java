@@ -25,8 +25,6 @@ import java.io.Serializable;
 /**
  * Maps an input record to one or more key-value pairs.
  * 
- * @author "Matthew Hayes"
- *
  * @param <In> Input type
  * @param <OutKey> Output key type
  * @param <OutVal> Output value type

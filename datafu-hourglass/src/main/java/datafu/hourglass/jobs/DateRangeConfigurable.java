@@ -24,8 +24,6 @@ import datafu.hourglass.fs.DateRange;
 /**
  * An interface for an object with a configurable output date range.
  * 
- * @author "Matthew Hayes"
- *
  */
 public interface DateRangeConfigurable 
 {

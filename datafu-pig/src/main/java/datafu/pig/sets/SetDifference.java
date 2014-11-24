@@ -196,8 +196,6 @@ public class SetDifference extends SetOperationsBase
    * This is compared first on the data, then on the index the bag came from
    * in the input tuple.
    * </p>
-   * @author mhayes
-   *
    */
   private static class Pair implements Comparable<Pair>
   {

@@ -75,8 +75,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  * }
  * </pre>
  *  
- * @author wvaughan
- *
  */
 public class BagConcat extends EvalFunc<DataBag>
 {

@@ -46,8 +46,6 @@ import datafu.hourglass.model.Mapper;
  * Given an input event with field "id" stored in daily directories according to yyyy/MM/dd, 
  * estimates the cardinality of the values over the past 30 days.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class EstimateCardinality extends Configured implements NamedTool, Serializable
 {  

@@ -57,8 +57,6 @@ import datafu.pig.hash.lsh.interfaces.Sampler;
  * Proceedings of the Symposium on Computational Geometry.
  * </p>
  *
- * @author cstella
- *
  */
 public abstract class AbstractStableDistributionFunction extends LSH
 {

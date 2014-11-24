@@ -42,8 +42,6 @@ import datafu.hourglass.fs.PathUtils;
  * Base class for execution planners.  An execution planner determines which files should be processed
  * for a particular run.
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class ExecutionPlanner
 {

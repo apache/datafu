@@ -45,8 +45,6 @@ import datafu.hourglass.schemas.TaskSchemas;
  *   <li><em>fail.on.missing</em> - whether the job should fail if input data within the desired range is missing</li>
  * </ul>
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class IncrementalJob extends TimeBasedJob
 {

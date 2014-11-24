@@ -41,8 +41,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * This is a streaming implementation, and therefore the input data does not need to be sorted.
  * </p>
  * 
- * @author mhayes
- *
  */
 public class HyperLogLogPlusPlus extends AccumulatorEvalFunc<Long>
 {

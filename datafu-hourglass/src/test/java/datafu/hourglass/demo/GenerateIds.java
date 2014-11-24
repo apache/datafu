@@ -45,8 +45,6 @@ import datafu.hourglass.test.Schemas;
  * Generate random test data in yyyy/MM/dd paths for
  * a given date range.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class GenerateIds extends Configured implements NamedTool
 {

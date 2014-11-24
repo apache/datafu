@@ -44,8 +44,6 @@ import datafu.hourglass.fs.PathUtils;
  * Methods are available as well for setting these configuration parameters.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class TimeBasedJob extends AbstractJob
 { 

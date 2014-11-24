@@ -28,8 +28,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 /**
  * A Hadoop mapper which delegates to an implementation read from the distributed cache.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class DelegatingMapper extends Mapper<Object, Object, Object, Object> 
 {

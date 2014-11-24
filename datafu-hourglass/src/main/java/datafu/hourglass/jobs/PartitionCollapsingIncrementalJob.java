@@ -36,8 +36,6 @@ import datafu.hourglass.model.Merger;
  * Instead of extending this class and implementing the abstract methods, this concrete version
  * can be used instead.  Getters and setters have been provided for the abstract methods. 
  * 
- * @author "Matthew Hayes"
- *
  */
 public class PartitionCollapsingIncrementalJob extends AbstractPartitionCollapsingIncrementalJob
 {

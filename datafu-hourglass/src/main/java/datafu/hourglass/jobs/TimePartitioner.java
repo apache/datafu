@@ -48,8 +48,6 @@ import org.apache.hadoop.mapreduce.Partitioner;
  * which should be set in the Hadoop configuration.  Input days are assigned to reducers in a round-robin fashion.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class TimePartitioner extends Partitioner<AvroKey<GenericRecord>,AvroValue<GenericRecord>> implements Configurable
 {

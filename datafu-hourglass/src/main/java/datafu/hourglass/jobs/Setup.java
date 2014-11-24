@@ -25,8 +25,6 @@ import org.apache.hadoop.conf.Configuration;
  * Used as a callback by {@link PartitionCollapsingIncrementalJob} and {@link PartitionPreservingIncrementalJob}
  * to provide configuration settings for the Hadoop job.
  * 
- * @author "Matthew Hayes"
- *
  */
 public interface Setup
 {

@@ -160,8 +160,6 @@ import com.google.common.primitives.Ints;
  * @see SimpleRandomSampleWithReplacementElect
  * @see <a href="http://en.wikipedia.org/wiki/Bootstrapping_(statistics)" target="_blank">Boostrapping (Wikipedia)</a>
  *
- * @author ximeng
- *
  */
 public class SimpleRandomSampleWithReplacementVote extends EvalFunc<DataBag>
 {

@@ -31,8 +31,6 @@ import datafu.test.pig.PigTests;
  * Tests for {@link SimpleRandomSampleWithReplacementVote} and
  * {@link SimpleRandomSampleWithReplacementElect}.
  * 
- * @author ximeng
- * 
  */
 public class SimpleRandomSampleWithReplacementTest extends PigTests
 {

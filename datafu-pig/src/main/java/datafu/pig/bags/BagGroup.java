@@ -78,8 +78,6 @@ import datafu.pig.util.AliasableEvalFunc;
  * }
  * </pre>
  *
- * @author wvaughan
- *
  */
 public class BagGroup extends AliasableEvalFunc<DataBag>
 {

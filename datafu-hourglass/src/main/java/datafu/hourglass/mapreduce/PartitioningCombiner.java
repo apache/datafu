@@ -37,8 +37,6 @@ import datafu.hourglass.model.Accumulator;
  * intermediate value.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public class PartitioningCombiner extends ObjectReducer implements Serializable 
 {

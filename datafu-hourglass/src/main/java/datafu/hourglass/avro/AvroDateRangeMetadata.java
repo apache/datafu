@@ -39,8 +39,6 @@ import datafu.hourglass.fs.PathUtils;
  * This is used by {@link datafu.hourglass.jobs.AbstractPartitionCollapsingIncrementalJob} so that when reusing previous
  * output it can determine the date range the data corresponds to.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class AvroDateRangeMetadata
 {

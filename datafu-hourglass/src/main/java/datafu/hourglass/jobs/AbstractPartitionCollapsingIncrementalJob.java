@@ -183,8 +183,6 @@ import datafu.hourglass.schemas.PartitionCollapsingSchemas;
  * <em>hadoop-conf.mapred.min.split.size</em> to the desired value. 
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class AbstractPartitionCollapsingIncrementalJob extends IncrementalJob
 {
@@ -626,8 +624,6 @@ public abstract class AbstractPartitionCollapsingIncrementalJob extends Incremen
   /**
    * Reports files created and processed for an iteration of the job.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   public static class Report
   {

@@ -61,8 +61,6 @@ import org.apache.pig.data.Tuple;
  * }
  * </pre>
  *
- * @author evion
- */
 
 public class SampleByKey extends FilterFunc
 {

@@ -28,8 +28,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 /**
  * A Hadoop reducer which delegates to an implementation read from the distributed cache.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class DelegatingReducer extends Reducer<Object, Object, Object, Object> 
 {

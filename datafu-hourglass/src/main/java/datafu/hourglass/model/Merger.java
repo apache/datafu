@@ -24,8 +24,6 @@ import java.io.Serializable;
 /**
  * Merges two values together.
  * 
- * @author "Matthew Hayes"
- *
  * @param <T> Value type
  */
 public interface Merger<T> extends Serializable

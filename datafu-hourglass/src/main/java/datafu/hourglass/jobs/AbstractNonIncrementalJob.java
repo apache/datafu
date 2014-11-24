@@ -84,8 +84,6 @@ import datafu.hourglass.fs.PathUtils;
  * and then rounded up.
  * </p>
  * 
- * @author "Matthew Hayes"
- *
  */
 public abstract class AbstractNonIncrementalJob extends TimeBasedJob
 {
@@ -333,8 +331,6 @@ public abstract class AbstractNonIncrementalJob extends TimeBasedJob
   /**
    * Mapper base class for {@link AbstractNonIncrementalJob}.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   public static abstract class BaseMapper extends Mapper<AvroKey<GenericRecord>, NullWritable, AvroKey<GenericRecord>, AvroValue<GenericRecord>>
   {    
@@ -343,8 +339,6 @@ public abstract class AbstractNonIncrementalJob extends TimeBasedJob
   /**
    * Combiner base class for {@link AbstractNonIncrementalJob}.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   public static abstract class BaseCombiner extends Reducer<AvroKey<GenericRecord>, AvroValue<GenericRecord>, AvroKey<GenericRecord>, AvroValue<GenericRecord>>
   {    
@@ -353,8 +347,6 @@ public abstract class AbstractNonIncrementalJob extends TimeBasedJob
   /**
    * Reducer base class for {@link AbstractNonIncrementalJob}.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   public static abstract class BaseReducer extends Reducer<AvroKey<GenericRecord>, AvroValue<GenericRecord>, AvroKey<GenericRecord>, NullWritable>
   {    
@@ -363,8 +355,6 @@ public abstract class AbstractNonIncrementalJob extends TimeBasedJob
   /**
    * Reports files created and processed for an iteration of the job.
    * 
-   * @author "Matthew Hayes"
-   *
    */
   public static class Report
   {

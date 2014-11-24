@@ -31,8 +31,6 @@ import datafu.test.pig.PigTests;
  * 
  * @deprecated This tests the deprecated functionality of SimpleRandomSample
  *             where the probability can be specified in the constructor.  
- * @author ximeng
- * 
  */
 public class SimpleRandomSampleTestOld extends PigTests
 {

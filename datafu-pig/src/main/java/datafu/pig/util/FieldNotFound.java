@@ -24,8 +24,6 @@ import org.apache.pig.backend.executionengine.ExecException;
 /**
  * Thrown by {see AliasableEvalFunc} when attempting to access an unknown field by name.
  * 
- * @author wvaughan
- *
  */
 public class FieldNotFound extends ExecException
 {

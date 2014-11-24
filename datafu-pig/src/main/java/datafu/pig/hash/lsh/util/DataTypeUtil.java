@@ -32,8 +32,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 
 /**
  * A utility function to translate between pig types and vectors.
- * @author cstella
- *
  */
 public enum DataTypeUtil {
   INSTANCE;

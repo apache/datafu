@@ -73,8 +73,6 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * }
  * </pre>
  *
- * @author wvaughan
- *
  * @param <T> type that the eval func returns
  */
 public abstract class AliasableEvalFunc<T> extends ContextualEvalFunc<T>

@@ -43,8 +43,6 @@ import datafu.hourglass.model.Mapper;
  * incrementally counts the number of events, grouped by each distinct value. 
  * New days will be merged with the previous output.
  * 
- * @author "Matthew Hayes"
- *
  */
 public class CountById extends Configured implements NamedTool, Serializable
 {
