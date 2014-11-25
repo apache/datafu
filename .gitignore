@@ -19,6 +19,7 @@ pigunit-input-overriden.txt
 .project
 .settings/
 /data/
+.ruby-version
 *.iml
 .idea
 .DS_Store

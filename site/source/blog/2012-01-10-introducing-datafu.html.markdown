@@ -1,6 +1,21 @@
 ---
 title: Introducing DataFu, an open source collection of useful Apache Pig UDFs
 author: Matthew Hayes
+license: >
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 ---
 
 At LinkedIn, we make extensive use of [Apache Pig](http://pig.apache.org/) for performing [data analysis on Hadoop](http://engineering.linkedin.com/hadoop/user-engagement-powered-apache-pig-and-hadoop). Pig is a simple, high-level programming language that consists of just a few dozen operators and makes it easy to write MapReduce jobs. For more advanced tasks, Pig also supports [User Defined Functions](http://pig.apache.org/docs/r0.9.1/udf.html) (UDFs), which let you integrate custom code in Java, Python, and JavaScript into your Pig scripts.
