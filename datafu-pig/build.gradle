@@ -5,6 +5,9 @@ apply plugin: 'download-task'
 
 import groovy.xml.MarkupBuilder
 
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
+
 buildscript {
   repositories {
       mavenCentral()
