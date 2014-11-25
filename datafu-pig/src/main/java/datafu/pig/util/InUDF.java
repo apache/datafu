@@ -52,7 +52,14 @@ public class InUDF extends FilterFunc
     Boolean match = false;
     if (o != null) {
       for (int i=1; i<input.size() && !match; i++) {
-        match = match || o.equals(input.get(i));
+        if (input.get(i) instanceof Tuple) {
+          for (int j=0; j<((Tuple)(input.get(i))).size() && !match; j++) {
+            match = match || o.equals(((Tuple)(input.get(i))).get(j));
+          }
+        } else {
+          match = match || o.equals(input.get(i));
+        }
+        
       }
     }    
     return match;
