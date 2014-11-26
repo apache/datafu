@@ -1,22 +1,5 @@
-DataFu
-Copyright 2010 LinkedIn, Inc
+Apache DataFu
+Copyright 2010-2014 The Apache Software Foundation
 
-This product includes/uses fastutil, a Java collections framework (http://fastutil.dsi.unimi.it/), licensed under Apache 2.
-
-This product includes/uses joda-time (http://joda.sourceforge.net/), licensed under Apache 2.
-
-This product includes/uses commons-math (http://commons.apache.org/math/), licensed under Apache 2.
-
-This product includes/uses guava (http://code.google.com/p/guava-libraries/), licensed under Apache 2.
-
-This product includes/uses stream (https://github.com/addthis/stream-lib), licensed under Apache 2.
-
-This product includes/uses jsr-305 (http://code.google.com/p/jsr-305/), licensed under BSD.
-
-This product includes/uses StreamingQuantile, copyright Cloudera (http://cloudera.com), licensed under Apache 2.
-
-This product includes/uses log4j (http://logging.apache.org/log4j/), licensed under Apache 2.
-
-This product includes/uses json (http://json.org/), licensed under The JSON License (http://json.org/license.html).
-
-This product includes/uses avro (http://avro.apache.org/), licensed under Apache 2.
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
