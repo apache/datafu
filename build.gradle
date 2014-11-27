@@ -66,8 +66,14 @@ rat {
     '**/*.csv',
     '**/*.svg',
     '**/package-list',
-    '**/jquery-2.0.3.min.js',
-    'site/source/stylesheets/normalize.css'
+    '**/jquery-2.0.3.min.js', // see LICENSE
+    'site/source/stylesheets/normalize.css', // see LICENSE
+    // build-plugin files in the Public Domain - see the LICENSE file
+    'build-plugin/**/EcjMultilineProcessor.java',
+    'build-plugin/**/JavacMultilineProcessor.java',
+    'build-plugin/**/Multiline.java',
+    'build-plugin/**/MultilineProcessor.java',
+    'build-plugin/**/javax.annotation.processing.Processor'
   ]
 }
 
