@@ -49,9 +49,12 @@ task sourceRelease(type: Tar) {
   }
 }
 
+// Signing requires a user ~/.gradle/gradle.properties file with signing information.
+// See: http://www.gradle.org/docs/current/userguide/signing_plugin.html
 signing {
   // TODO: this doesn't show up in the 'tasks' for some reason, need to figure out why.
   // This creates a task 'signSourceRelease' that builds the source release and signs it.
+  required { !version.endsWith("SNAPSHOT") }
   sign sourceRelease
 }
 
