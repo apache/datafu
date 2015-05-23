@@ -159,10 +159,6 @@ dependencies {
   // should be available
   compile "joda-time:joda-time:$jodaTimeVersion"
 
-  // needed for compilation only.  obviously don't need to autojar this.
-  compile "org.apache.pig:pig:$pigVersion"
-  compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
-
   testCompile "org.apache.pig:pigunit:$pigVersion"
   testCompile "log4j:log4j:$log4jVersion"
   testCompile "jline:jline:$jlineVersion"
@@ -180,6 +176,22 @@ modifyPom {
       // The only exception is joda-time, but this is already a pig dependency
       // so it should already be available.
     }
+  }
+}
+
+if (hadoopVersion.startsWith("2.") || hadoopVersion.startsWith("0.23.")) {
+  dependencies {
+    // needed for compilation only.  obviously don't need to autojar this.
+    compile "org.apache.pig:pig:$pigVersion:h2"
+    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+  }
+} else {
+  dependencies {
+    // needed for compilation only.  obviously don't need to autojar this.
+    compile "org.apache.pig:pig:$pigVersion"
+    compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
   }
 }
 

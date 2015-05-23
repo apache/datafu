@@ -51,9 +51,9 @@ public class DistributedCacheHelper
     Path[] localCacheFiles = DistributedCache.getLocalCacheFiles(conf);
     for (Path localCacheFile : localCacheFiles)
     {
-      if (localCacheFile.toString().endsWith(path.toString()))
+      if (localCacheFile.getName().endsWith(path.getName()))
       {
-        localPath = localCacheFile.toString();
+        localPath = localCacheFile.getName();
         break;
       }
     }

@@ -66,7 +66,7 @@ public class PathUtils
     @Override
     public boolean accept(Path path)
     {
-      String s = path.getName().toString();
+      String s = path.getName();
       return !s.startsWith(".") && !s.startsWith("_");        
     }
   };
@@ -177,7 +177,7 @@ public class PathUtils
    */
   public static List<DatePath> findDatedPaths(FileSystem fs, Path path) throws IOException
   {
-    FileStatus[] outputPaths = fs.listStatus(path, nonHiddenPathFilter);
+    FileStatus[] outputPaths = fs.globStatus(new Path(path, "*"), nonHiddenPathFilter);
     
     List<DatePath> outputs = new ArrayList<DatePath>();
     

@@ -24,9 +24,11 @@ import datafu.pig.bags.DistinctBy;
 import datafu.pig.bags.Enumerate;
 import datafu.test.pig.PigTests;
 import junit.framework.Assert;
+
 import org.adrianwalker.multilinestring.Multiline;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataBag;
+import org.apache.pig.data.SortedDataBag;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
 import org.apache.pig.pigunit.PigTest;
@@ -34,10 +36,14 @@ import org.testng.annotations.Test;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 
+import org.apache.pig.impl.util.Utils;
+import org.apache.pig.builtin.Utf8StorageConverter;
+import org.apache.pig.ResourceSchema.ResourceFieldSchema;
 
 public class BagTests extends PigTests
 {
@@ -729,12 +735,12 @@ public class BagTests extends PigTests
     PigTest test = createPigTestFromString(distinctByMultiComplexFieldTest);
 
     writeLinesToFile("input",
-                     "({(a-b,[a#0,b#1],{(a-b,0),(a-b,1)}),(a-c,[b#1,a#0],{(a-b,0),(a-b,1)}),(a-d,[a#1,b#0],{(a-b,1),(a-b,2)})})");
+                     "({(a-b,[b#1],{(a-b,0),(a-b,1)}),(a-c,[b#1],{(a-b,0),(a-b,1)}),(a-d,[b#0],{(a-b,1),(a-b,2)})})");
 
     test.runScript();
 
     assertOutput(test, "data2",
-                 "({(a-b,[b#1,a#0],{(a-b,0),(a-b,1)}),(a-d,[b#0,a#1],{(a-b,1),(a-b,2)})})");
+                 "({(a-b,[b#1],{(a-b,0),(a-b,1)}),(a-d,[b#0],{(a-b,1),(a-b,2)})})");
   }
 
   /**
@@ -1149,9 +1155,21 @@ public class BagTests extends PigTests
                      "1\t{(K1,A1),(K2,B1),(K3,C1)}\t{(K1,A2),(K2,B2),(K2,B22)}\t{(K1,A3),(K3,C3),(K4,D3)}");
 
     test.runScript();
-
-    assertOutput(test, "data2",
-        "(1,{(K1,A1,K1,A2,K1,A3),(K2,B1,K2,B2,,),(K2,B1,K2,B22,,),(K3,C1,,,K3,C3)},{(K1,A1,K1,A3,K1,A2),(K2,B1,,,K2,B2),(K2,B1,,,K2,B22),(K3,C1,K3,C3,,)})");
+    
+    List<Tuple> tuples = getLinesForAlias(test, "data2");
+    assertEquals(tuples.size(), 1);
+    Tuple tuple = tuples.get(0);
+    DataBag joined1 = (DataBag)tuple.get(1);
+    DataBag joined2 = (DataBag)tuple.get(2);
+    
+    String joined1Schema = "{(bag1::k: chararray,bag1::v: chararray,bag2::k: chararray,bag2::v: chararray,bag3::k3: chararray,bag3::v3: chararray)}";
+    String joined2Schema = "{(bag1::k: chararray,bag1::v: chararray,bag3::k3: chararray,bag3::v3: chararray,bag2::k: chararray,bag2::v: chararray)}";
+    String expectedJoined1 = "{(K1,A1,K1,A2,K1,A3),(K2,B1,K2,B2,,),(K2,B1,K2,B22,,),(K3,C1,,,K3,C3)}";
+    String expectedJoined2 = "{(K1,A1,K1,A3,K1,A2),(K2,B1,,,K2,B2),(K2,B1,,,K2,B22),(K3,C1,K3,C3,,)}";
+    
+    // compare sorted bags because there is no guarantee on the order
+    assertEquals(getSortedBag(joined1).toString(),getSortedBag(expectedJoined1, joined1Schema).toString());
+    assertEquals(getSortedBag(joined2).toString(),getSortedBag(expectedJoined2, joined2Schema).toString());
   }
 
     /**
@@ -1188,8 +1206,33 @@ public class BagTests extends PigTests
             throw e;
         }
 
-        assertOutput(test, "data2",
-                "(1,{(K1,A1,K1,A2,K1,A3),(K2,B1,K2,B2,,),(K2,B1,K2,B22,,),(K3,C1,,,K3,C3),(,,,,K4,D3)},{(K1,A1,K1,A3,K1,A2),(K2,B1,,,K2,B2),(K2,B1,,,K2,B22),(K3,C1,K3,C3,,),(,,K4,D3,,)})");
+        List<Tuple> tuples = getLinesForAlias(test, "data2");
+        assertEquals(tuples.size(), 1);
+        Tuple tuple = tuples.get(0);
+        DataBag joined1 = (DataBag)tuple.get(1);
+        DataBag joined2 = (DataBag)tuple.get(2);
+        
+        String joined1Schema = "{(bag1::k: chararray,bag1::v: chararray,bag2::k: chararray,bag2::v: chararray,bag3::k3: chararray,bag3::v3: chararray)}";
+        String joined2Schema = "{(bag1::k: chararray,bag1::v: chararray,bag3::k3: chararray,bag3::v3: chararray,bag2::k: chararray,bag2::v: chararray)}";
+        String expectedJoined1 = "{(K1,A1,K1,A2,K1,A3),(K2,B1,K2,B2,,),(K2,B1,K2,B22,,),(K3,C1,,,K3,C3),(,,,,K4,D3)}";
+        String expectedJoined2 = "{(K1,A1,K1,A3,K1,A2),(K2,B1,,,K2,B2),(K2,B1,,,K2,B22),(K3,C1,K3,C3,,),(,,K4,D3,,)}";
+        
+        // compare sorted bags because there is no guarantee on the order
+        assertEquals(getSortedBag(joined1).toString(),getSortedBag(expectedJoined1, joined1Schema).toString());
+        assertEquals(getSortedBag(joined2).toString(),getSortedBag(expectedJoined2, joined2Schema).toString());
+    }
+    
+    private DataBag getSortedBag(String bagString, String schema) throws Exception {
+        Utf8StorageConverter converter = new Utf8StorageConverter();
+        ResourceFieldSchema parsedSchema = new ResourceFieldSchema(Utils.parseSchema("the_bag: " + schema).getField("the_bag"));
+        DataBag bag = converter.bytesToBag(bagString.getBytes("UTF-8"), parsedSchema);
+        return getSortedBag(bag);
+    }
+    
+    private DataBag getSortedBag(DataBag bag) {
+        DataBag sortedBag = new SortedDataBag(null);
+        sortedBag.addAll(bag);
+        return sortedBag;
     }
     
     /**

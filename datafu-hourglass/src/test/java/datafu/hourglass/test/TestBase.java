@@ -26,100 +26,36 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.MiniMRClientCluster;
+import org.apache.hadoop.mapred.MiniMRClientClusterFactory;
 import org.apache.hadoop.mapred.MiniMRCluster;
 import org.apache.log4j.Logger;
 
 public class TestBase
-{
-  private Logger _log = Logger.getLogger(TestBase.class);
-  
-  private MiniDFSCluster _dfsCluster;
-  private MiniMRCluster _mrCluster;
+{  
   private FileSystem _fileSystem;
   protected String _confDir;
   
-  public static final int LOCAL_MR = 1;
-  public static final int CLUSTER_MR = 2;
-  public static final int LOCAL_FS = 4;
-  public static final int DFS_FS = 8;
-
-  private boolean localMR;
-  private boolean localFS;
-
-  private int taskTrackers;
-  private int dataNodes;
-  
   public TestBase() throws IOException 
   {
-    this(1,1);
-  }
-  
-  public TestBase(int taskTrackers, int dataNodes) throws IOException 
-  {      
-    if (System.getProperty("testlocal") != null && Boolean.parseBoolean(System.getProperty("testlocal")))
-    {
-      localMR = true;
-      localFS = true;
       _confDir = System.getProperty("confdir");
-    }
-    
-    if (taskTrackers < 1) {
-      throw new IllegalArgumentException(
-                                         "Invalid taskTrackers value, must be greater than 0");
-    }
-    if (dataNodes < 1) {
-      throw new IllegalArgumentException(
-                                         "Invalid dataNodes value, must be greater than 0");
-    }
-    this.taskTrackers = taskTrackers;
-    this.dataNodes = dataNodes;
   }
   
-  @SuppressWarnings("deprecation")
   public void beforeClass() throws Exception
   {
     // make sure the log folder exists or it will fail
     new File("test-logs").mkdirs();    
     System.setProperty("hadoop.log.dir", "test-logs");
-        
-    if (localFS) 
-    {
-      _fileSystem = FileSystem.get(new JobConf());
-      _log.info("*** Using local file system: " + _fileSystem.getUri());
-    }
-    else 
-    {
-      _log.info("*** Starting Mini DFS Cluster");    
-      _dfsCluster = new MiniDFSCluster(new JobConf(), dataNodes, true, null);
-      _fileSystem = _dfsCluster.getFileSystem();
-    }
     
-    if (localMR)
-    {
-      _log.info("*** Using local MR Cluster");       
-    }
-    else
-    { 
-      _log.info("*** Starting Mini MR Cluster");  
-      _mrCluster = new MiniMRCluster(taskTrackers, _fileSystem.getName(), 1);
-    }
+    _fileSystem = FileSystem.get(new JobConf());
   }
   
   public void afterClass() throws Exception
   {
-    if (_dfsCluster != null) {
-      _log.info("*** Shutting down Mini DFS Cluster");    
-      _dfsCluster.shutdown();
-      _dfsCluster = null;
-    }
-    if (_mrCluster != null) {
-      _log.info("*** Shutting down Mini MR Cluster");     
-      _mrCluster.shutdown();
-      _mrCluster = null;
-    }
   }
   
   /**
@@ -139,42 +75,9 @@ public class TestBase
    * managed by the testcase.
    * @return configuration that works on the testcase Hadoop instance
    */
-  protected JobConf createJobConf() {    
-    if (localMR)
-    {
-      JobConf conf = new JobConf();
-      String jarName = System.getProperty("testjar");
-      if (jarName == null)
-      {
-        throw new RuntimeException("must set testjar property");
-      }
-      _log.info("Using jar name: " + jarName);
-      conf.setJar(jarName);
-      return conf;
-    }
-    else
-    {
-      return _mrCluster.createJobConf();
-    }
-  }
-  
-  /**
-   * Indicates if the MR is running in local or cluster mode.
-   *
-   * @return returns TRUE if the MR is running locally, FALSE if running in
-   * cluster mode.
-   */
-  public boolean isLocalMR() {
-    return localMR;
-  }
-
-  /**
-   * Indicates if the filesystem is local or DFS.
-   *
-   * @return returns TRUE if the filesystem is local, FALSE if it is DFS.
-   */
-  public boolean isLocalFS() {
-    return localFS;
+  protected JobConf createJobConf() 
+  {
+    return new JobConf();
   }
   
   /**
@@ -189,7 +92,7 @@ public class TestBase
   {
     ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
     DataOutputStream dataStream = new DataOutputStream(arrayOutputStream);    
-    createJobConf().write(dataStream);    
+    createJobConf().write(dataStream);  
     dataStream.flush();
     props.setProperty("test.conf", new String(Base64.encodeBase64(arrayOutputStream.toByteArray())));
   }
@@ -206,5 +109,17 @@ public class TestBase
     Properties props = new Properties();
     storeTestConf(props);  
     return props;
+  }
+  
+  protected String getDataPath()
+  {
+    if (System.getProperty("hourglass.data.dir") != null)
+    {
+      return System.getProperty("hourglass.data.dir");
+    }
+    else
+    {
+      return new File(System.getProperty("user.dir"), "data").getAbsolutePath();
+    }  
   }
 }

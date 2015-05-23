@@ -57,8 +57,8 @@ public class PartitionPreservingTests extends TestBase
 {
   private Logger _log = Logger.getLogger(PartitionPreservingTests.class);
   
-  private Path _inputPath = new Path("/data/tracking/SimpleEvent");
-  private Path _outputPath = new Path("/output");
+  private Path _inputPath = new Path(getDataPath(), "tracking/SimpleEvent");
+  private Path _outputPath = new Path(getDataPath(), "output");
   
   private static final Schema EVENT_SCHEMA;
   

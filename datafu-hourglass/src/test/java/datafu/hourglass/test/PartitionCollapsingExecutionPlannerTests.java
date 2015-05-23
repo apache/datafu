@@ -55,8 +55,8 @@ public class PartitionCollapsingExecutionPlannerTests extends TestBase
 {
   private Logger _log = Logger.getLogger(PartitionCollapsingTests.class);
   
-  private Path _inputPath = new Path("/input");
-  private Path _outputPath = new Path("/output");
+  private Path _inputPath = new Path(getDataPath(), "input");
+  private Path _outputPath = new Path(getDataPath(), "output");
   
   private Properties _props;
   

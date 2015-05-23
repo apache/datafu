@@ -93,13 +93,13 @@ public class Examples extends TestBase
     _log.info("*** Running " + method.getName());
     
     _log.info("*** Cleaning input and output paths");  
-    getFileSystem().delete(new Path("/data"), true);
-    getFileSystem().delete(new Path("/output"), true);
-    getFileSystem().mkdirs(new Path("/data"));
-    getFileSystem().mkdirs(new Path("/output"));
+    getFileSystem().delete(new Path(getDataPath(), "data"), true);
+    getFileSystem().delete(new Path(getDataPath(), "output"), true);
+    getFileSystem().mkdirs(new Path(getDataPath(), "data"));
+    getFileSystem().mkdirs(new Path(getDataPath(), "output"));
                
     _record = new GenericData.Record(EVENT_SCHEMA);    
-    _eventWriter = new DailyTrackingWriter(new Path("/data/event"),EVENT_SCHEMA,getFileSystem());
+    _eventWriter = new DailyTrackingWriter(new Path(getDataPath(), "data/event"),EVENT_SCHEMA,getFileSystem());
   }
   
   @Test
@@ -119,13 +119,13 @@ public class Examples extends TestBase
     closeDayForEvent();
             
     // run    
-    new CountById().run(createJobConf(),"/data/event","/output");
+    new CountById().run(createJobConf(),getDataPath() + "/data/event",getDataPath() + "/output");
     
     // verify
     
-    checkOutputFolderCount(new Path("/output"), 1);
+    checkOutputFolderCount(new Path(getDataPath(), "output"), 1);
     
-    HashMap<Long,Integer> counts = loadOutputCounts(new Path("/output"), "20130316");
+    HashMap<Long,Integer> counts = loadOutputCounts(new Path(getDataPath(), "output"), "20130316");
     
     checkSize(counts,3);    
     checkIdCount(counts,1,5);
@@ -140,9 +140,9 @@ public class Examples extends TestBase
     closeDayForEvent();
     
     // run    
-    new CountById().run(createJobConf(),"/data/event","/output");
+    new CountById().run(createJobConf(),getDataPath() + "/data/event",getDataPath() + "/output");
     
-    counts = loadOutputCounts(new Path("/output"), "20130317");
+    counts = loadOutputCounts(new Path(getDataPath(), "output"), "20130317");
     
     checkSize(counts,3);    
     checkIdCount(counts,1,7);
@@ -170,12 +170,12 @@ public class Examples extends TestBase
     }
         
     // run    
-    new EstimateCardinality().run(createJobConf(),"/data/event","/output/daily","/output/summary",30);
+    new EstimateCardinality().run(createJobConf(),getDataPath() + "/data/event", getDataPath() + "/output/daily", getDataPath() + "/output/summary",30);
     
     // verify    
-    checkIntermediateFolderCount(new Path("/output/daily"), 30);
-    checkOutputFolderCount(new Path("/output/summary"), 1);
-    Assert.assertTrue(Math.abs(10000L - loadMemberCount(new Path("/output/summary"),"20130330").longValue())/10000.0 < 0.005);
+    checkIntermediateFolderCount(new Path(getDataPath(), "output/daily"), 30);
+    checkOutputFolderCount(new Path(getDataPath(), "output/summary"), 1);
+    Assert.assertTrue(Math.abs(10000L - loadMemberCount(new Path(getDataPath(), "output/summary"),"20130330").longValue())/10000.0 < 0.005);
 
     // more data
     openDayForEvent(2013, 3, 31);        
@@ -183,12 +183,12 @@ public class Examples extends TestBase
     closeDayForEvent();
     
     // run    
-    new EstimateCardinality().run(createJobConf(),"/data/event","/output/daily","/output/summary",30);
+    new EstimateCardinality().run(createJobConf(),getDataPath() + "/data/event", getDataPath() + "/output/daily", getDataPath() + "/output/summary",30);
     
     // verify    
-    checkIntermediateFolderCount(new Path("/output/daily"), 31);
-    checkOutputFolderCount(new Path("/output/summary"), 1);
-    Assert.assertEquals(loadMemberCount(new Path("/output/summary"),"20130331").longValue(),10L);
+    checkIntermediateFolderCount(new Path(getDataPath(), "output/daily"), 31);
+    checkOutputFolderCount(new Path(getDataPath(), "output/summary"), 1);
+    Assert.assertEquals(loadMemberCount(new Path(getDataPath(), "output/summary"),"20130331").longValue(),10L);
   }
   
   private void openDayForEvent(int year, int month, int day) throws IOException

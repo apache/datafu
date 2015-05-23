@@ -82,6 +82,9 @@ To run tests for a single class, use the `test.single` property.  For example, t
 
     ./gradlew :datafu-pig:test -Dtest.single=QuantileTests
 
-The tests can also be run from within eclipse.  Note that you may run out of heap when executing tests in Eclipse. To fix this adjust your heap settings for the TestNG plugin. Go to Eclipse->Preferences. Select TestNG->Run/Debug. Add "-Xmx1G" to the JVM args.
+The tests can also be run from within eclipse.  You'll need to install the TestNG plugin for Eclipse.  See: http://testng.org/doc/download.html. 
 
+Potential issues and workaround:
+* You may run out of heap when executing tests in Eclipse. To fix this adjust your heap settings for the TestNG plugin. Go to Eclipse->Preferences. Select TestNG->Run/Debug. Add "-Xmx1G" to the JVM args.
+* You may get a "broken pipe" error when running tests.  If so right click on the project, open the TestNG settings, and uncheck "Use project TestNG jar".
 

@@ -59,9 +59,9 @@ public class PartitionPreservingCollapsingIntegrationTests extends TestBase
 {
   private Logger _log = Logger.getLogger(PartitionPreservingCollapsingIntegrationTests.class);
   
-  private Path _inputPath = new Path("/data/tracking/SimpleEvent");
-  private Path _intermediatePath = new Path("/intermediate");
-  private Path _outputPath = new Path("/output");
+  private Path _inputPath = new Path(getDataPath(), "tracking/SimpleEvent");
+  private Path _intermediatePath = new Path(getDataPath(), "intermediate");
+  private Path _outputPath = new Path(getDataPath(), "output");
   
   private static final Schema EVENT_SCHEMA;
   
@@ -108,8 +108,10 @@ public class PartitionPreservingCollapsingIntegrationTests extends TestBase
     _log.info("*** Cleaning input and output paths");  
     getFileSystem().delete(_inputPath, true);
     getFileSystem().delete(_outputPath, true);
+    getFileSystem().delete(_intermediatePath, true);
     getFileSystem().mkdirs(_inputPath);
     getFileSystem().mkdirs(_outputPath);
+    getFileSystem().mkdirs(_intermediatePath);
     
     _maxIterations = 20;
     _maxDaysToProcess = 365;

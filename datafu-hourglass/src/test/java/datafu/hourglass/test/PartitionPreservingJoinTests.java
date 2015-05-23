@@ -58,9 +58,9 @@ public class PartitionPreservingJoinTests extends TestBase
 {
   private Logger _log = Logger.getLogger(PartitionPreservingJoinTests.class);
   
-  private Path _impressionEventPath = new Path("/data/tracking/impressions");
-  private Path _clickEventPath = new Path("/data/tracking/clicks");
-  private Path _outputPath = new Path("/output");
+  private Path _impressionEventPath = new Path(getDataPath(), "tracking/impressions");
+  private Path _clickEventPath = new Path(getDataPath(), "tracking/clicks");
+  private Path _outputPath = new Path(getDataPath(), "output");
   
   private static final Schema IMPRESSION_SCHEMA;
   private static final Schema CLICK_SCHEMA;

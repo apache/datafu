@@ -43,22 +43,47 @@ dependencies {
   compile "log4j:log4j:$log4jVersion"
   compile "org.json:json:$jsonVersion"
   compile "org.apache.avro:avro:$avroVersion"
-  compile "org.apache.avro:avro-mapred:$avroVersion"
   compile "org.apache.avro:avro-compiler:$avroVersion"
-
-  // needed for compilation and testing, not listed as a dependencies in pom
-  compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
-  compile "org.apache.hadoop:hadoop-tools:$hadoopVersion"
+  compile "org.apache.commons:commons-math:$commonsMathVersion"
 
   // needed for testing, not listed as a dependencies in pom
-  testCompile "org.apache.hadoop:hadoop-test:$hadoopVersion"
   testCompile "com.clearspring.analytics:stream:$streamVersion"
   testCompile "javax.ws.rs:jsr311-api:$jsr311Version"
   testCompile "org.slf4j:slf4j-log4j12:$slf4jVersion"
   testCompile "commons-io:commons-io:$commonsIoVersion"
-  testCompile "org.apache.avro:avro-tools:$avroVersion"
   testCompile "org.testng:testng:$testngVersion"
 }
+
+if (hadoopVersion.startsWith("2.") || hadoopVersion.startsWith("0.23.")) {
+  dependencies {
+    // core dependencies, listed as dependencies in pom
+    compile "org.apache.avro:avro-mapred:$avroVersion:hadoop2"
+
+    // needed for compilation and testing, not listed as a dependencies in pom
+    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-archives:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-auth:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion"
+
+    // needed for testing, not listed as a dependencies in pom
+    testCompile "org.apache.hadoop:hadoop-minicluster:$hadoopVersion"
+  }
+} else {
+  dependencies {
+    // core dependencies, listed as dependencies in pom
+    compile "org.apache.avro:avro-mapred:$avroVersion"
+
+    // needed for compilation and testing, not listed as a dependencies in pom
+    compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-tools:$hadoopVersion"
+
+    // needed for testing, not listed as a dependencies in pom
+    testCompile "org.apache.hadoop:hadoop-test:$hadoopVersion"
+  }
+}
+ 
 
 // modify the pom dependencies so we don't include hadoop and the testing related artifacts
 modifyPom {
@@ -96,6 +121,8 @@ modifyPom {
 test {
   // enable TestNG support (default is JUnit)
   useTestNG()
+
+  systemProperty 'hourglass.data.dir', file('data')
 
   maxHeapSize = "2G"
 }
