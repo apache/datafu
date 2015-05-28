@@ -19,6 +19,9 @@
 
 apply plugin: 'java'
 
+// append "-incubating" while still in the incubating process
+archivesBaseName = 'datafu-hourglass-incubating'
+
 import groovy.xml.MarkupBuilder
 
 buildscript {

@@ -1,0 +1,79 @@
+This file contains the PGP keys of various developers.
+
+Users: 
+
+    pgp < KEYS
+
+    -or-
+
+    gpg --import KEYS
+
+Developers: 
+
+    (gpg --list-sigs <Key ID> \
+     && gpg --armor --export <Key ID>) >> KEYS
+
+    -or-
+
+    (gpg2 --list-sigs <Key ID> \
+     && gpg2 --armor --export <Key ID>) >> KEYS
+
+
+pub   4096R/01D3DE61 2015-05-27
+uid       [ultimate] Matthew Terence Hayes (Code Signing Key) <matthew.terence.hayes@gmail.com>
+sig 3        01D3DE61 2015-05-27  Matthew Terence Hayes (Code Signing Key) <matthew.terence.hayes@gmail.com>
+sub   4096R/F98368D2 2015-05-27
+sig          01D3DE61 2015-05-27  Matthew Terence Hayes (Code Signing Key) <matthew.terence.hayes@gmail.com>
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+
+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
+=A90w
+-----END PGP PUBLIC KEY BLOCK-----

@@ -29,6 +29,13 @@ allprojects {
   repositories {
     mavenCentral()
   }
+
+  // by default append "-SNAPSHOT" to all versions, unless explicitly overriden
+  beforeEvaluate { project ->
+    if (!ext.release.toBoolean()) {
+      project.version += "-SNAPSHOT"
+    }
+  }
 }
 
 apply from: file("gradle/dependency-versions.gradle")
@@ -73,7 +80,13 @@ rat {
     'build-plugin/**/JavacMultilineProcessor.java',
     'build-plugin/**/Multiline.java',
     'build-plugin/**/MultilineProcessor.java',
-    'build-plugin/**/javax.annotation.processing.Processor'
+    'build-plugin/**/javax.annotation.processing.Processor',
+    // test data
+    'datafu-hourglass/data/**',
+    'datafu-pig/input*',
+    'datafu-pig/docs',
+    'datafu-pig/queries',
+    'datafu-pig/query'
   ]
 }
 

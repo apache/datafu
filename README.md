@@ -40,19 +40,38 @@ Bugs and feature requests can be filed [here](https://issues.apache.org/jira/bro
 
 ## Developers
 
+### Source release
+
+If you are starting from a source release, then you'll want to verify the release is valid and bootstrap the build environment.
+
+To verify that the archive has the correct MD5 checksum, the following two commands can be run.  These should produce the same output.
+
+  openssl md5 < apache-datafu-sources-x.y.z-incubating.tgz
+  cat apache-datafu-sources-x.y.z-incubating.tgz.MD5
+
+To verify the archive against its signature, you can run:
+
+  gpg2 --verify apache-datafu-sources-x.y.z-incubating.tgz.asc
+
+The command above will assume you are verifying `apache-datafu-sources-x.y.z-incubating.tgz` and produce "Good signature" if the archive is valid.
+
+To build DataFu from a source release, it is first necessary to download a gradle wrapper script.  This bootstrapping process requires Gradle to be installed on the source machine.  Gradle is available through most package managers or directly from [its website](http://www.gradle.org/).  Once you have installed Gradle and have ensured that the `gradle` is available in your path, you can bootstrap the wrapper with:
+
+    gradle -b bootstrap.gradle
+
+After the bootstrap script has completed, you should find a `gradlew` script in the root of the project.  The regular gradlew instructions below should then be available.
+
+When building from a source release, the version for all generated artifacts will be of the form `x.y.z`.  If you were to clone the git repo and build you would find `-SNAPSHOT` appended to the version.  This helps to distinguish official releases from those generated from the code repository for testing purposes.
+
 ### Building the Code
 
 To build DataFu from a git checkout or binary release, run:
 
     ./gradlew clean assemble
 
-To build DataFu from a source release, it is first necessary to download the gradle wrapper script above. This bootstrapping process requires Gradle to be installed on the source machine.  Gradle is available through most package managers or directly from [its website](http://www.gradle.org/).  To bootstrap the wrapper, run:
+The datafu-pig JAR can be found under `datafu-pig/build/libs`.  The artifact name will be of the form `datafu-pig-incubating-x.y.z.jar` if this is a source release and `datafu-pig-incubating-x.y.z-SNAPSHOT.jar` if this is being built from the code repository.
 
-    gradle -b bootstrap.gradle
-
-After the bootstrap script has completed, the regular gradlew instructions are available.
-
-The datafu-pig JAR can be found under `datafu-pig/build/libs` by the name `datafu-pig-x.y.z.jar`, where x.y.z is the version.  Similarly, the datafu-hourglass can be found in the `datafu-hourglass/build/libs` directory.
+The datafu-hourglass can be found in the `datafu-hourglass/build/libs` directory.
 
 ### Generating Eclipse Files
 

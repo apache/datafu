@@ -22,13 +22,40 @@ project(':') {
   apply plugin: 'signing'
 }
 
-task sourceRelease(type: Tar) {
+def isRelease = ext.release.toBoolean()
+
+def releaseVersion = project.version
+if (!isRelease) {
+  releaseVersion += "-SNAPSHOT"
+}
+
+// Modify the gradle.properties to indicate whether this is a release.  This results in the
+// source releases generating artifacts without -SNAPSHOT appended to the version when they are
+// built.
+task prepare_release_config(type: Copy) {
+  from "$rootDir/gradle.properties"
+  into "$rootDir"
+  rename { filename -> 
+    filename + ".release" }
+  filter { line ->
+    if (isRelease && line.startsWith("release=")) {
+      "release=true"
+    }
+    else {
+      line
+    }
+  }
+}
+
+task sourceRelease(type: Tar, dependsOn: prepare_release_config) {
   description = "Build a source release, specifically excluding the build directories and gradle wrapper files"
   compression = Compression.GZIP
 
-  baseName = "datafu-sources-${project.version}-incubating"
+  baseName "apache-datafu-incubating-sources-${releaseVersion}"
 
   from(project.rootDir) {
+    // don't include gradle.properties because we use a modified version
+    exclude "gradle.properties"
     exclude '**/build'
     exclude 'build'
     exclude '.gradle'
@@ -36,6 +63,16 @@ task sourceRelease(type: Tar) {
     exclude 'gradlew.bat'
     exclude 'gradle/wrapper/gradle-wrapper.jar'
     exclude 'gradle/wrapper/gradle-wrapper.properties'
+  }
+
+  // rename gradle.properties.release to gradle.properties
+  rename { filename ->
+    if (filename.equals("gradle.properties.release")) {
+      "gradle.properties"
+    }
+    else {
+      filename
+    }
   }
 
   into(baseName)
@@ -52,11 +89,14 @@ task sourceRelease(type: Tar) {
 // Signing requires a user ~/.gradle/gradle.properties file with signing information.
 // See: http://www.gradle.org/docs/current/userguide/signing_plugin.html
 signing {
-  // TODO: this doesn't show up in the 'tasks' for some reason, need to figure out why.
-  // This creates a task 'signSourceRelease' that builds the source release and signs it.
-  required { !version.endsWith("SNAPSHOT") }
+  // Sign the source archive if the proper configuration is in place to do so.  Otherwise
+  // skip the signing process (it isn't required).  This archive can be manually signed if
+  // needed.
+  required false
   sign sourceRelease
 }
+
+task release(dependsOn: signSourceRelease)
 
 // Publishing to Apache's Maven repository (Nexus). To install the archives in the
 // local repository, run the 'install' task.

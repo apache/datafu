@@ -21,6 +21,9 @@ apply plugin: 'java'
 apply plugin: 'gradle-autojar'
 apply plugin: 'download-task'
 
+// append "-incubating" while still in the incubating process
+archivesBaseName = 'datafu-pig-incubating'
+
 import groovy.xml.MarkupBuilder
 
 buildscript {
@@ -108,10 +111,10 @@ task jarWithDependencies(type: Autojar) {
   autojarExtra = '-baeq'
 }
 
+def outputFile = file(tasks.jar.getArchivePath().absoluteFile.toString().replace("-core","-jarjar"))
+
 task jarWithDependenciesNamespaced(dependsOn: jarWithDependencies) {
   description 'Creates the jar that includes dependencies (under a datafu namespace)'
-
-  outputFile = file(tasks.jar.getArchivePath().absoluteFile.toString().replace("-core","-jarjar"))
 
   doLast {
     project.ant {
@@ -131,7 +134,7 @@ task jarWithDependenciesNamespaced(dependsOn: jarWithDependencies) {
 task finalJar(type: Jar, dependsOn: jarWithDependenciesNamespaced) {
   description 'Creates the final jar'
 
-  from(zipTree(jarWithDependenciesNamespaced.outputFile))
+  from(zipTree(outputFile))
 }
 
 // don't publish the core archive, as this doesn't have the dependencies
