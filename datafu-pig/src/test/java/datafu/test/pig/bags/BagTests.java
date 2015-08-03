@@ -187,8 +187,72 @@ public class BagTests extends PigTests
                  "(1,{(1),(2),(3),(4)})",
                  "(2,{(10),(20),(30),(40),(50),(60)})");
   }
-
+  
   /**
+
+define TupleFromBag datafu.pig.bags.TupleFromBag();
+
+%declare emptyTuple TOTUPLE(0,'NO_NUMBER')
+
+data = LOAD 'input' using PigStorage(',') AS (a:INT,b:CHARARRAY);
+
+grouped = GROUP data BY a;
+
+result1 = FOREACH grouped GENERATE group AS a, TupleFromBag(data, 0);
+
+result2 = FOREACH grouped GENERATE group AS a, TupleFromBag(data,0).b as first_b, TupleFromBag(data,1).b as second_b;
+
+result3 = FOREACH grouped GENERATE group AS a, TupleFromBag(data,0).b as first_b, TupleFromBag(data,3).b as forth_b;
+
+result4 = FOREACH grouped GENERATE group AS a,TupleFromBag(data,0,$emptyTuple).b as first_b, TupleFromBag(data,3,$emptyTuple).b as forth_b;
+
+   **/
+
+  @Multiline
+  private String tupleFromBagTest;
+
+  @Test
+  public void tupleFromBagTest() throws Exception
+  {
+	  PigTest test = createPigTestFromString(tupleFromBagTest);
+
+	  writeLinesToFile("input",
+              "1,a",
+              "1,b",
+              "1,c",
+              "2,d",
+              "2,e",
+              "2,f",
+              "3,g",
+              "3,h",
+              "3,i");
+
+	  test.runScript();
+
+	  assertOutput(test, "result1",
+              "(1,(1,c))",
+              "(2,(2,f))",
+              "(3,(3,i))");
+
+	  assertOutput(test, "result2",
+              "(1,c,b)",
+              "(2,f,e)",
+              "(3,i,h)");
+
+	  assertOutput(test, "result3",
+              "(1,c,)",
+              "(2,f,)",
+              "(3,i,)");
+
+	  assertOutput(test, "result4",
+              "(1,c,NO_NUMBER)",
+              "(2,f,NO_NUMBER)",
+              "(3,i,NO_NUMBER)");
+
+  }
+
+
+ /**
 
 
   define FirstTupleFromBag datafu.pig.bags.FirstTupleFromBag();
