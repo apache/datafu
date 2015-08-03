@@ -29,16 +29,21 @@ import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 /**
  * <p>
- * This UDF will extract tuple out of bag based on the specified index value of the tuple.
- * It will have three input parameter
- * 1. DataBag
- * 2. Index
- * 3. Default tuple (Optional)
+ * This UDF will extract a tuple from a bag based on a specified index.
  * </p>
  * <p>
+ * There are three input parameter:
+ * </p>
+ * <ol>
+ * <li>DataBag</li>
+ * <li>Index</li>
+ * <li>Default tuple (Optional)</li>
+ * </ol>
+ * <p>
  * Example:
+ * </p>
  * <pre>
- *
+ * {@code
  * define TupleFromBag datafu.pig.bags.TupleFromBag();
  * %declare defaultTuple TOTUPLE(0,'NO_NUMBER')
  *
@@ -106,9 +111,8 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * (1,c,NO_NUMBER)
  * (2,f,NO_NUMBER)
  * (3,i,NO_NUMBER)
- * 
+ * } 
  * </pre>
- * </p>
  */
 
 public class TupleFromBag extends EvalFunc<Tuple>{
