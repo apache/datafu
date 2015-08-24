@@ -38,10 +38,6 @@ import com.clearspring.analytics.hash.MurmurHash;
 import com.clearspring.analytics.stream.cardinality.CardinalityMergeException;
 import com.clearspring.analytics.stream.cardinality.HyperLogLogPlus;
 
-import datafu.pig.stats.entropy.EmpiricalCountEntropy.Final;
-import datafu.pig.stats.entropy.EmpiricalCountEntropy.Initial;
-import datafu.pig.stats.entropy.EmpiricalCountEntropy.Intermediate;
-
 /**
  * A UDF that applies the HyperLogLog++ cardinality estimation algorithm.
  * 
@@ -146,14 +142,11 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
       // count should always be 1 if bag is non empty
       DataBag bag = (DataBag) input.get(0);
       Iterator<Tuple> it = bag.iterator();
+      Tuple t = null;
       if (it.hasNext()) {
-        Tuple t = (Tuple) it.next();
-        if (t != null && t.size() > 0 && t.get(0) != null) {
-          long x = MurmurHash.hash64(t);
-          return mTupleFactory.newTuple((Object) x);
-        }
+        t = (Tuple) it.next();
       }
-      return mTupleFactory.newTuple((Object) MurmurHash.hash64(null));
+      return mTupleFactory.newTuple((Object) MurmurHash.hash64(t));
     }
   }
 
@@ -208,7 +201,7 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
       Tuple t = it.next();
       Object data = t.get(0);
       if (data instanceof Long) {
-        estimator.offer(data);
+        estimator.offerHashed((Long)data);
       } else if (data instanceof DataByteArray) {
         DataByteArray bytes = (DataByteArray) data;
         HyperLogLogPlus newEstimator;
