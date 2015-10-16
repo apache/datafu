@@ -18,11 +18,13 @@ license: >
    limitations under the License.
 ---
 
-[DataFu](http://data.linkedin.com/opensource/datafu) is an open-source collection of user-defined functions for working with large-scale data in [Hadoop](http://hadoop.apache.org/) and [Pig](http://pig.apache.org/).
+_Update (10/15/2015): The links in this blog post have been updated to point to the correct locations within the Apache DataFu website._
+
+[DataFu](/) is an open-source collection of user-defined functions for working with large-scale data in [Hadoop](http://hadoop.apache.org/) and [Pig](http://pig.apache.org/).
 
 About two years ago, we recognized a need for a stable, well-tested library of Pig UDFs that could assist in common data mining and statistics tasks. Over the years, we had developed several routines that were used across LinkedIn and were thrown together into an internal package we affectionately called “littlepiggy.” The unfortunate part, and this is true of many such efforts, is that the UDFs were ill-documented, ill-organized, and easily got broken when someone made a change. Along came [PigUnit](http://pig.apache.org/docs/r0.11.1/test.html#pigunit), which allowed UDF testing, so we spent the time to clean up these routines by adding documentation and rigorous unit tests. From this “datafoo” package, we thought this would help the community at large, and there you have the initial release of DataFu.
 
-Since then, the project has continued to evolve. We have accepted contributions from a number of sources, improved the style and quality of testing, and adapted to the changing features and versions of Pig. During this time DataFu has been used extensively at LinkedIn for many of our data driven products like "People You May Known" and "Skills and Endorsements." The library is used at numerous companies, and it has also been included in Cloudera's Hadoop distribution ([CDH](http://www.cloudera.com/content/cloudera/en/products/cdh.html)) as well as the [Apache BigTop](http://bigtop.apache.org/) project. DataFu has matured, and we are proud to announce the [1.0 release](https://github.com/linkedin/datafu/blob/master/changes.md).
+Since then, the project has continued to evolve. We have accepted contributions from a number of sources, improved the style and quality of testing, and adapted to the changing features and versions of Pig. During this time DataFu has been used extensively at LinkedIn for many of our data driven products like "People You May Known" and "Skills and Endorsements." The library is used at numerous companies, and it has also been included in Cloudera's Hadoop distribution ([CDH](http://www.cloudera.com/content/cloudera/en/products/cdh.html)) as well as the [Apache BigTop](http://bigtop.apache.org/) project. DataFu has matured, and we are proud to announce the [1.0 release](/docs/datafu/1.0.0/).
 
 This release of DataFu has a number of new features that can make writing Pig easier, cleaner, and more efficient. In this post, we are going to highlight some of these new features by walking through a large number of examples. Think of this as a HowTo Pig + DataFu guide.
 
@@ -59,23 +61,23 @@ accepts_counted = FOREACH (GROUP accepts BY (user_id, item_id)) GENERATE
   FLATTEN(group) as (user_id, item_id), COUNT_STAR(accepts) as count;
 rejects_counted = FOREACH (GROUP rejects BY (user_id, item_id)) GENERATE
   FLATTEN(group) as (user_id, item_id), COUNT_STAR(rejects) as count;
- 
-joined_accepts = JOIN impressions_counted BY (user_id, item_id) LEFT OUTER, accepts_counted BY (user_id, item_id);  
-joined_accepts = FOREACH joined_accepts GENERATE 
+
+joined_accepts = JOIN impressions_counted BY (user_id, item_id) LEFT OUTER, accepts_counted BY (user_id, item_id);
+joined_accepts = FOREACH joined_accepts GENERATE
   impressions_counted::user_id as user_id,
   impressions_counted::item_id as item_id,
   impressions_counted::count as impression_count,
   ((accepts_counted::count is null)?0:accepts_counted::count) as accept_count;
- 
+
 joined_accepts_rejects = JOIN joined_accepts BY (user_id, item_id) LEFT OUTER, rejects_counted BY (user_id, item_id);
-joined_accepts_rejects = FOREACH joined_accepts_rejects GENERATE 
+joined_accepts_rejects = FOREACH joined_accepts_rejects GENERATE
   joined_accepts::user_id as user_id,
   joined_accepts::item_id as item_id,
   joined_accepts::impression_count as impression_count,
   joined_accepts::accept_count as accept_count,
   ((rejects_counted::count is null)?0:rejects_counted::count) as reject_count;
- 
-features = FOREACH (GROUP joined_accepts_rejects BY user_id) GENERATE 
+
+features = FOREACH (GROUP joined_accepts_rejects BY user_id) GENERATE
   group as user_id, joined_accepts_rejects.(item_id, impression_count, accept_count, reject_count) as items;
 ```
 
@@ -87,13 +89,13 @@ Recognizing that we can combine the outer joins and group operations into a sing
 
 ```pig
 features_grouped = COGROUP impressions BY (user_id, item_id), accepts BY (user_id, item_id), rejects BY (user_id, item_id);
-features_counted = FOREACH features_grouped GENERATE 
+features_counted = FOREACH features_grouped GENERATE
   FLATTEN(group) as (user_id, item_id),
   COUNT_STAR(impressions) as impression_count,
   COUNT_STAR(accepts) as accept_count,
   COUNT_STAR(rejects) as reject_count;
- 
-features = FOREACH (GROUP features_counted BY user_id) GENERATE 
+
+features = FOREACH (GROUP features_counted BY user_id) GENERATE
   group as user_id,
   features_counted.(item_id, impression_count, accept_count, reject_count) as items;
 ```
@@ -110,15 +112,15 @@ One thing that we have noticed is that even very big data will frequently get re
 DEFINE CountEach datafu.pig.bags.CountEach('flatten');
 DEFINE BagLeftOuterJoin datafu.pig.bags.BagLeftOuterJoin();
 DEFINE Coalesce datafu.pig.util.Coalesce();
- 
+
 features_grouped = COGROUP impressions BY user_id, accepts BY user_id, rejects BY user_id;
- 
-features_counted = FOREACH features_grouped GENERATE 
+
+features_counted = FOREACH features_grouped GENERATE
   group as user_id,
   CountEach(impressions.item_id) as impressions,
   CountEach(accepts.item_id) as accepts,
   CountEach(rejects.item_id) as rejects;
- 
+
 features_joined = FOREACH features_counted GENERATE
   user_id,
   BagLeftOuterJoin(
@@ -126,7 +128,7 @@ features_joined = FOREACH features_counted GENERATE
     accepts, 'item_id',
     rejects, 'item_id'
   ) as items;
- 
+
 features = FOREACH features_joined {
   projected = FOREACH items GENERATE
     impressions::item_id as item_id,
@@ -156,7 +158,7 @@ Next we count the occurences of each item in the impression, accept and reject b
 ```pig
 DEFINE CountEach datafu.pig.bags.CountEach('flatten');
 
-features_counted = FOREACH features_grouped GENERATE 
+features_counted = FOREACH features_grouped GENERATE
     group as user_id,
     CountEach(impressions.item_id) as impressions,
     CountEach(accepts.item_id) as accepts,
@@ -277,33 +279,33 @@ public class MortgagePayment extends AliasableEvalFunc<DataBag> {
       Schema tupleSchema = new Schema();
       tupleSchema.add(new Schema.FieldSchema("monthly_payment", DataType.DOUBLE));
       Schema bagSchema;
-    
+
       bagSchema = new Schema(new Schema.FieldSchema(this.getClass().getName().toLowerCase(), tupleSchema, DataType.BAG));
       return bagSchema;
     } catch (FrontendException e) {
       throw new RuntimeException(e);
     }
   }
- 
+
   @Override
   public DataBag exec(Tuple input) throws IOException  {
     DataBag output = BagFactory.getInstance().newDefaultBag();
-    
+
     // get a value from the input tuple by alias
     Double principal = getDouble(input, "principal");
     Integer numPayments = getInteger(input, "num_payments");
     DataBag interestRates = getBag(input, "interest_rates");
-    
+
     for (Tuple interestTuple : interestRates) {
       // get a value from the inner bag tuple by alias
       Double interest = getDouble(interestTuple, getPrefixedAliasName("interest_rates", "interest_rate"));
       double monthlyPayment = computeMonthlyPayment(principal, numPayments, interest);
       output.add(TupleFactory.getInstance().newTuple(monthlyPayment));
     }
-    
+
     return output;
   }
- 
+
   private double computeMonthlyPayment(Double principal, Integer numPayments, Double interest) {
     return principal * (interest * Math.pow(interest+1, numPayments)) / (Math.pow(interest+1, numPayments) - 1.0);
   }
@@ -322,9 +324,9 @@ The model for a linear regression is pretty simple; it's just a mapping of field
 
 ```pig
 DEFINE LinearRegression datafu.test.blog.LinearRegression('intercept:1,impression_count:-0.1,accept_count:2.0,reject_count:-1.0');
- 
+
 features = LOAD 'test/pig/datafu/test/blog/features.dat' AS (user_id:int, items:bag{(item_id:int,impression_count:int,accept_count:int,reject_count:int)});
- 
+
 recommendations = FOREACH features {
   scored_items = FOREACH items GENERATE item_id, LinearRegression(*) as score;
   GENERATE user_id, scored_items as items;
@@ -339,20 +341,20 @@ Now, the hard work, writing the UDF:
 public class LinearRegression extends AliasableEvalFunc<Double>
 {
   Map<String, Double> parameters;
-  
+
   public LinearRegression(String parameterString) {
     parameters = new HashMap<String, Double>();
     for (String token : parameterString.split(",")) {
       String[] keyValue = token.split(":");
       parameters.put(keyValue[0].trim(), Double.parseDouble(keyValue[1].trim()));
-    }     
+    }
   }
- 
+
   @Override
   public Schema getOutputSchema(Schema input) {
     return new Schema(new Schema.FieldSchema("score", DataType.DOUBLE));
   }
- 
+
   @Override
   public Double exec(Tuple input) throws IOException {
     double score = 0.0;
@@ -408,17 +410,17 @@ The staright-foward solution for this task will be group the tracking data for e
 
 ```pig
 grouped = COGROUP impressions BY (user_id, item_id), accepts BY (user_id, item_id), rejects BY (user_id, item_id) features BY (user_id, item_id);
-full_result = FOREACH grouped GENREATE 
+full_result = FOREACH grouped GENREATE
   FLATTEN(group) AS user_id, item_id,
   (impressions::timestamp is null)?1:0 AS is_impressed,
   (accepts::timestamp is null)?1:0 AS is_accepted,
   (rejects::timestamp is null)?1:0 AS is_rejected,
   Coalesce(features::feature_1, 0) AS feature_1,
   Coalesce(features::feature_2, 0) AS feature_2;
- 
+
 grouped_full_result = GROUP full_result BY user_id;
 sampled = SAMPLE grouped_full_result BY group 0.01;
-result = FOREACH sampled GENERATE 
+result = FOREACH sampled GENERATE
   group AS user_id,
   FLATTEN(full_result);
 ```
@@ -431,14 +433,14 @@ Yep.
 
 ```pig
 DEFINE SampleByKey datafu.pig.sampling.SampleByKey('whatever_the_salt_you_want_to_use','0.01');
- 
+
 impressions = FILTER impressions BY SampleByKey('user_id');
 accepts = FILTER impressions BY SampleByKey('user_id');
 rejects = FILTER rejects BY SampleByKey('user_id');
 features = FILTER features BY SampleByKey('user_id');
- 
+
 grouped = COGROUP impressions BY (user_id, item_id), accepts BY (user_id, item_id), rejects BY (user_id, item_id), features BY (user_id, item_id);
-result = FOREACH grouped GENREATE 
+result = FOREACH grouped GENREATE
   FLATTEN(group) AS (user_id, item_id),
   (impressions::timestamp is null)?1:0 AS is_impressed,
   (accepts::timestamp is null)?1:0 AS is_accepted,
@@ -501,14 +503,14 @@ One case where conditional logic can be painful is filtering based on a set of v
 
 ```pig
 data = LOAD 'input' using PigStorage(',') AS (what:chararray, adj:chararray);
-  
+
 dump data;
 -- (roses,red)
 -- (violets,blue)
 -- (sugar,sweet)
-  
+
 data2 = FILTER data BY adj == 'red' OR adj == 'blue';
-  
+
 dump data2;
 -- (roses,red)
 -- (violets,blue)
@@ -518,16 +520,16 @@ However as the number of items to check for grows this becomes very verbose. The
 
 ```pig
 DEFINE In datafu.pig.util.In();
- 
+
 data = LOAD 'input' using PigStorage(',') AS (what:chararray, adj:chararray);
-  
+
 dump data;
 -- (roses,red)
 -- (violets,blue)
 -- (sugar,sweet)
-  
+
 data2 = FILTER data BY In(adj, 'red','blue');
-  
+
 dump data2;
 -- (roses,red)
 -- (violets,blue)
@@ -541,10 +543,10 @@ Pig's `JOIN` operator supports performing left outer joins on two relations only
 input1 = LOAD 'input1' using PigStorage(',') AS (val1:INT,val2:INT);
 input2 = LOAD 'input2' using PigStorage(',') AS (val1:INT,val2:INT);
 input3 = LOAD 'input3' using PigStorage(',') AS (val1:INT,val2:INT);
-  
+
 data1 = JOIN input1 BY val1 LEFT, input2 BY val1;
 data1 = FILTER data1 BY input1::val1 IS NOT NULL;
-  
+
 data2 = JOIN data1 BY input1::val1 LEFT, input3 BY val1;
 data2 = FILTER data2 BY input1::val1 IS NOT NULL;
 ```
@@ -555,13 +557,13 @@ However this can be inefficient as it requires multiple MapReduce jobs. For many
 input1 = LOAD 'input1' using PigStorage(',') AS (val1:INT,val2:INT);
 input2 = LOAD 'input2' using PigStorage(',') AS (val1:INT,val2:INT);
 input3 = LOAD 'input3' using PigStorage(',') AS (val1:INT,val2:INT);
-  
+
 data1 = COGROUP input1 BY val1, input2 BY val1, input3 BY val1;
 data2 = FOREACH data1 GENERATE
   FLATTEN(input1), -- left join on this
-  FLATTEN((IsEmpty(input2) ? TOBAG(TOTUPLE((int)null,(int)null)) : input2)) 
+  FLATTEN((IsEmpty(input2) ? TOBAG(TOTUPLE((int)null,(int)null)) : input2))
       as (input2::val1,input2::val2),
-  FLATTEN((IsEmpty(input3) ? TOBAG(TOTUPLE((int)null,(int)null)) : input3)) 
+  FLATTEN((IsEmpty(input3) ? TOBAG(TOTUPLE((int)null,(int)null)) : input3))
       as (input3::val1,input3::val2);
 ```
 
@@ -571,11 +573,11 @@ To clean up this code we have created `EmptyBagToNullFields`, which replicates t
 
 ```pig
 DEFINE EmptyBagToNullFields datafu.pig.bags.EmptyBagToNullFields();
- 
+
 input1 = LOAD 'input1' using PigStorage(',') AS (val1:INT,val2:INT);
 input2 = LOAD 'input2' using PigStorage(',') AS (val1:INT,val2:INT);
 input3 = LOAD 'input3' using PigStorage(',') AS (val1:INT,val2:INT);
-  
+
 data1 = COGROUP input1 BY val1, input2 BY val1, input3 BY val1;
 data2 = FOREACH data1 GENERATE
   FLATTEN(input1),
@@ -592,9 +594,9 @@ Ok, a second encore, but no more. If you are doing a lot of these, you can turn 
 ```pig
 DEFINE left_outer_join(relation1, key1, relation2, key2, relation3, key3) returns joined {
   cogrouped = COGROUP $relation1 BY $key1, $relation2 BY $key2, $relation3 BY $key3;
-  $joined = FOREACH cogrouped GENERATE 
-    FLATTEN($relation1), 
-    FLATTEN(EmptyBagToNullFields($relation2)), 
+  $joined = FOREACH cogrouped GENERATE
+    FLATTEN($relation1),
+    FLATTEN(EmptyBagToNullFields($relation2)),
     FLATTEN(EmptyBagToNullFields($relation3));
 }
 ```
@@ -607,6 +609,6 @@ features = left_outer_join(input1, val1, input2, val2, input3, val3);
 
 ## Wrap-up
 
-So, that's a lot to digest, but it's just a highlight into a few interesting pieces of DataFu. Check out the [DataFu 1.0 release](http://data.linkedin.com/opensource/datafu) as there's even more in store.
+So, that's a lot to digest, but it's just a highlight into a few interesting pieces of DataFu. Check out the [DataFu 1.0 release](/docs/datafu/1.0.0/) as there's even more in store.
 
 We hope that it proves valuable to you and as always welcome any contributions. Please let us know how you're using the library — we would love to hear from you.

@@ -18,6 +18,8 @@ license: >
    limitations under the License.
 ---
 
+_Update (10/15/2015): The links in this blog post have been updated to point to the correct locations within the Apache DataFu website._
+
 For a large scale site such as LinkedIn, tracking metrics accurately and efficiently is an important task. For example, imagine we need a dashboard that shows the number of visitors to every page on the site over the last thirty days. To keep this dashboard up to date, we can schedule a query that runs daily and gathers the stats for the last 30 days. However, this simple implementation would be wasteful: only one day of data has changed, but we'd be consuming and recalculating the stats for all 30.
 
 A more efficient solution is to make the query incremental: using basic arithmetic, we can update the output from the previous day by adding and subtracting input data. This enables the job to process only the new data, significantly reducing the computational resources required. Unfortunately, although there are many benefits to the incremental approach, getting incremental jobs right is hard:
@@ -26,7 +28,7 @@ A more efficient solution is to make the query incremental: using basic arithmet
 * If the previous output is reused, then the job needs to be written to consume not just new input data, but also previous outputs.
 * There are more things that can go wrong with an incremental job, so you typically need to spend more time writing automated tests to make sure things are working.
 
-To solve these problems, we are happy to announce that we have open sourced [Hourglass](https://github.com/linkedin/datafu/tree/master/contrib/hourglass), a framework that makes it much easier to write incremental Hadoop jobs. We are releasing Hourglass under the Apache 2.0 License as part of the [DataFu](https://github.com/linkedin/datafu) project. We will be presenting our "Hourglass: a Library for Incremental Processing on Hadoop" paper at the [IEEE BigData 2013](http://cci.drexel.edu/bigdata/bigdata2013/index.htm) conference on October 9th.
+To solve these problems, we are happy to announce that we have open sourced [Hourglass](/docs/hourglass/getting-started.html), a framework that makes it much easier to write incremental Hadoop jobs. We are releasing Hourglass under the Apache 2.0 License as part of the [DataFu](/) project. We will be presenting our "Hourglass: a Library for Incremental Processing on Hadoop" paper at the [IEEE BigData 2013](http://cci.drexel.edu/bigdata/bigdata2013/index.htm) conference on October 9th.
 
 In this post, we will give an overview of the basic concepts behind Hourglass and walk through examples of using the framework to solve processing tasks incrementally. The first example presents a job that counts how many times a member has logged in to a site. The second example presents a job that estimates the number of members who have visited in the past thirty days. Lastly, we will show you how to get the code and start writing your own incremental hadoop jobs.
 
@@ -83,7 +85,7 @@ Hourglass uses [Avro](http://avro.apache.org/) for all of the input and output d
 With the basic concepts out of the way, let's look at an example. Suppose that we have a website that tracks user logins as an event, and for each event, the member ID is recorded. These events are collected and stored in HDFS in Avro under paths with the format `/data/event/yyyy/MM/dd`. Suppose for this example our Avro schema is:
 
     {
-      "type" : "record", "name" : "ExampleEvent", 
+      "type" : "record", "name" : "ExampleEvent",
       "namespace" : "datafu.hourglass.test",
       "fields" : [ {
         "name" : "id",
@@ -98,9 +100,9 @@ To continue our example, let's say there are two days of data currently availabl
 
     2013/03/15:
     {"id": 1}, {"id": 1}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 3}
-     
+
     2013/03/16:
-    {"id": 1}, {"id": 1}, {"id": 2}, {"id": 2}, {"id": 3}, 
+    {"id": 1}, {"id": 1}, {"id": 2}, {"id": 2}, {"id": 3},
 
 Let's aggregate the counts by member ID using Hourglass. To perform the aggregation we will use [PartitionCollapsingIncrementalJob](/docs/hourglass/0.1.3/datafu/hourglass/jobs/PartitionCollapsingIncrementalJob.html), which takes a partitioned data set and collapses all the partitions together into a single output. The goal is to aggregate the two days of input and produce a single day of output, as in the following diagram:
 
@@ -109,7 +111,7 @@ Let's aggregate the counts by member ID using Hourglass. To perform the aggregat
 First, create the job:
 
 ```java
-PartitionCollapsingIncrementalJob job = 
+PartitionCollapsingIncrementalJob job =
     new PartitionCollapsingIncrementalJob(Example.class);
 ```
 
@@ -117,22 +119,22 @@ Next, we will define schemas for the key and value used by the job. The key affe
 
 ```java
 final String namespace = "com.example";
- 
-final Schema keySchema = 
+
+final Schema keySchema =
   Schema.createRecord("Key",null,namespace,false);
- 
+
 keySchema.setFields(Arrays.asList(
   new Field("member_id",Schema.create(Type.LONG),null,null)));
- 
+
 final String keySchemaString = keySchema.toString(true);
- 
-final Schema valueSchema = 
+
+final Schema valueSchema =
   Schema.createRecord("Value",null,namespace,false);
- 
+
 valueSchema.setFields(Arrays.asList(
   new Field("count",Schema.create(Type.INT),null,null)));
 ```
- 
+
 final String valueSchemaString = valueSchema.toString(true);
 
 This produces the following representation:
@@ -144,7 +146,7 @@ This produces the following representation:
         "type" : "long"
       } ]
     }
-     
+
     {
       "type" : "record", "name" : "Value", "namespace" : "com.example",
       "fields" : [ {
@@ -176,58 +178,58 @@ job.setMapper(new Mapper<GenericRecord,GenericRecord,GenericRecord>()
 {
   private transient Schema kSchema;
   private transient Schema vSchema;
-  
+
   @Override
   public void map(
     GenericRecord input,
-    KeyValueCollector<GenericRecord, GenericRecord> collector) 
-  throws IOException, InterruptedException 
+    KeyValueCollector<GenericRecord, GenericRecord> collector)
+  throws IOException, InterruptedException
   {
-    if (kSchema == null) 
+    if (kSchema == null)
       kSchema = new Schema.Parser().parse(keySchemaString);
- 
-    if (vSchema == null) 
+
+    if (vSchema == null)
       vSchema = new Schema.Parser().parse(valueSchemaString);
- 
+
     GenericRecord key = new GenericData.Record(kSchema);
     key.put("member_id", input.get("id"));
- 
+
     GenericRecord value = new GenericData.Record(vSchema);
     value.put("count", 1);
- 
+
     collector.collect(key,value);
-  }      
+  }
 });
 ```
 
 An accumulator is responsible for aggregating this data. Records will be grouped by member ID and then passed to the accumulator one-by-one. The accumulator keeps a running total and adds each input count to it. When all data has been passed to it, the `getFinal()` method will be called, which returns the output record containing the count.
 
 ```java
-job.setReducerAccumulator(new Accumulator<GenericRecord,GenericRecord>() 
+job.setReducerAccumulator(new Accumulator<GenericRecord,GenericRecord>()
 {
   private transient int count;
   private transient Schema vSchema;
-  
+
   @Override
   public void accumulate(GenericRecord value) {
     this.count += (Integer)value.get("count");
   }
- 
+
   @Override
   public GenericRecord getFinal() {
-    if (vSchema == null) 
+    if (vSchema == null)
       vSchema = new Schema.Parser().parse(valueSchemaString);
- 
+
     GenericRecord output = new GenericData.Record(vSchema);
     output.put("count", count);
- 
+
     return output;
   }
- 
+
   @Override
   public void cleanup() {
     this.count = 0;
-  }      
+  }
 });
 ```
 
@@ -289,43 +291,43 @@ HyperLogLog is a good fit for this use case. For this example, we will use [Hype
 Let's start by defining the mapper. The key it uses is just a dummy value, as we are only producing a single statistic in this case. For the value we use a record with two fields: one is the count estimate; the other we'll just call "data", which can be either a single member ID or the bytes from the serialized estimator. For the map output we use the member ID.
 
 ```java
-Mapper<GenericRecord,GenericRecord,GenericRecord> mapper = 
+Mapper<GenericRecord,GenericRecord,GenericRecord> mapper =
   new Mapper<GenericRecord,GenericRecord,GenericRecord>() {
     private transient Schema kSchema;
     private transient Schema vSchema;
-  
+
     @Override
     public void map(
       GenericRecord input,
-      KeyValueCollector<GenericRecord, GenericRecord> collector) 
+      KeyValueCollector<GenericRecord, GenericRecord> collector)
     throws IOException, InterruptedException
     {
-      if (kSchema == null) 
+      if (kSchema == null)
         kSchema = new Schema.Parser().parse(keySchemaString);
-      
-      if (vSchema == null) 
+
+      if (vSchema == null)
         vSchema = new Schema.Parser().parse(valueSchemaString);
-      
+
       GenericRecord key = new GenericData.Record(kSchema);
       key.put("name", "member_count");
-      
+
       GenericRecord value = new GenericData.Record(vSchema);
       value.put("data",input.get("id")); // member id
       value.put("count", 1L);            // just a single member
-      
-      collector.collect(key,value);        
-    }      
+
+      collector.collect(key,value);
+    }
   };
 ```
 
 Next, we'll define the accumulator, which can be used for both the combiner and the reducer. This accumulator can handle either member IDs or estimator bytes. When it receives a member ID it adds it to the HyperLogLog estimator. When it receives an estimator it merges it with the current estimator to produce a new one. To produce the final result, it gets the current estimate and also serializes the current estimator as a sequence of bytes.
 
 ```java
-Accumulator<GenericRecord,GenericRecord> accumulator = 
+Accumulator<GenericRecord,GenericRecord> accumulator =
   new Accumulator<GenericRecord,GenericRecord>() {
     private transient HyperLogLogPlus estimator;
     private transient Schema vSchema;
-  
+
     @Override
     public void accumulate(GenericRecord value)
     {
@@ -341,10 +343,10 @@ Accumulator<GenericRecord,GenericRecord> accumulator =
         HyperLogLogPlus newEstimator;
         try
         {
-          newEstimator = 
+          newEstimator =
             HyperLogLogPlus.Builder.build(bytes.array());
- 
-          estimator = 
+
+          estimator =
             (HyperLogLogPlus)estimator.merge(newEstimator);
         }
         catch (IOException e)
@@ -354,21 +356,21 @@ Accumulator<GenericRecord,GenericRecord> accumulator =
         catch (CardinalityMergeException e)
         {
           throw new RuntimeException(e);
-        }      
+        }
       }
     }
- 
+
     @Override
     public GenericRecord getFinal()
     {
-      if (vSchema == null) 
+      if (vSchema == null)
         vSchema = new Schema.Parser().parse(valueSchemaString);
-      
+
       GenericRecord output = new GenericData.Record(vSchema);
-      
+
       try
       {
-        ByteBuffer bytes = 
+        ByteBuffer bytes =
           ByteBuffer.wrap(estimator.getBytes());
         output.put("data", bytes);
         output.put("count", estimator.cardinality());
@@ -379,27 +381,29 @@ Accumulator<GenericRecord,GenericRecord> accumulator =
       }
       return output;
     }
- 
+
     @Override
     public void cleanup()
     {
       estimator = null;
-    }      
+    }
   };
 ```
 
 So there you have it. With the mapper and accumulator now defined, it is just a matter of passing them to the jobs and providing some other configuration. The key piece is to ensure that the second job uses a 30 day sliding window:
 
 ```java
-PartitionCollapsingIncrementalJob job2 = 
-  new PartitionCollapsingIncrementalJob(Example.class);    
- 
+PartitionCollapsingIncrementalJob job2 =
+  new PartitionCollapsingIncrementalJob(Example.class);
+
 // ...
- 
+
 job2.setNumDays(30); // 30 day sliding window
 ```
 
 ## Try it yourself!
+
+_Update (10/15/2015): Please see the updated version of these instructions at [Getting Started](/docs/hourglass/getting-started.html), which have changed significantly.  The instructions below will not work with the current code base, which has moved to Apache._
 
 Here is how you can start using Hourglass. We'll test out the job from the first example against some test data we'll create in a Hadoop. First, clone the DataFu repository and navigate to the Hourglass directory:
 
@@ -456,4 +460,4 @@ If you're interested in the project, we also encourage you to try running the un
 
 ## Conclusion
 
-We hope this whets your appetite for incremental data processing with DataFu's Hourglass. The [code](https://github.com/linkedin/datafu/tree/master/contrib/hourglass) is available on Github in the [DataFu](https://github.com/linkedin/datafu) repository under an Apache 2.0 license. Documentation is available [here](/docs/hourglass/javadoc.html). We are accepting contributions, so if you are interesting in helping out, please fork the code and send us your pull requests!
+We hope this whets your appetite for incremental data processing with DataFu's Hourglass. The [code](https://github.com/apache/incubator-datafu/tree/master/datafu-hourglass) is available on Github in the [DataFu](https://github.com/apache/incubator-datafu) repository under an Apache 2.0 license. Documentation is available [here](/docs/hourglass/javadoc.html). We are accepting contributions, so if you are interesting in helping out, please fork the code and send us your pull requests!

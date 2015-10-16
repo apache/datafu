@@ -1,5 +1,6 @@
 ---
-title: Mailing Lists - Apache DataFu Community
+title: Mailing Lists - Community
+section_name: Community
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with

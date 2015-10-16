@@ -2,6 +2,7 @@
 title: Getting Started - Apache DataFu Hourglass
 section_name: Apache DataFu Hourglass
 version: 0.1.3
+snapshot_version: 1.3.0-SNAPSHOT
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -28,38 +29,15 @@ A typical example of a sliding window is a dashboard that shows the number of vi
 To keep this dashboard up to date, we can schedule a query that runs daily and gathers the stats for the last 30 days.
 However, this simple implementation would be wasteful: only one day of data has changed, but we'd be consuming and recalculating
 the stats for all 30.  A more efficient solution is to make the query incremental: using basic arithmetic, we can update the output
-from the previous day by adding and subtracting input data. This enables the job to process only the new data, significantly reducing 
+from the previous day by adding and subtracting input data. This enables the job to process only the new data, significantly reducing
 the computational resources required.
 
 Hourglass is a framework that makes it much easier to write incremental Hadoop jobs to perform this type of computation efficiently.
 It provides incremental jobs that abstract away the complexity of implementing a robust incremental solution, with the appropriate hooks
 so that developers can supply custom logic to perform the aggregation task.
 
-## Download
-
-DataFu's Hourglass library is available as a JAR that can be found in the Maven central repository
-under the group ID [com.linkedin.datafu](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.linkedin.datafu%22) by the
-name `datafu-hourglass`.
-
-If you are using Ivy, you can download `datafu-hourglass` and its dependencies with:
-
-```xml
-<dependency org="com.linkedin.datafu" name="datafu-hourglass" rev="<%= current_page.data.version %>"/>
-```
-
-Or if you are using Maven:
-
-```xml
-<dependency>
-  <groupId>com.linkedin.datafu</groupId>
-  <artifactId>datafu-hourglass</artifactId>
-  <version><%= current_page.data.version %></version>
-</dependency>
-```
-
-Your other option is to [download](https://github.com/linkedin/datafu/archive/master.zip) the code and build the JAR yourself.
-After unzipping the archive, navigate to `contrib/hourglass`  and build the JAR by running `ant jar`.  The dependencies will be 
-downloaded to `lib/common`.
+If you have not already checked out the code, please see: [Quick Start](/docs/quick-start.html).  There you'll also see how to declare a
+dependency on Hourglass in a project.
 
 ## Examples
 
@@ -72,24 +50,25 @@ to compute daily, such as how many times each user has logged in or viewed a pag
 These sample jobs are packaged in a tool that can be run from the command line.  The same tool also serves as a test data generator.
 Here we will walk through how to generate test data and run the jobs against it.
 
-To start, get the source code and navigate to the Hourglass directory.
+Build the main Hourglass JAR, build the test JAR, and copy the dependencies necessary for the demo to a single directory:
 
-    git clone git://git.apache.org/incubator-datafu.git
-    cd contrib/hourglass
+    ./gradlew :datafu-hourglass:jar :datafu-hourglass:testJar :datafu-hourglass:copyDemoDependencies
 
-Build the Hourglass JAR, and in addition build the test jar that contains the sample jobs.
+Define some variables that we'll need for the `hadoop jar` command. These list the JAR dependencies, as well as the JARs we just built.
 
-    ant jar
-    ant testjar
+    export LIBJARS=$(find "datafu-hourglass/build/libs" -name '*.jar' | xargs echo | tr ' ' ',')
 
-Define some variables that we'll need for the `hadoop jar` command later. These list the JAR dependencies, as well as the two JARs we just built.
+    export LIBJARS=$LIBJARS,$(find "datafu-hourglass/build/demo_dependencies" -name '*.jar' | xargs echo | tr ' ' ',')
 
-    export LIBJARS=$(find "lib/common" -name '*.jar' | xargs echo | tr ' ' ',')
-    export LIBJARS=$LIBJARS,$(find "lib/test" -name '*.jar' | xargs echo | tr ' ' ',')
-    export LIBJARS=$LIBJARS,$(find "build" -name '*.jar' | xargs echo | tr ' ' ',')
     export HADOOP_CLASSPATH=`echo ${LIBJARS} | sed s/,/:/g`
 
 Assuming you've set up the `hadoop` command to run against your Hadoop cluster, you are now ready to run the jobs.
+
+Let's define some shorthand commands to run the Hourglass JAR and dump JSON from an Avro file:
+
+    export HOURGLASS_CMD="hadoop jar datafu-hourglass/build/libs/datafu-hourglass-incubating-<%= current_page.data.snapshot_version %>-tests.jar datafu.hourglass.demo.Main"
+
+    export TO_JSON_CMD="java -jar datafu-hourglass/build/demo_dependencies/avro-tools-1.7.4.jar tojson"
 
 ### Counting Events
 
@@ -100,12 +79,12 @@ First we'll generate some test data under the path`/data/event` using the `gener
 The command below will create some random events for dates between 2013/03/01 and 2013/03/14, inclusive.
 Each record consists of just a single long value from the range 1-100.
 
-    hadoop jar build/datafu-hourglass-test.jar generate -libjars ${LIBJARS} /data/event 2013/03/01-2013/03/14
+    $HOURGLASS_CMD generate -libjars ${LIBJARS} /data/event 2013/03/01-2013/03/14
 
 Just to get a sense for what the data looks like, we can copy it locally and dump the first several records.
 
     hadoop fs -copyToLocal /data/event/2013/03/01/part-00000.avro temp.avro
-    java -jar lib/test/avro-tools-jar-1.7.4.jar tojson temp.avro | head
+    $TO_JSON_CMD temp.avro | head
 
 This will produce output looking something like this:
 
@@ -120,10 +99,10 @@ This will produce output looking something like this:
     {"id":6}
     {"id":44}
 
-Now run the `countbyid` command, which executes the sample [CountById](https://github.com/linkedin/datafu/blob/master/contrib/hourglass/test/java/datafu/hourglass/demo/CountById.java) job.
+Now run the `countbyid` command, which executes the sample [CountById](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/CountById.java) job.
 This will count the number of events for each ID value.
 
-    hadoop jar build/datafu-hourglass-test.jar countbyid -libjars ${LIBJARS} /data/event /output
+    $HOURGLASS_CMD countbyid -libjars ${LIBJARS} /data/event /output
 
 In the console output you will notice that it reads all fourteen days of input that are available.
 We can see what this produced by copying the output locally and dumping the first several records.
@@ -131,7 +110,7 @@ Each record consists of an ID and a count.
 
     rm temp.avro
     hadoop fs -copyToLocal /output/20130314/part-r-00000.avro temp.avro
-    java -jar lib/test/avro-tools-jar-1.7.4.jar tojson temp.avro | head
+    $TO_JSON_CMD temp.avro | head
 
 This will produce output looking something like this:
 
@@ -148,13 +127,13 @@ This will produce output looking something like this:
 
 Now let's generate an additional day of data, for 2013/03/15:
 
-    hadoop jar build/datafu-hourglass-test.jar generate -libjars ${LIBJARS} /data/event 2013/03/15
+    $HOURGLASS_CMD generate -libjars ${LIBJARS} /data/event 2013/03/15
 
 The job is configured to consume all available input data.  But since a previous output already exists,
 it is able to reuse this result and therefore it only needs to consume the previous output and the new
 day of input.  Let's run the incremental job again:
 
-    hadoop jar build/datafu-hourglass-test.jar countbyid -libjars ${LIBJARS} /data/event /output
+    $HOURGLASS_CMD countbyid -libjars ${LIBJARS} /data/event /output
 
 You'll notice in console output that the job considers two alternative plans.  In one version it consumes
 all available input data to produce the new output.  In the other version it reuses the previous output
@@ -165,9 +144,9 @@ We can download the new output and inspect the counts:
 
     rm temp.avro
     hadoop fs -copyToLocal /output/20130315/part-r-00000.avro temp.avro
-    java -jar lib/test/avro-tools-jar-1.7.4.jar tojson temp.avro | head
+    $TO_JSON_CMD temp.avro | head
 
-The implementation of the `CountById` job can be found [here](https://github.com/linkedin/datafu/blob/master/contrib/hourglass/test/java/datafu/hourglass/demo/CountById.java).
+The implementation of the `CountById` job can be found [here](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/CountById.java).
 A more detailed explanation of how the job works and how it is implemented can be found in our
 [blog post](/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html).
 
@@ -185,11 +164,11 @@ Let's start by cleaning up the output directory:
 
     hadoop fs -rmr /output
 
-If you have been following along from the previous example, you already have fifteen days of input data available, 
+If you have been following along from the previous example, you already have fifteen days of input data available,
 so we don't need to regenerate it.  We can run the `cardinality` command to execute the two jobs.  This executes
-the sample jobs in [EstimateCardinality](https://github.com/linkedin/datafu/blob/master/contrib/hourglass/test/java/datafu/hourglass/demo/EstimateCardinality.java).
+the sample jobs in [EstimateCardinality](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/EstimateCardinality.java).
 
-    hadoop jar build/datafu-hourglass-test.jar cardinality -libjars ${LIBJARS} /data/event /intermediate /output 15
+    $HOURGLASS_CMD cardinality -libjars ${LIBJARS} /data/event /intermediate /output 15
 
 You will notice in the console output that the job consumes fifteen days of input.  We can then inspect the output to
 see the count of distinct IDs.  Note that the output record consists of the count *and* the serialized HyperLogLog estimator,
@@ -197,27 +176,27 @@ so we use `grep` to return just the count.
 
     rm temp.avro
     hadoop fs -copyToLocal /output/20130315/part-r-00000.avro temp.avro
-    java -jar lib/test/avro-tools-jar-1.7.4.jar tojson temp.avro | grep -E -oh "\"count\":[0-9]+"
+    $TO_JSON_CMD temp.avro | grep -E -oh "\"count\":[0-9]+"
 
 As the IDs in the test data are generated from the range 1-100, this produces the expected output of 100.
-We'll add a new day of data, but this time we'll use the range 101-200.  
+We'll add a new day of data, but this time we'll use the range 101-200.
 
-    hadoop jar build/datafu-hourglass-test.jar generate -libjars ${LIBJARS} /data/event 2013/03/16 101-200
+    $HOURGLASS_CMD generate -libjars ${LIBJARS} /data/event 2013/03/16 101-200
 
 Now we'll run the job again.  It automatically consumes fifteen days of data ending with the most recent data that's
 available.
 
-    hadoop jar build/datafu-hourglass-test.jar cardinality -libjars ${LIBJARS} /data/event /intermediate /output 15
+    $HOURGLASS_CMD cardinality -libjars ${LIBJARS} /data/event /intermediate /output 15
 
 We can now inspect the output again:
 
     rm temp.avro
     hadoop fs -copyToLocal /output/20130316/part-r-00000.avro temp.avro
-    java -jar lib/test/avro-tools-jar-1.7.4.jar tojson temp.avro | grep -E -oh "\"count\":[0-9]+"
+    $TO_JSON_CMD temp.avro | grep -E -oh "\"count\":[0-9]+"
 
 This produces the expected result of 200.
 
-The implementation of the `EstimateCardinality` job can be found [here](https://github.com/linkedin/datafu/blob/master/contrib/hourglass/test/java/datafu/hourglass/demo/EstimateCardinality.java).
+The implementation of the `EstimateCardinality` job can be found [here](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/EstimateCardinality.java).
 A more detailed explanation of how the job works and how it is implemented can be found in our
 [blog post](/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html).
 

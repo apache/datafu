@@ -40,24 +40,24 @@ import com.clearspring.analytics.stream.cardinality.HyperLogLogPlus;
 
 /**
  * A UDF that applies the HyperLogLog++ cardinality estimation algorithm.
- * 
+ *
  * <p>
  * This uses the implementation of HyperLogLog++ from <a href="https://github.com/addthis/stream-lib" target="_blank">stream-lib</a>.
- * The HyperLogLog++ algorithm is an enhanced version of HyperLogLog as described in 
+ * The HyperLogLog++ algorithm is an enhanced version of HyperLogLog as described in
  * <a href="http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en/us/pubs/archive/40671.pdf">here</a>.
  * </p>
- * 
+ *
  * <p>
  * This is a streaming implementation, and therefore the input data does not need to be sorted.
  * </p>
- * 
+ *
  */
 public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
 {
   private static TupleFactory mTupleFactory = TupleFactory.getInstance();
 
   private String p;
-  
+
   /**
    * Constructs a HyperLogLog++ estimator.
    */
@@ -65,11 +65,11 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
   {
     this("20");
   }
-  
+
   /**
    * Constructs a HyperLogLog++ estimator.
-   * 
-   * @param par precision value
+   *
+   * @param p precision value
    */
   public HyperLogLogPlusPlus(String p)
   {
@@ -77,7 +77,7 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
     this.p = p;
     cleanup();
   }
-    
+
   @Override
   public Schema outputSchema(Schema input)
   {
@@ -86,21 +86,21 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
       {
         throw new RuntimeException("Expected input to have only a single field");
       }
-      
+
       Schema.FieldSchema inputFieldSchema = input.getField(0);
 
       if (inputFieldSchema.type != DataType.BAG)
       {
         throw new RuntimeException("Expected a BAG as input");
       }
-      
+
       return new Schema(new Schema.FieldSchema(null, DataType.LONG));
     }
     catch (FrontendException e) {
       throw new RuntimeException(e);
     }
   }
-  
+
   private String param = null;
   private String getParam()
   {
@@ -113,7 +113,7 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
     }
     return param;
   }
-  
+
   @Override
   public String getFinal() {
       return Final.class.getName() + getParam();
@@ -133,7 +133,7 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
 	public Initial() {};
 	public Initial(String p) {};
 
-	  
+
     @Override
     public Tuple exec(Tuple input) throws IOException {
       // Since Initial is guaranteed to be called
@@ -156,7 +156,7 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
 	};
 	private String p;
 	public Intermediate(String p) {this.p = p;};
-	  
+
     @Override
     public Tuple exec(Tuple input) throws IOException {
       try {
@@ -179,7 +179,7 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
 	};
 	private String p;
 	public Final(String p) {this.p = p;};
-	  
+
     @Override
     public Long exec(Tuple input) throws IOException {
       try {
@@ -217,5 +217,5 @@ public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
     }
     return estimator;
   }
-  
+
 }

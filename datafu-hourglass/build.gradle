@@ -32,6 +32,33 @@ buildscript {
   }
 }
 
+// Core dependencies are those that we explicitly depend on and are not picked up as transitive dependencies of Hadoop.
+configurations.create('core')
+configurations.create('testCore')
+
+// Hadoop dependencies are those that we need for compile time but are provided by Hadoop when jobs are submitted.
+configurations.create('hadoop')
+
+// Dependencies needed in order to run the demo against Hadoop.
+configurations.create('demoRuntime')
+
+configurations {
+  // compile is split into core and hadoop configurations
+  compile {
+    extendsFrom core, hadoop
+  }
+
+  testCompile {
+    extendsFrom compile, testCore
+  }
+
+  // hadoopRuntime is an alternative to runtime that excludes all the hadoop jars (in the hadoop configuration) and
+  // their transitive dependencies.
+  demoRuntime {
+    extendsFrom core, testCore
+  }
+}
+
 cleanEclipse {
   doLast {
     delete ".apt_generated"
@@ -41,34 +68,68 @@ cleanEclipse {
   }
 }
 
+task testJar(type: Jar) {
+  classifier = 'tests'
+  from sourceSets.test.output
+}
+
+def demoDependenciesDir = new File("$buildDir/demo_dependencies")
+
+task replace_demo_dependencies_dir() << {
+  println "Creating $demoDependenciesDir"
+
+  if (demoDependenciesDir.exists()) {
+    demoDependenciesDir.deleteDir()
+  }
+  demoDependenciesDir.mkdirs()
+}
+
+task copyDemoDependencies(type: Copy, dependsOn: replace_demo_dependencies_dir) {
+    from configurations.demoRuntime
+    into demoDependenciesDir
+    def copyDetails = []
+    eachFile { copyDetails << it }
+    doLast {
+      copyDetails.each { FileCopyDetails details ->
+        def target = new File(demoDependenciesDir, details.path)
+        if(target.exists()) {
+          target.setLastModified(details.lastModified)
+        }
+      }
+    }
+}
+
 dependencies {
   // core dependencies, listed as dependencies in pom
-  compile "log4j:log4j:$log4jVersion"
-  compile "org.json:json:$jsonVersion"
-  compile "org.apache.avro:avro:$avroVersion"
-  compile "org.apache.avro:avro-compiler:$avroVersion"
-  compile "org.apache.commons:commons-math:$commonsMathVersion"
+  core "log4j:log4j:$log4jVersion"
+  core "org.json:json:$jsonVersion"
+  core "org.apache.avro:avro:$avroVersion"
+  core "org.apache.avro:avro-compiler:$avroVersion"
+  core "org.apache.commons:commons-math:$commonsMathVersion"
 
   // needed for testing, not listed as a dependencies in pom
-  testCompile "com.clearspring.analytics:stream:$streamVersion"
+  testCore "com.clearspring.analytics:stream:$streamVersion"
+  testCompile "commons-io:commons-io:$commonsIoVersion"
   testCompile "javax.ws.rs:jsr311-api:$jsr311Version"
   testCompile "org.slf4j:slf4j-log4j12:$slf4jVersion"
-  testCompile "commons-io:commons-io:$commonsIoVersion"
   testCompile "org.testng:testng:$testngVersion"
+
+  // only needed for running the demo
+  demoRuntime "org.apache.avro:avro-tools:$avroVersion"
 }
 
 if (hadoopVersion.startsWith("2.") || hadoopVersion.startsWith("0.23.")) {
   dependencies {
     // core dependencies, listed as dependencies in pom
-    compile "org.apache.avro:avro-mapred:$avroVersion:hadoop2"
+    core "org.apache.avro:avro-mapred:$avroVersion:hadoop2"
 
     // needed for compilation and testing, not listed as a dependencies in pom
-    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-archives:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-auth:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-common:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-archives:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-auth:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-mapreduce-client-core:$hadoopVersion"
 
     // needed for testing, not listed as a dependencies in pom
     testCompile "org.apache.hadoop:hadoop-minicluster:$hadoopVersion"
@@ -76,17 +137,17 @@ if (hadoopVersion.startsWith("2.") || hadoopVersion.startsWith("0.23.")) {
 } else {
   dependencies {
     // core dependencies, listed as dependencies in pom
-    compile "org.apache.avro:avro-mapred:$avroVersion"
+    core "org.apache.avro:avro-mapred:$avroVersion"
 
     // needed for compilation and testing, not listed as a dependencies in pom
-    compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-tools:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-core:$hadoopVersion"
+    hadoop "org.apache.hadoop:hadoop-tools:$hadoopVersion"
 
     // needed for testing, not listed as a dependencies in pom
     testCompile "org.apache.hadoop:hadoop-test:$hadoopVersion"
   }
 }
- 
+
 
 // modify the pom dependencies so we don't include hadoop and the testing related artifacts
 modifyPom {

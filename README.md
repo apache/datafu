@@ -24,7 +24,7 @@ If you'd like to jump in and get started, check out the corresponding guides for
 * [DataFu 1.0](http://datafu.incubator.apache.org/blog/2013/09/04/datafu-1-0.html)
 * [DataFu's Hourglass: Incremental Data Processing in Hadoop](http://datafu.incubator.apache.org/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html)
 
-## Presentations 
+## Presentations
 
 * [A Brief Tour of DataFu](http://www.slideshare.net/matthewterencehayes/datafu)
 * [Building Data Products at LinkedIn with DataFu](http://www.slideshare.net/matthewterencehayes/building-data-products-at-linkedin-with-datafu)
@@ -101,7 +101,7 @@ To run tests for a single class, use the `test.single` property.  For example, t
 
     ./gradlew :datafu-pig:test -Dtest.single=QuantileTests
 
-The tests can also be run from within eclipse.  You'll need to install the TestNG plugin for Eclipse.  See: http://testng.org/doc/download.html. 
+The tests can also be run from within eclipse.  You'll need to install the TestNG plugin for Eclipse.  See: http://testng.org/doc/download.html.
 
 Potential issues and workaround:
 * You may run out of heap when executing tests in Eclipse. To fix this adjust your heap settings for the TestNG plugin. Go to Eclipse->Preferences. Select TestNG->Run/Debug. Add "-Xmx1G" to the JVM args.

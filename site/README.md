@@ -1,6 +1,6 @@
 # Apache DataFu website
 
-We use [Middleman](http://middlemanapp.com/) to generate the website content. This requires Ruby.
+We use [Middleman](http://middlemanapp.com/) to generate the website content. This requires Ruby.  It's highly recommended that you use something like [rbenv](https://github.com/sstephenson/rbenv) to manage your Ruby versions.  The website content has been successfully generated using Ruby version `2.2.2`.
 
 ## Setup
 
