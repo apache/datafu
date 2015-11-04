@@ -2,11 +2,11 @@
 
 This will guide you through the source release process for Apache DataFu.
 
-For general information on the Apache Incubator release process, see the [Release Management](http://incubator.apache.org/guides/releasemanagement.html) page.  
+For general information on the Apache Incubator release process, see the [Release Management](http://incubator.apache.org/guides/releasemanagement.html) page.
 
 ## Prerequisites
 
-If this is your first time doing an Apache release, then there is some initial setup involved.  To perform a release, you will need to be able to sign the source tarball.  See the [Signing Releases](http://www.apache.org/dev/release-signing.html) page for information on how to do this.  You should read this page before proceeding.   In a nutshell, you'll need to follow the instructions at [How To OpenPGP](http://www.apache.org/dev/openpgp.html#generate-key) to generate a new code signing key and publish the public key in various places.  
+If this is your first time doing an Apache release, then there is some initial setup involved.  To perform a release, you will need to be able to sign the source tarball.  See the [Signing Releases](http://www.apache.org/dev/release-signing.html) page for information on how to do this.  You should read this page before proceeding.   In a nutshell, you'll need to follow the instructions at [How To OpenPGP](http://www.apache.org/dev/openpgp.html#generate-key) to generate a new code signing key and publish the public key in various places.
 
 Once you have followed these instructions, you should have:
 
@@ -15,6 +15,18 @@ Once you have followed these instructions, you should have:
 * Your public key viewable at https://people.apache.org/keys/committer/your-alias.asc
 * Your public key also viewable at https://people.apache.org/keys/group/datafu.asc
 
+After completing this, you should also configure git to use your key for signing.  If your signing key is identified by `01234567`, then you can configure git with:
+
+    git config --global user.signingkey 01234567
+
+If you are using gpg2 then you'll need to tell git to use it.
+
+    git config --global gpg.program gpg2
+
+Tip: You may get an error about a passphrase not being provided when signing with git.  If this happens try running the command below, which should case the passphrase prompt to show in the terminal.
+
+    export GPG_TTY=`tty`
+
 ## Code Validation
 
 Before releasing, we must run various checks to ensure that files have the proper license headers and that all automated tests pass.  These checks can be run with:
@@ -22,6 +34,13 @@ Before releasing, we must run various checks to ensure that files have the prope
     ./gradlew check
 
 If this builds successfully then it means the tests pass and the report was successfully generated.  But, it doesn't mean that all license headers are in place.  You should open the report at `build/rat/rat-report.html` to validate that all files that are in scope (i.e. not excluded) have the appopriate headers.  Use the `rat` task to generate this report without running tests.  See `HEADER` for the contents of the license header.  These contents should appear at the top of the file as a comment.  If a file or set of files needs to be excluded from Rat validation, you can update the Rat exclusion list in `build.gradle`.
+
+## Create a branch for release
+
+Assuming you have are preparing to release version `x.y.z` from the current commit, then create a branch with:
+
+        git checkout -b x.y.z
+        git push origin x.y.z
 
 ## Create a Source Release
 
@@ -55,7 +74,25 @@ If you have configured your key information in your `gradle.properties` then you
 
     gpg --sign --armor --detach-sig build/distribution/source/apache-datafu-sources-*.tgz
 
-If you have GPG v2 installed then you'll need to use `gpg2` instead.  
+If you have GPG v2 installed then you'll need to use `gpg2` instead.
+
+## Upload the release
+
+You should make the release available in your folder under `people.apache.org`.  For example, if you are releasing release candidate RC0 for version `x.y.z` then you should upload the source distribution files to:
+
+    http://people.apache.org/~yourname/incubator-datafu-x.y.z-rc0/
+
+Note that you should be able to SSH to the machine with `ssh yourname@people.apache.org` and scp the files as you would any other remote machine.
+
+## Tag the release
+
+You should tag the release candidate in git.  Assuming you are releasing release candidate RC0 for version `x.y.z` then you can attach a tag to the current commit with:
+
+    git tag -s release-x.y.z-rc0 -m 'Apache DataFu (incubating) x.y.z RC0'
+
+Then push the tag:
+
+    git push origin release-x.y.z-rc0
 
 ## Testing the source release
 
