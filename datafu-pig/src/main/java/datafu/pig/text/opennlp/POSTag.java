@@ -42,17 +42,17 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  *
  * -- input:
  * -- (Appetizers during happy hour range from low to high.)
- * input = LOAD 'input' AS (text:chararray);
+ * infoo = LOAD 'input' AS (text:chararray);
  * --
  * -- ({(Appetizers),(during),(happy),(hour),(range),(from),(low),(to),(high),(.)})
- * tokenized = FOREACH input GENERATE TokenizeME(text) AS tokens;
+ * tokenized = FOREACH infoo GENERATE TokenizeME(text) AS tokens;
  * --
  * -- output:
  * -- Tuple schema is: (word, tag, confidence)
  * -- ({(Appetizers,NNP,0.3619277937390988),(during,IN,0.7945543860326094),(happy,JJ,0.9888504792754391),
  * -- (hour,NN,0.9427455123502427),(range,NN,0.7335527963654751),(from,IN,0.9911576465589752),(low,JJ,0.9652034031895174),
  * -- (to,IN,0.7005347487371849),(high,JJ,0.8227771746247106),(.,.,0.9900983495480891)})
- * output = FOREACH tokenized GENERATE POSTag(tokens) AS tagged;
+ * outfoo = FOREACH tokenized GENERATE POSTag(tokens) AS tagged;
  * }
  * </pre>
  */

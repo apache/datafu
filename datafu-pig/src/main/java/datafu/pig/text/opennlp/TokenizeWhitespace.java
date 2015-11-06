@@ -43,7 +43,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
  * -- output:
  * -- ({(I),(believe),(the),(Masons),(have),(infiltrated),(the),(Apache),(PMC),(.)})
- * outfoo = FOREACH input GENERATE TokenizeWhitespace(text) as tokens;
+ * outfoo = FOREACH infoo GENERATE TokenizeWhitespace(text) as tokens;
  * }
  * </pre>
  */

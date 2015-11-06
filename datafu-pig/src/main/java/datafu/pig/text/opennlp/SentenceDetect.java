@@ -35,7 +35,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * Example:
  * <pre>
  * {@code
- * define SentenceDetect datafu.pig.text.SentenceDetect('data/en-sent.bin');
+ * define SentenceDetect datafu.pig.text.opennlp.SentenceDetect('data/en-sent.bin');
  *
  * -- input:
  * -- ("I believe the Masons have infiltrated the Apache PMC. I believe laser beams control cat brains.")
@@ -43,7 +43,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
  * -- output:
  * -- ({(I believe the Masons have infiltrated the Apache PMC.)(I believe laser beams control cat brains.)})
- * outfoo = FOREACH input GENERATE SentenceDetect(text) as sentences;
+ * outfoo = FOREACH infoo GENERATE SentenceDetect(text) as sentences;
  * }
  * </pre>
  */
@@ -80,7 +80,7 @@ public class SentenceDetect extends EvalFunc<DataBag>
         DataBag outBag = bf.newDefaultBag();
         if(sdetector == null) {
             String loadFile = CachedFile.getFileName(MODEL_FILE, this.modelPath);
-            InputStream is = new FileInputStream(modelPath);
+            InputStream is = new FileInputStream(loadFile);
             InputStream buffer = new BufferedInputStream(is);
             SentenceModel model = new SentenceModel(buffer);
             this.sdetector = new SentenceDetectorME(model);
