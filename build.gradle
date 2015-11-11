@@ -92,4 +92,5 @@ rat {
 
 allprojects {
   apply plugin: 'eclipse'
+  apply plugin: 'idea'
 }
