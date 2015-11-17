@@ -1,6 +1,6 @@
 ---
 title: Sessions - Guide - Apache DataFu Pig
-version: 1.2.0
+version: 1.3.0
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -35,7 +35,7 @@ pv = LOAD 'pageviews.csv' USING PigStorage(',')
 
 One statistic that may be useful to know is how long users tend to stay active on the website.
 When they visit do they tend to stick around for a long time and view many pages?  Or is it
-typically a very brief session?  Apache DataFu provides UDFs that help in this sort of analysis.  
+typically a very brief session?  Apache DataFu provides UDFs that help in this sort of analysis.
 
 ### Sessionization
 
@@ -150,7 +150,7 @@ We now have the page view counts grouped by member and URL.  Now we can perform 
 total page views across all members and URLs.
 
 ```pig
-pv_sum = FOREACH (GROUP pv_sessionized ALL) 
+pv_sum = FOREACH (GROUP pv_sessionized ALL)
          GENERATE SUM(pv_sessionized.count) as total_pvs;
 DUMP pv_sum;
 ```

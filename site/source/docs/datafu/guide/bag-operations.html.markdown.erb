@@ -1,6 +1,6 @@
 ---
 title: Bag Operations - Guide - Apache DataFu Pig
-version: 1.2.0
+version: 1.3.0
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,8 +21,8 @@ license: >
 
 ## Bag operations
 
-Often when working with data in Pig, it makes sense to keep the data grouped by one or more fields, 
-which means you are working with bags.  Unfortunately there aren't many convenient ways to work 
+Often when working with data in Pig, it makes sense to keep the data grouped by one or more fields,
+which means you are working with bags.  Unfortunately there aren't many convenient ways to work
 with bags in Pig out of the box.  For this reason Apache DataFu provides several UDFs for performing useful
 operations on bags that come up in practice.
 
@@ -74,7 +74,7 @@ input = LOAD 'input' AS (B1: bag{T: tuple(v:INT)}, B2: bag{T: tuple(v:INT)}, B3:
 -- ({(1),(2),(3),(4),(5),(6),(7)})
 output = FOREACH input GENERATE BagConcat(B1,B2,B3);
 ```
-[BagConcat](/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagConcat.html) can also be 
+[BagConcat](/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagConcat.html) can also be
 used to concatenate all tuples present in a bag of bags.
 
 ```pig
@@ -103,10 +103,10 @@ key `k`.  The `input_bag` is a bag containing the tuples from the original `inpu
 
 ```pig
  define BagGroup datafu.pig.bags.BagGroup();
- 
+
  data = LOAD 'input' AS (input_bag: bag {T: tuple(k: int, v: chararray)});
  -- ({(1,A),(1,B),(2,A),(2,B),(2,C),(3,A)})
- 
+
  -- Group input_bag by k
  data2 = FOREACH data GENERATE BagGroup(input_bag, input_bag.(k)) as grouped;
  -- data2: {grouped: {(group: int,input_bag: {T: (k: int,v: chararray)})}}
@@ -188,9 +188,9 @@ bags per member using a single MapReduce job:
 ```pig
 define CountEach datafu.pig.bags.CountEach();
 
-features_counted = FOREACH (COGROUP impressions BY user_id, 
-                                    accepts BY user_id, 
-                                    rejects BY user_id) GENERATE 
+features_counted = FOREACH (COGROUP impressions BY user_id,
+                                    accepts BY user_id,
+                                    rejects BY user_id) GENERATE
   group as user_id,
   CountEach(impressions.item_id) as impressions,
   CountEach(accepts.item_id) as accepts,

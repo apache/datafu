@@ -1,6 +1,6 @@
 ---
 title: More Tips and Tricks - Guide - Apache DataFu Pig
-version: 1.2.0
+version: 1.3.0
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -33,7 +33,7 @@ data = FOREACH data GENERATE (val IS NOT NULL ? val : 0) as result;
 Or, sometimes you want to return the first non-null value among several fields:
 
 ```pig
-data = FOREACH data GENERATE (val1 IS NOT NULL ? val1 : 
+data = FOREACH data GENERATE (val1 IS NOT NULL ? val1 :
                (val2 IS NOT NULL ? val2 :
                (val3 IS NOT NULL ? val3 :
                NULL))) as result;
@@ -120,7 +120,7 @@ DEFINE EmptyBagToNullFields datafu.pig.bags.EmptyBagToNullFields();
 
 data = FOREACH (COGROUP input1 BY key, input2 BY key, input3 BY key) GENERATE
   FLATTEN(input1), -- left join on this
-  FLATTEN(EmptyBagToNullFields(input2)),  
+  FLATTEN(EmptyBagToNullFields(input2)),
   FLATTEN(EmptyBagToNullFields(input3));
 ```
 
@@ -129,9 +129,9 @@ While you're at it, why not create a macro:
 ```pig
 DEFINE left_outer_join(relation1, key1, relation2, key2, relation3, key3) returns joined {
   cogrouped = COGROUP $relation1 BY $key1, $relation2 BY $key2, $relation3 BY $key3;
-  $joined = FOREACH cogrouped GENERATE 
-    FLATTEN($relation1), 
-    FLATTEN(EmptyBagToNullFields($relation2)), 
+  $joined = FOREACH cogrouped GENERATE
+    FLATTEN($relation1),
+    FLATTEN(EmptyBagToNullFields($relation2)),
     FLATTEN(EmptyBagToNullFields($relation3));
 }
 ```

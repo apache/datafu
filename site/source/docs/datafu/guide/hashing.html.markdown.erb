@@ -1,6 +1,6 @@
 ---
 title: Hashing - Guide - Apache DataFu Pig
-version: 1.2.0
+version: 1.3.0
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -23,7 +23,7 @@ license: >
 
 ### MD5
 
-The [MD5 hash](http://en.wikipedia.org/wiki/MD5) of a string can be computed with the 
+The [MD5 hash](http://en.wikipedia.org/wiki/MD5) of a string can be computed with the
 [MD5](/docs/datafu/<%= current_page.data.version %>/datafu/pig/hash/MD5.html)
 UDF.
 
@@ -31,7 +31,7 @@ For example:
 
 ```pig
 define MD5 datafu.pig.hash.MD5();
-  
+
 --input: "hello, world!"
 data_in = LOAD 'input' as (val:chararray);
 data_out = FOREACH data_in GENERATE MD5(val) as val;
@@ -55,7 +55,7 @@ The output will be in hexadecimal.
 
 ```pig
 define SHA datafu.pig.hash.SHA();
-  
+
 --input: "hello, world!"
 data_in = LOAD 'input' as (val:chararray);
 data_out = FOREACH data_in GENERATE SHA(val) as val;

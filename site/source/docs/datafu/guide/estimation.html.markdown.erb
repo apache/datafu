@@ -1,6 +1,6 @@
 ---
 title: Estimation - Guide - Apache DataFu Pig
-version: 1.2.0
+version: 1.3.0
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -30,14 +30,14 @@ execution.  With this in mind Apache DataFu has UDFs for computing estimates of 
 [StreamingQuantile](/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingQuantile.html) can
 compute estimates of the [median](http://en.wikipedia.org/wiki/Median)
 and [quantiles](http://en.wikipedia.org/wiki/Quantile) of bags. The advantage of these methods is they do not require
-the input bags to be sorted.  
+the input bags to be sorted.
 
 See [Statistics](/docs/datafu/guide/statistics.html) for more details.
 
 ### Cardinality
 
 The [cardinality](http://en.wikipedia.org/wiki/Cardinality) of a data set is the number of distinct elements
-within it.  
+within it.
 
 Suppose we have data consisting of member IDs and we want to know the count of distinct member IDs.
 We can do this in Pig as follows:

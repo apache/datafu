@@ -1,6 +1,6 @@
 ---
 title: Link Analysis - Guide - Apache DataFu Pig
-version: 1.2.0
+version: 1.3.0
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -36,7 +36,7 @@ topic_edges_grouped = FOREACH topic_edges_grouped GENERATE
   group.source as source,
   topic_edges.(dest,weight) as edges;
 
-topic_edges_grouped_by_topic = GROUP topic_edges_grouped BY topic; 
+topic_edges_grouped_by_topic = GROUP topic_edges_grouped BY topic;
 
 topic_ranks = FOREACH topic_edges_grouped_by_topic GENERATE
   group as topic,
@@ -45,5 +45,5 @@ topic_ranks = FOREACH topic_edges_grouped_by_topic GENERATE
 skill_ranks = FOREACH skill_ranks GENERATE
   topic, source, pr;
 ```
-    
+
 This implementation stores the nodes and edges (mostly) in memory. It is therefore best suited when one needs to compute PageRank on many reasonably sized graphs in parallel.

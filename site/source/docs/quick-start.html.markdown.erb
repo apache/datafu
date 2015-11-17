@@ -1,9 +1,7 @@
 ---
 title: Quick Start - Apache DataFu
 section_name: Apache DataFu
-version: 1.2.0
-next_version: 1.3.0
-snapshot_version: 1.3.0-SNAPSHOT
+version: 1.3.0
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -23,28 +21,33 @@ license: >
 
 # Quick Start
 
-Clone the repository with the following command:
+Download the source release from one of the mirrors:
 
-    git clone https://git-wip-us.apache.org/repos/asf/incubator-datafu.git
-    cd incubator-datafu
+* [http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.0/](http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.0/)
+
+Also make sure you have [Gradle](http://gradle.org/gradle-download/) installed.  The instructions below assume the `gradle` command is in your path.
+
+Extract the source and bootstrap the `gradlew` script we'll use for building:
+
+    tar xvf apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz
+    cd apache-datafu-incubating-sources-<%= current_page.data.version %>
+    gradle -b bootstrap.gradle
 
 ## Build
 
-To build the JARs, run:
+To build the JARs from the source release, run:
 
     ./gradlew assemble
-
-This will produce snapshot JARs for the next upcoming release, `<%= current_page.data.next_version %>`.  There is not _yet_ an official Apache release for DataFu, so for the moment we recommend building the latest version from HEAD.
 
 ### DataFu Pig
 
 After building, the DataFu Pig artifacts can be found in `datafu-pig/build/libs`.  This should contain:
 
-* `datafu-pig-incubating-<%= current_page.data.snapshot_version %>.jar`
-* `datafu-pig-incubating-<%= current_page.data.snapshot_version %>-javadoc.jar`
-* `datafu-pig-incubating-<%= current_page.data.snapshot_version %>-sources.jar`
+* `datafu-pig-incubating-<%= current_page.data.version %>.jar`
+* `datafu-pig-incubating-<%= current_page.data.version %>-javadoc.jar`
+* `datafu-pig-incubating-<%= current_page.data.version %>-sources.jar`
 
-The `datafu-pig-incubating-<%= current_page.data.snapshot_version %>.jar` file can now be used in Pig!
+The `datafu-pig-incubating-<%= current_page.data.version %>.jar` file can now be used in Pig!
 
 See [DataFu Pig - Getting Started](/docs/datafu/getting-started.html) for next steps.
 
@@ -52,28 +55,28 @@ See [DataFu Pig - Getting Started](/docs/datafu/getting-started.html) for next s
 
 After building, the DataFu Hourglass artifacts can be found in `datafu-hourglass/build/libs`.  This should contain:
 
-* `datafu-hourglass-incubating-<%= current_page.data.snapshot_version %>.jar`
-* `datafu-hourglass-incubating-<%= current_page.data.snapshot_version %>-javadoc.jar`
-* `datafu-hourglass-incubating-<%= current_page.data.snapshot_version %>-sources.jar`
+* `datafu-hourglass-incubating-<%= current_page.data.version %>.jar`
+* `datafu-hourglass-incubating-<%= current_page.data.version %>-javadoc.jar`
+* `datafu-hourglass-incubating-<%= current_page.data.version %>-sources.jar`
 
 DataFu Hourglass has several external library dependencies that are required in order to use it.  Therefore, the easiest way to get started using it is to install DataFu to your local maven repository:
 
     ./gradlew install
 
-Assuming your local maven repository is at `~/.m2`, you should see the DataFu Hourglass libraries under `~/.m2/repository/org/apache/datafu/datafu-hourglass-incubating/<%= current_page.data.snapshot_version %>`.
+Assuming your local maven repository is at `~/.m2`, you should see the DataFu Hourglass libraries under `~/.m2/repository/org/apache/datafu/datafu-hourglass-incubating/<%= current_page.data.version %>`.
 
 You should now be able to declare a dependency on DataFu Hourglass.
 
 Gradle:
 
 ```groovy
-compile "org.apache.datafu:datafu-hourglass-incubating:<%= current_page.data.snapshot_version %>"
+compile "org.apache.datafu:datafu-hourglass-incubating:<%= current_page.data.version %>"
 ```
 
 Ivy:
 
 ```xml
-<dependency org="org.apache.datafu" name="datafu-hourglass-incubating" rev="<%= current_page.data.snapshot_version %>"/>
+<dependency org="org.apache.datafu" name="datafu-hourglass-incubating" rev="<%= current_page.data.version %>"/>
 ```
 
 Maven:
@@ -82,7 +85,7 @@ Maven:
 <dependency>
   <groupId>org.apache.datafu</groupId>
   <artifactId>datafu-hourglass-incubating</artifactId>
-  <version><%= current_page.data.snapshot_version %></version>
+  <version><%= current_page.data.version %></version>
 </dependency>
 ```
 

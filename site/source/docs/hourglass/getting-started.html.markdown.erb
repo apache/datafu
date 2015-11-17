@@ -2,7 +2,6 @@
 title: Getting Started - Apache DataFu Hourglass
 section_name: Apache DataFu Hourglass
 version: 0.1.3
-snapshot_version: 1.3.0-SNAPSHOT
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -66,7 +65,7 @@ Assuming you've set up the `hadoop` command to run against your Hadoop cluster, 
 
 Let's define some shorthand commands to run the Hourglass JAR and dump JSON from an Avro file:
 
-    export HOURGLASS_CMD="hadoop jar datafu-hourglass/build/libs/datafu-hourglass-incubating-<%= current_page.data.snapshot_version %>-tests.jar datafu.hourglass.demo.Main"
+    export HOURGLASS_CMD="hadoop jar datafu-hourglass/build/libs/datafu-hourglass-incubating-<%= current_page.data.version %>-tests.jar datafu.hourglass.demo.Main"
 
     export TO_JSON_CMD="java -jar datafu-hourglass/build/demo_dependencies/avro-tools-1.7.4.jar tojson"
 

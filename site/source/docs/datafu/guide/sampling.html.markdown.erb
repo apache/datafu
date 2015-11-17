@@ -1,6 +1,6 @@
 ---
 title: Sampling - Guide - Apache DataFu Pig
-version: 1.2.0
+version: 1.3.0
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -37,7 +37,7 @@ generated sample.
 
 [SimpleRandomSample](/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SimpleRandomSample.html)
 implements scalable simple random sampling.
-It can be used to generate a sample of size of exactly `ceil(p*n)` without replacement from a population of size `n`, 
+It can be used to generate a sample of size of exactly `ceil(p*n)` without replacement from a population of size `n`,
 where `p` is the sampling
 probability.  The output will be exactly this size with probability at least 99.99%.  Sampling "without replacement"
 means that no item will appear more than once.
@@ -73,14 +73,14 @@ To use these UDFs, the user needs to provide the desired sample size and a good 
 size (or the exact size).  For example, to generate a sample of 100,000 without replacement:
 
 ```pig
-DEFINE SRSWR_VOTE 
+DEFINE SRSWR_VOTE
   datafu.pig.sampling.SimpleRandomSampleWithReplacementVote();
-DEFINE SRSWR_ELECT 
+DEFINE SRSWR_ELECT
   datafu.pig.sampling.SimpleRandomSampleWithReplacementElect();
 
-item       = LOAD 'input' AS (x:double); 
+item       = LOAD 'input' AS (x:double);
 summary    = FOREACH (GROUP item ALL) GENERATE COUNT(item) AS count;
-candidates = FOREACH item GENERATE 
+candidates = FOREACH item GENERATE
   FLATTEN(SRSWR_VOTE(TOBAG(x), 100000, summary.count));
 sampled    = FOREACH (GROUP candidates BY position PARALLEL 10) GENERATE
   FLATTEN(SRSWR_ELECT(candidates));
@@ -97,12 +97,12 @@ and then outputs the bootstrap estimates.
 ```pig
 summary    = FOREACH (GROUP item ALL) GENERATE
   AVG(item.x) AS mean, COUNT(item) AS count;
-candidates = FOREACH item GENERATE 
+candidates = FOREACH item GENERATE
   FLATTEN(SRSWR_VOTE(TOBAG(x), summary.count*100, summary.count));
-sampled    = FOREACH (GROUP candidates BY (position % 100) 
-                      PARALLEL 10) GENERATE 
+sampled    = FOREACH (GROUP candidates BY (position % 100)
+                      PARALLEL 10) GENERATE
   AVG(SRSWR_ELECT(candidates)) AS mean;
-bootstrap  = FOREACH (GROUP sampled ALL) GENERATE 
+bootstrap  = FOREACH (GROUP sampled ALL) GENERATE
   summary.mean AS mean, sampled.mean AS bootstrapMeans;
  ```
 
@@ -199,9 +199,9 @@ For example, suppose that we have a recommendation system where we have tracked 
 impressed to users and when they have clicked on them:
 
 ```pig
-impressions = 
+impressions =
   LOAD '$impressions' AS (user_id:int, item_id:int, timestamp:long);
-clicks = 
+clicks =
   LOAD '$accepts' AS (user_id:int, item_id:int, timestamp:long);
 ```
 
@@ -248,7 +248,7 @@ joined_sample = FOREACH (COGROUP impressions BY (user_id,item_id),
                                  clicks BY (user_id,item_id)) GENERATE
   group.user_id as user_id,
   group.item_id as item_id,
-  ((SIZE(impressions) > 0 ? 1 : 0)) as is_impressed,  
+  ((SIZE(impressions) > 0 ? 1 : 0)) as is_impressed,
   ((SIZE(clicks) > 0 ? 1 : 0)) as is_clicked;
 ```
 
