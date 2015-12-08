@@ -76,7 +76,7 @@ If you have configured your key information in your `gradle.properties` then you
 
 If you have GPG v2 installed then you'll need to use `gpg2` instead.
 
-## Upload the release
+## Upload the Source Release
 
 You should make the release available in your folder under `people.apache.org`.  For example, if you are releasing release candidate RC0 for version `x.y.z` then you should upload the source distribution files to:
 
@@ -94,13 +94,50 @@ Then push the tag:
 
     git push origin release-x.y.z-rc0
 
+## Staging artifacts in Maven
+
+General information on publishing to Maven can be found [here](http://www.apache.org/dev/publishing-maven-artifacts.html).  To upload the archive to the Apache Nexus staging repository, run:
+
+    ./gradlew uploadArchives -Prelease=true -PnexusUsername=yourNexusUsername -PnexusPassword=yourNexusPassword -Psigning.keyId=yourGpgKeyId -Psigning.password=yourGpgSigningPassword
+
+Note that if you are running the above command from a source release you don't need `-Prelease=true`.
+
+If you now visit the [Apache Nexus Repository](https://repository.apache.org) and click on Staging Repositories, you should see a repository named orgapachedatafu-xxxx, where xxxx is some number.  Select the repository and browse the content to make sure the set of files looks right.  If it looks correct then Close the repository.  The repository is now ready for testing.  If you look at the summary there is a URL for the repository that may be used to fetch the archives.
+
+Let's suppose you have a Gradle project you'd like to use to test DataFu.  You can add the URL for the Staging Repository to your `build.gradle` like this:
+
+    repositories {
+      mavenCentral()
+      maven {
+        url 'https://repository.apache.org/content/repositories/orgapachedatafu-xxxx'
+      }
+    }
+
+You can now depend on the versions of the archives in this Staging Repository in your `build.gradle`:
+
+    dependencies {
+      compile "org.apache.datafu:datafu-pig-incubating:x.y.z"
+      compile "org.apache.datafu:datafu-hourglass-incubating:x.y.z"
+    }
+
+You could also visit the Staging Repository URL in your browser and download the files for testing.
+
+## Call for a vote to release
+
+At this point you should have:
+
+1. Published a source release for testing
+2. Staged artifacts in Nexus built from that source archive for testing
+
+Now you can call a vote in the DataFu dev mailing list for release.   Look in the archives at previous votes for an example.  If the vote passes then you may call a vote in the Incubator general mailing list (this is necessary because DataFu is still incubating).
+
 ## Testing the source release
 
 Once you have built the source tarball, you should verify that it can be used.  Follow the instructions in the `README.md` file assuming you are someone who has just downloaded the source tarball and want to use it.
 
-## Releasing to your local Maven repository
+### Releasing to your local Maven repository
 
-You may want to release binaries to your local Maven repository under your home directory to do additional testing.  To do so, run:
+You may want to release binaries to your local Maven repository under your home directory to do local testing against it.  To do so, run:
 
     ./gradlew install -Prelease=true
 
@@ -109,3 +146,27 @@ You should be able to see all the installed artifacts in the local repository no
     find ~/.m2/repository/org/apache/datafu/
 
 Again, setting `release=true` prevents `-SNAPSHOT` from being appended to the version.
+
+## Publishing the release
+
+Once the Incubator general vote has passed, you can publish the source release and artifacts.
+
+### Source release
+
+The DataFu source release are checked into SVN under [https://dist.apache.org/repos/dist/release/incubator/datafu](https://dist.apache.org/repos/dist/release/incubator/datafu).
+
+To see all the previous releases:
+
+    svn list https://dist.apache.org/repos/dist/release/incubator/datafu
+
+Create a directory for the release (replace `x.y.z` with the release number):
+
+    svn mkdir https://dist.apache.org/repos/dist/release/incubator/datafu/apache-datafu-incubating-x.y.z
+    svn co https://dist.apache.org/repos/dist/release/incubator/datafu apache-datafu-incubating-x.y.z-release
+    cd apache-datafu-incubating-x.y.z-release
+
+Now copy the source release files into this directory and commit them.  Within 24 hours they will be distributed to the mirrors.  Then it should be available for download at `http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-x.y.z/`.
+
+### Artifacts
+
+To distribute the artifacts, simple select the staged repository for DataFu that you prepared in Nexus and chooose Release.  They should then be available within the next day or so in the [central repository](http://search.maven.org/).
