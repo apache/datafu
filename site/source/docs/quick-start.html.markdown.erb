@@ -21,25 +21,66 @@ license: >
 
 # Quick Start
 
-Download the source release from one of the mirrors:
+Apache DataFu is available for download as a source release and as compiled artifacts stored in a Maven repository.
+
+## Downloading from the Maven Repository
+
+The latest release can be found in [Apache's Maven Repository for DataFu](https://repository.apache.org/content/groups/public/org/apache/datafu):
+
+* [datafu-pig-incubating-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-pig-incubating/<%= current_page.data.version %>/)
+* [datafu-hourglass-incubating-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-hourglass-incubating/<%= current_page.data.version %>/)
+
+You can also use a dependency management system to download the DataFu artifacts and all their dependencies.
+
+Gradle:
+
+```groovy
+compile "org.apache.datafu:datafu-pig-incubating:<%= current_page.data.version %>"
+compile "org.apache.datafu:datafu-hourglass-incubating:<%= current_page.data.version %>"
+```
+
+Ivy:
+
+```xml
+<dependency org="org.apache.datafu" name="datafu-pig-incubating" rev="<%= current_page.data.version %>"/>
+<dependency org="org.apache.datafu" name="datafu-hourglass-incubating" rev="<%= current_page.data.version %>"/>
+```
+
+Maven:
+
+```xml
+<dependency>
+  <groupId>org.apache.datafu</groupId>
+  <artifactId>datafu-pig-incubating</artifactId>
+  <version><%= current_page.data.version %></version>
+</dependency>
+<dependency>
+  <groupId>org.apache.datafu</groupId>
+  <artifactId>datafu-hourglass-incubating</artifactId>
+  <version><%= current_page.data.version %></version>
+</dependency>
+```
+
+See the following guides for next steps:
+
+* [Getting started with DataFu for Pig](/docs/datafu/getting-started.html)
+* [Getting started with DataFu Hourglass](/docs/hourglass/getting-started.html)
+
+## Building from Source
+
+You can also build DataFu from the source release.  Download the source release from one of the mirrors:
 
 * [http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.0/](http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.0/)
 
-Also make sure you have [Gradle](http://gradle.org/gradle-download/) installed.  The instructions below assume the `gradle` command is in your path.
-
-Extract the source and bootstrap the `gradlew` script we'll use for building:
+Make sure you have [Gradle](http://gradle.org/gradle-download/) installed.  Extract the source and bootstrap the `gradlew` script that's used for building:
 
     tar xvf apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz
     cd apache-datafu-incubating-sources-<%= current_page.data.version %>
     gradle -b bootstrap.gradle
 
-## Build
-
 To build the JARs from the source release, run:
 
     ./gradlew assemble
-
-### DataFu Pig
 
 After building, the DataFu Pig artifacts can be found in `datafu-pig/build/libs`.  This should contain:
 
@@ -47,13 +88,9 @@ After building, the DataFu Pig artifacts can be found in `datafu-pig/build/libs`
 * `datafu-pig-incubating-<%= current_page.data.version %>-javadoc.jar`
 * `datafu-pig-incubating-<%= current_page.data.version %>-sources.jar`
 
-The `datafu-pig-incubating-<%= current_page.data.version %>.jar` file can now be used in Pig!
+The `datafu-pig-incubating-<%= current_page.data.version %>.jar` file can now be used in Pig.
 
-See [DataFu Pig - Getting Started](/docs/datafu/getting-started.html) for next steps.
-
-### DataFu Hourglass
-
-After building, the DataFu Hourglass artifacts can be found in `datafu-hourglass/build/libs`.  This should contain:
+The DataFu Hourglass artifacts can be found in `datafu-hourglass/build/libs`.  This should contain:
 
 * `datafu-hourglass-incubating-<%= current_page.data.version %>.jar`
 * `datafu-hourglass-incubating-<%= current_page.data.version %>-javadoc.jar`
@@ -65,28 +102,4 @@ DataFu Hourglass has several external library dependencies that are required in 
 
 Assuming your local maven repository is at `~/.m2`, you should see the DataFu Hourglass libraries under `~/.m2/repository/org/apache/datafu/datafu-hourglass-incubating/<%= current_page.data.version %>`.
 
-You should now be able to declare a dependency on DataFu Hourglass.
-
-Gradle:
-
-```groovy
-compile "org.apache.datafu:datafu-hourglass-incubating:<%= current_page.data.version %>"
-```
-
-Ivy:
-
-```xml
-<dependency org="org.apache.datafu" name="datafu-hourglass-incubating" rev="<%= current_page.data.version %>"/>
-```
-
-Maven:
-
-```xml
-<dependency>
-  <groupId>org.apache.datafu</groupId>
-  <artifactId>datafu-hourglass-incubating</artifactId>
-  <version><%= current_page.data.version %></version>
-</dependency>
-```
-
-See [DataFu Hourglass - Getting Started](/docs/hourglass/getting-started.html) for next steps.
+You should now be able to declare a dependency on DataFu Hourglass as shown above.
