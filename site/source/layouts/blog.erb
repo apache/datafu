@@ -17,6 +17,17 @@
 # under the License.
 %>
 
+<% content_for :meta_tags do %>
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@apachedatafu" />
+  <meta name="twitter:title" content="<%= current_article.title %>" />
+  <meta name="twitter:description" content="<%= inner_text current_article.summary %>" />
+  <meta property="og:url" content="http://datafu.incubator.apache.org<%= current_page.url %>" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="<%= current_article.title %>" />
+  <meta property="og:description" content="<%= inner_text current_article.summary %>" />
+<% end %>
+
 <% wrap_layout :layout do %>
 <div class="row">
   <article class="col-lg-10">

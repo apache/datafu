@@ -58,11 +58,11 @@ Dir['./lib/*'].each { |f| require f }
 # activate :livereload
 
 # Methods defined in the helpers block are available in templates
-# helpers do
-#   def some_helper
-#     "Helping"
-#   end
-# end
+helpers do
+  def inner_text(html)
+    Nokogiri.HTML(html).text.gsub(/\s+/, " ")
+  end
+end
 
 set :css_dir, 'stylesheets'
 

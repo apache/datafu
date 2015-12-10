@@ -18,8 +18,6 @@ license: >
    limitations under the License.
 ---
 
-_Update (10/15/2015): The links in this blog post have been updated to point to the correct locations within the Apache DataFu website._
-
 For a large scale site such as LinkedIn, tracking metrics accurately and efficiently is an important task. For example, imagine we need a dashboard that shows the number of visitors to every page on the site over the last thirty days. To keep this dashboard up to date, we can schedule a query that runs daily and gathers the stats for the last 30 days. However, this simple implementation would be wasteful: only one day of data has changed, but we'd be consuming and recalculating the stats for all 30.
 
 A more efficient solution is to make the query incremental: using basic arithmetic, we can update the output from the previous day by adding and subtracting input data. This enables the job to process only the new data, significantly reducing the computational resources required. Unfortunately, although there are many benefits to the incremental approach, getting incremental jobs right is hard:
@@ -461,3 +459,5 @@ If you're interested in the project, we also encourage you to try running the un
 ## Conclusion
 
 We hope this whets your appetite for incremental data processing with DataFu's Hourglass. The [code](https://github.com/apache/incubator-datafu/tree/master/datafu-hourglass) is available on Github in the [DataFu](https://github.com/apache/incubator-datafu) repository under an Apache 2.0 license. Documentation is available [here](/docs/hourglass/javadoc.html). We are accepting contributions, so if you are interesting in helping out, please fork the code and send us your pull requests!
+
+_Update (10/15/2015): The links in this blog post have been updated to point to the correct locations within the Apache DataFu website._

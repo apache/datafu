@@ -18,8 +18,6 @@ license: >
    limitations under the License.
 ---
 
-_Update (10/15/2015): The links in this blog post have been updated to point to the correct locations within the Apache DataFu website._
-
 [DataFu](/) is an open-source collection of user-defined functions for working with large-scale data in [Hadoop](http://hadoop.apache.org/) and [Pig](http://pig.apache.org/).
 
 About two years ago, we recognized a need for a stable, well-tested library of Pig UDFs that could assist in common data mining and statistics tasks. Over the years, we had developed several routines that were used across LinkedIn and were thrown together into an internal package we affectionately called “littlepiggy.” The unfortunate part, and this is true of many such efforts, is that the UDFs were ill-documented, ill-organized, and easily got broken when someone made a change. Along came [PigUnit](http://pig.apache.org/docs/r0.11.1/test.html#pigunit), which allowed UDF testing, so we spent the time to clean up these routines by adding documentation and rigorous unit tests. From this “datafoo” package, we thought this would help the community at large, and there you have the initial release of DataFu.
@@ -612,3 +610,5 @@ features = left_outer_join(input1, val1, input2, val2, input3, val3);
 So, that's a lot to digest, but it's just a highlight into a few interesting pieces of DataFu. Check out the [DataFu 1.0 release](/docs/datafu/1.0.0/) as there's even more in store.
 
 We hope that it proves valuable to you and as always welcome any contributions. Please let us know how you're using the library — we would love to hear from you.
+
+_Update (10/15/2015): The links in this blog post have been updated to point to the correct locations within the Apache DataFu website._
