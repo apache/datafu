@@ -406,7 +406,7 @@ One key point on sampling here: We want the sampling to be done by `user_id`. Th
 
 ### Naive approach
 
-The staright-foward solution for this task will be group the tracking data for each user, item pair, then group it by `user_id`, sample this grouped data, and then flatten it all out again again:
+The straightforward solution for this task will be group the tracking data for each user, item pair, then group it by `user_id`, sample this grouped data, and then flatten it all out again again:
 
 ```pig
 grouped = COGROUP impressions BY (user_id, item_id), accepts BY (user_id, item_id), rejects BY (user_id, item_id) features BY (user_id, item_id);
