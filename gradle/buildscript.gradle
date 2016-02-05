@@ -28,4 +28,5 @@ repositories {
 
 dependencies {
   classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+  classpath 'com.fizzpod:gradle-sweeney-plugin:1.0+'
 }
