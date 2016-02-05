@@ -21,10 +21,12 @@ package datafu.pig.bags;
 
 import java.io.IOException;
 
-import datafu.pig.util.SimpleEvalFunc;
+import org.apache.pig.Accumulator;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
+
+import datafu.pig.util.SimpleEvalFunc;
 
 /**
  * Returns the first tuple from a bag. Requires a second parameter that will be returned if the bag is empty.
@@ -46,8 +48,36 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * </pre>
  */
 
-public class FirstTupleFromBag extends SimpleEvalFunc<Tuple>
+public class FirstTupleFromBag extends SimpleEvalFunc<Tuple> implements Accumulator<Tuple>
 {
+  private Tuple result = null;
+  private boolean found = false;
+
+  @Override
+  public void accumulate(Tuple tuple) throws IOException
+  {
+    if (found == false) {      
+      DataBag bag = (DataBag) tuple.get(0);
+      Tuple defaultValue = (Tuple) tuple.get(1);
+
+      result = call(bag, defaultValue);
+      found = true;
+    }
+  }
+
+  @Override
+  public void cleanup()
+  {
+    found = false;
+    result = null;
+  }
+
+  @Override
+  public Tuple getValue()
+  {
+    return result;
+  }
+    
   public Tuple call(DataBag bag, Tuple defaultValue) throws IOException
   {
     for (Tuple t : bag) {
@@ -67,4 +97,3 @@ public class FirstTupleFromBag extends SimpleEvalFunc<Tuple>
     }
   }
 }
-
