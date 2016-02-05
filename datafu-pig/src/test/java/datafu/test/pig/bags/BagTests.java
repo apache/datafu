@@ -22,6 +22,7 @@ package datafu.test.pig.bags;
 import datafu.pig.bags.CountEach;
 import datafu.pig.bags.DistinctBy;
 import datafu.pig.bags.Enumerate;
+import datafu.pig.bags.FirstTupleFromBag;
 import datafu.test.pig.PigTests;
 import junit.framework.Assert;
 
@@ -34,6 +35,7 @@ import org.apache.pig.data.TupleFactory;
 import org.apache.pig.pigunit.PigTest;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +46,8 @@ import static org.testng.Assert.assertEquals;
 import org.apache.pig.impl.util.Utils;
 import org.apache.pig.builtin.Utf8StorageConverter;
 import org.apache.pig.ResourceSchema.ResourceFieldSchema;
+
+import com.beust.jcommander.internal.Lists;
 
 public class BagTests extends PigTests
 {
@@ -277,6 +281,32 @@ result4 = FOREACH grouped GENERATE group AS a,TupleFromBag(data,0,$emptyTuple).b
     test.runScript();
 
     assertOutput(test, "data2", "(1,(4))");
+  }
+   
+  @Test
+  public void firstTupleFromBagAccumulateTest() throws Exception
+  {
+    TupleFactory tf = TupleFactory.getInstance();
+    BagFactory bf = BagFactory.getInstance();
+ 
+    FirstTupleFromBag op = new FirstTupleFromBag();
+    
+    Tuple defaultValue = tf.newTuple(1000);
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(4))), defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(9))), defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(16))), defaultValue)));
+    assertEquals(op.getValue(), tf.newTuple(4));
+    op.cleanup();
+    
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(11))), defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(17))), defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(5))), defaultValue)));
+    assertEquals(op.getValue(), tf.newTuple(11));
+    op.cleanup();
+    
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(), defaultValue)));
+    assertEquals(op.getValue(), defaultValue);
+    op.cleanup();
   }
 
   /**
