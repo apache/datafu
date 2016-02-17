@@ -79,6 +79,13 @@ This command generates the eclipse project and classpath files:
 
     ./gradlew eclipse
 
+To load the projects in Eclipse:
+
+  * Select "File -> Import", then "Existing Projects into Workspace"
+  * Choose the root of the repository as the root directory
+  * Check "Search for nested projects"
+  * Click Finish
+
 To clean up the eclipse files:
 
     ./gradlew cleanEclipse
