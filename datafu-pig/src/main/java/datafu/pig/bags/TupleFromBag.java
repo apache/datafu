@@ -21,7 +21,7 @@ package datafu.pig.bags;
 
 
 import java.io.IOException;
-import org.apache.pig.EvalFunc;
+import org.apache.pig.AccumulatorEvalFunc;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
@@ -115,32 +115,38 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
  * </pre>
  */
 
-public class TupleFromBag extends EvalFunc<Tuple>{
+public class TupleFromBag extends AccumulatorEvalFunc<Tuple> {
 
+	private int tupleIndex = 0;
+	private Tuple result = null;
+	private Tuple defaultResult = null;
+	
 	@Override
-	public Tuple exec(Tuple tinput) throws IOException
-	{
-
-		try{
-			DataBag samples = (DataBag) tinput.get(0);
-
-			int tupleIndex = 0;
-			int index = ((Number)tinput.get(1)).intValue();
-			for (Tuple tuple : samples) {
-				if(tupleIndex == index){
-					return tuple;
+	public void accumulate(Tuple tinput) throws IOException {
+		
+		if (result == null) {
+			try{
+				DataBag samples = (DataBag) tinput.get(0);
+	
+				int index = ((Number)tinput.get(1)).intValue();
+				for (Tuple tuple : samples) {
+					if(tupleIndex == index){
+						result = tuple;
+						return;
+					}
+					tupleIndex++;
 				}
-				tupleIndex++;
+			}
+			catch (Exception e){
+				// no logging was done in the original class, and I preserve this behavior
+				// however, an exception would have caused null to be returned.
+				// instead, I silently continue and attempt to reach the desired index
+			}
+			
+			if (defaultResult == null && tinput.size() == 3){
+				defaultResult = DataType.toTuple(tinput.get(2));
 			}
 		}
-		catch (Exception e){
-			return null;
-		}
-		if (tinput.size() == 3){
-			return DataType.toTuple(tinput.get(2));
-		}
-
-		return null;
 	}
 
 	@Override
@@ -163,6 +169,18 @@ public class TupleFromBag extends EvalFunc<Tuple>{
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void cleanup() {
+		tupleIndex = 0;
+		result = null;
+		defaultResult = null;
+	}
+
+	@Override
+	public Tuple getValue() {
+		return result != null ? result : defaultResult;
 	}
 
 }

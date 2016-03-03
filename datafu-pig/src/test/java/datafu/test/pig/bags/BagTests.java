@@ -23,6 +23,7 @@ import datafu.pig.bags.CountEach;
 import datafu.pig.bags.DistinctBy;
 import datafu.pig.bags.Enumerate;
 import datafu.pig.bags.FirstTupleFromBag;
+import datafu.pig.bags.TupleFromBag;
 import datafu.test.pig.PigTests;
 import junit.framework.Assert;
 
@@ -46,8 +47,6 @@ import static org.testng.Assert.assertEquals;
 import org.apache.pig.impl.util.Utils;
 import org.apache.pig.builtin.Utf8StorageConverter;
 import org.apache.pig.ResourceSchema.ResourceFieldSchema;
-
-import com.beust.jcommander.internal.Lists;
 
 public class BagTests extends PigTests
 {
@@ -253,6 +252,32 @@ result4 = FOREACH grouped GENERATE group AS a,TupleFromBag(data,0,$emptyTuple).b
               "(2,f,NO_NUMBER)",
               "(3,i,NO_NUMBER)");
 
+  }
+
+  @Test
+  public void tupleFromBagAccumulateTest() throws Exception
+  {
+    TupleFactory tf = TupleFactory.getInstance();
+    BagFactory bf = BagFactory.getInstance();
+ 
+    TupleFromBag op = new TupleFromBag();
+    
+    Tuple defaultValue = tf.newTuple(1000);
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(4))), 0, defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(9))), 0, defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(16))), 0, defaultValue)));
+    assertEquals(op.getValue(), tf.newTuple(4));
+    op.cleanup();
+    
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(11))), 1, defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(17))), 1, defaultValue)));
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(Arrays.asList(tf.newTuple(5))), 1, defaultValue)));
+    assertEquals(op.getValue(), tf.newTuple(17));
+    op.cleanup();
+    
+    op.accumulate(tf.newTuple(Arrays.asList(bf.newDefaultBag(), 2, defaultValue)));
+    assertEquals(op.getValue(), defaultValue);
+    op.cleanup();
   }
 
 
