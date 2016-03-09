@@ -43,8 +43,8 @@ def getToolsJar()
   throw new GradleException("jdk tools jar not found")
 }
 
-cleanEclipse { 
-  doLast { 
+cleanEclipse {
+  doLast {
     delete ".apt_generated"
     delete ".settings"
     delete ".factorypath"
@@ -58,5 +58,7 @@ nexus {
   attachJavadoc = false
 }
 
-// don't publish the build plugin
-configurations.archives.artifacts.removeAll { return it.name == "build-plugin"; }
+// don't publish the build plugin when releasing (however we do need it when buildling locally for testing)
+if (ext.release.toBoolean()) {
+  configurations.archives.artifacts.removeAll { return it.name == "build-plugin"; }
+}

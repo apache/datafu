@@ -15,7 +15,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({"org.adrianwalker.multilinestring.Multiline"})
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_7)
 public final class MultilineProcessor extends AbstractProcessor {
   private Processor delegator = null;
   

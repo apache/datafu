@@ -90,6 +90,13 @@ rat {
   ]
 }
 
+apply plugin: 'com.fizzpod.sweeney'
+
+sweeney {
+  // Must use JDK 1.7
+  enforce type: "equal", expect: "1.7", value: {System.getProperty('java.version').substring(0,3)}
+}
+
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
