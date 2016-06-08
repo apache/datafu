@@ -19,6 +19,7 @@
 
 package datafu.test.pig.bags;
 
+import datafu.pig.bags.CountDistinctUpTo;
 import datafu.pig.bags.CountEach;
 import datafu.pig.bags.DistinctBy;
 import datafu.pig.bags.Enumerate;
@@ -28,6 +29,7 @@ import datafu.test.pig.PigTests;
 import junit.framework.Assert;
 
 import org.adrianwalker.multilinestring.Multiline;
+import org.apache.pig.Accumulator;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.SortedDataBag;
@@ -36,6 +38,7 @@ import org.apache.pig.data.TupleFactory;
 import org.apache.pig.pigunit.PigTest;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -971,63 +974,100 @@ result4 = FOREACH grouped GENERATE group AS a,TupleFromBag(data,0,$emptyTuple).b
     Assert.assertEquals("(11,51)", iter.next().toString());
   }
 
+  private void firstAccumulateForTests(Accumulator distinct) throws IOException {
+	    DataBag bag;
+	    Tuple input;
+	    Tuple data;
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 10);
+	    data.set(1, 20);
+	    distinct.accumulate(input);
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 11);
+	    data.set(1, 50);
+	    distinct.accumulate(input);
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 10);
+	    data.set(1, 22);
+	    distinct.accumulate(input);
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 12);
+	    data.set(1, 40);
+	    distinct.accumulate(input);
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 11);
+	    data.set(1, 50);
+	    distinct.accumulate(input);
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 11);
+	    data.set(1, 51);
+	    distinct.accumulate(input);
+}
+
+  private void secondAccumulateForTests(Accumulator distinct) throws IOException {
+	    DataBag bag;
+	    Tuple input;
+	    Tuple data;
+
+	    // do it again to test cleanup
+	    distinct.cleanup();
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 12);
+	    data.set(1, 42);
+	    distinct.accumulate(input);
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 11);
+	    data.set(1, 51);
+	    distinct.accumulate(input);
+
+	    data = TupleFactory.getInstance().newTuple(2);
+	    bag = BagFactory.getInstance().newDefaultBag();
+	    bag.add(data);
+	    input = TupleFactory.getInstance().newTuple(bag);
+	    data.set(0, 11);
+	    data.set(1, 50);
+	    distinct.accumulate(input);
+  }
+  
   @Test
   public void distinctByAccumulateTest() throws Exception
   {
     DistinctBy distinct = new DistinctBy("0");
 
-    DataBag bag;
-    Tuple input;
-    Tuple data;
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 10);
-    data.set(1, 20);
-    distinct.accumulate(input);
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 11);
-    data.set(1, 50);
-    distinct.accumulate(input);
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 10);
-    data.set(1, 22);
-    distinct.accumulate(input);
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 12);
-    data.set(1, 40);
-    distinct.accumulate(input);
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 11);
-    data.set(1, 50);
-    distinct.accumulate(input);
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 11);
-    data.set(1, 51);
-    distinct.accumulate(input);
-
+    firstAccumulateForTests(distinct);
+    
     DataBag result = distinct.getValue();
 
     Assert.assertEquals(3, result.size());
@@ -1037,32 +1077,7 @@ result4 = FOREACH grouped GENERATE group AS a,TupleFromBag(data,0,$emptyTuple).b
     Assert.assertEquals("(11,50)", iter.next().toString());
     Assert.assertEquals("(12,40)", iter.next().toString());
 
-    // do it again to test cleanup
-    distinct.cleanup();
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 12);
-    data.set(1, 42);
-    distinct.accumulate(input);
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 11);
-    data.set(1, 51);
-    distinct.accumulate(input);
-
-    data = TupleFactory.getInstance().newTuple(2);
-    bag = BagFactory.getInstance().newDefaultBag();
-    bag.add(data);
-    input = TupleFactory.getInstance().newTuple(bag);
-    data.set(0, 11);
-    data.set(1, 50);
-    distinct.accumulate(input);
+    secondAccumulateForTests(distinct);
 
     result = distinct.getValue();
 
@@ -1246,6 +1261,108 @@ result4 = FOREACH grouped GENERATE group AS a,TupleFromBag(data,0,$emptyTuple).b
   }
 
   /**
+
+  define CountDistinctUpTo3 datafu.pig.bags.CountDistinctUpTo('3');
+  define CountDistinctUpTo10 datafu.pig.bags.CountDistinctUpTo('10');
+
+  data = LOAD 'input' AS (bag1: bag {T: tuple(t1:chararray, t2:int)});
+
+  data2 = FOREACH data GENERATE CountDistinctUpTo3(bag1) as counted;
+
+  data3 = FOREACH data GENERATE CountDistinctUpTo10(bag1) as counted;
+
+  STORE data2 INTO 'output';
+
+   */
+  @Multiline
+  private String countDistinctUpToTest;
+
+  @Test
+  public void countDistinctUpToTest() throws Exception {
+    PigTest test = createPigTestFromString(countDistinctUpToTest);
+
+    writeLinesToFile("input", "({(A,0),(B,0),(D,0),(A,0),(C,0),(E,0),(A,0),(B,0),(A,0),(B,0)})");
+    test.runScript();
+
+    assertOutput(test, "data2", "(3)");
+    assertOutput(test, "data3", "(5)");
+    
+    writeLinesToFile("input", "({(A,0),(B,2),(D,0),(A,1),(C,3),(E,2),(A,1),(B,2),(A,0),(B,2),(E,0)})");
+    test.runScript();
+
+    assertOutput(test, "data2", "(3)");
+    assertOutput(test, "data3", "(7)");
+
+  }
+
+  @Test
+  public void countDistinctUpToAccumulatorTest() throws IOException
+  {
+    CountDistinctUpTo distinct = new CountDistinctUpTo("2");
+
+    firstAccumulateForTests(distinct);
+    
+    int result = distinct.getValue();
+
+    Assert.assertEquals(2, result);
+
+    secondAccumulateForTests(distinct);
+
+    result = distinct.getValue();
+
+    Assert.assertEquals(2, result);
+  }
+  
+  private void countDistinctUpToAlgebraic(String amount, int expected) throws IOException
+  {
+    CountDistinctUpTo.Initial initial = new CountDistinctUpTo.Initial(amount);
+    CountDistinctUpTo.Intermediate intermediate = new CountDistinctUpTo.Intermediate(amount);
+    CountDistinctUpTo.Final finalFunc = new CountDistinctUpTo.Final(amount);
+
+    DataBag intermediateBag = BagFactory.getInstance().newDefaultBag();
+    
+    for (int i=0; i<100; i++) {
+        DataBag innerBag = BagFactory.getInstance().newDefaultBag();
+        innerBag.add(TupleFactory.getInstance().newTuple((Object)(i % 20)));
+    	Tuple initialInput = TupleFactory.getInstance().newTuple(innerBag);
+    	intermediateBag.add(initial.exec(initialInput));
+    }
+
+    Tuple intermediateOutput = intermediate.exec(TupleFactory.getInstance().newTuple(intermediateBag));
+    intermediateBag = BagFactory.getInstance().newDefaultBag(Arrays.asList(intermediateOutput));
+    Integer result = finalFunc.exec(TupleFactory.getInstance().newTuple(intermediateBag));
+
+    Assert.assertEquals(expected, result.intValue());
+    
+    intermediateBag = BagFactory.getInstance().newDefaultBag();
+    
+    for (int i=0; i<10; i++) {
+        DataBag innerBag = BagFactory.getInstance().newDefaultBag();
+        innerBag.add(TupleFactory.getInstance().newTuple((Object)(i % 3)));
+    	Tuple initialInput = TupleFactory.getInstance().newTuple(innerBag);
+    	intermediateBag.add(initial.exec(initialInput));
+    }
+
+    intermediateOutput = intermediate.exec(TupleFactory.getInstance().newTuple(intermediateBag));
+    intermediateBag = BagFactory.getInstance().newDefaultBag(Arrays.asList(intermediateOutput));
+    result = finalFunc.exec(TupleFactory.getInstance().newTuple(intermediateBag));
+    
+    Assert.assertEquals(3, result.intValue());
+
+  }
+
+  @Test
+  public void countDistinctUpToAlgebraicTest() throws IOException
+  {
+	  // check flow in which Intermediate passes all the distinct tuples it finds
+	  countDistinctUpToAlgebraic("50", 20); 
+	  
+	  // check flow in which Intermediate passes the max count as a null in its result
+	  countDistinctUpToAlgebraic("5", 5);
+  }
+
+  /**
+
 
 
   define BagLeftOuterJoin datafu.pig.bags.BagLeftOuterJoin();
