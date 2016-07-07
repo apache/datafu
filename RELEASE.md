@@ -78,11 +78,17 @@ If you have GPG v2 installed then you'll need to use `gpg2` instead.
 
 ## Upload the Source Release
 
-You should make the release available in your folder under `people.apache.org`.  For example, if you are releasing release candidate RC0 for version `x.y.z` then you should upload the source distribution files to:
+You should make the release candidate available in [https://dist.apache.org/repos/dist/dev/incubator/datafu](https://dist.apache.org/repos/dist/dev/incubator/datafu).  For example, if you are releasing release candidate RC0 for version `x.y.z` then you should upload the source distribution files to:
 
-    http://people.apache.org/~yourname/incubator-datafu-x.y.z-rc0/
+    https://dist.apache.org/repos/dist/dev/incubator/datafu/incubator-datafu-x.y.z-rc0/
 
-Note that you should be able to SSH to the machine with `ssh yourname@people.apache.org` and scp the files as you would any other remote machine.
+To create a release folder and check out out (be sure to substitute x.y.z for the actual version):
+
+    svn mkdir https://dist.apache.org/repos/dist/dev/incubator/datafu/apache-datafu-incubating-x.y.z-rc0
+    svn co https://dist.apache.org/repos/dist/dev/incubator/datafu/apache-datafu-incubating-x.y.z-rc0 apache-datafu-incubating-x.y.z-rc0
+    cd apache-datafu-incubating-x.y.z-rc0
+
+You could then add the source release as described above and commit.
 
 ## Tag the release
 
@@ -162,7 +168,7 @@ To see all the previous releases:
 Create a directory for the release (replace `x.y.z` with the release number):
 
     svn mkdir https://dist.apache.org/repos/dist/release/incubator/datafu/apache-datafu-incubating-x.y.z
-    svn co https://dist.apache.org/repos/dist/release/incubator/datafu apache-datafu-incubating-x.y.z-release
+    svn co https://dist.apache.org/repos/dist/release/incubator/datafu/apache-datafu-incubating-x.y.z apache-datafu-incubating-x.y.z-release
     cd apache-datafu-incubating-x.y.z-release
 
 Now copy the source release files into this directory and commit them.  Within 24 hours they will be distributed to the mirrors.  Then it should be available for download at `http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-x.y.z/`.
