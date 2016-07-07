@@ -35,7 +35,7 @@ if (!isRelease) {
 task prepare_release_config(type: Copy) {
   from "$rootDir/gradle.properties"
   into "$rootDir"
-  rename { filename -> 
+  rename { filename ->
     filename + ".release" }
   filter { line ->
     if (isRelease && line.startsWith("release=")) {
@@ -81,8 +81,9 @@ task sourceRelease(type: Tar, dependsOn: prepare_release_config) {
   destinationDir = file("${project.buildDir}/distribution/source")
 
   archiveName = "${baseName}.tgz"
-  doLast { // generate md5 checksum
-    ant.checksum file:"$destinationDir/$archiveName"
+  doLast {
+    ant.checksum file:"$destinationDir/$archiveName", algorithm: "MD5"
+    ant.checksum file:"$destinationDir/$archiveName", algorithm: "SHA-512"
   }
 }
 
