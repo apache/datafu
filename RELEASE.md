@@ -82,7 +82,7 @@ You should make the release candidate available in [https://dist.apache.org/repo
 
     https://dist.apache.org/repos/dist/dev/incubator/datafu/incubator-datafu-x.y.z-rc0/
 
-To create a release folder and check out out (be sure to substitute x.y.z for the actual version):
+To create a release folder and check it out (be sure to substitute x.y.z for the actual version):
 
     svn mkdir https://dist.apache.org/repos/dist/dev/incubator/datafu/apache-datafu-incubating-x.y.z-rc0
     svn co https://dist.apache.org/repos/dist/dev/incubator/datafu/apache-datafu-incubating-x.y.z-rc0 apache-datafu-incubating-x.y.z-rc0
@@ -104,9 +104,9 @@ Then push the tag:
 
 General information on publishing to Maven can be found [here](http://www.apache.org/dev/publishing-maven-artifacts.html).  To upload the archive to the Apache Nexus staging repository, run:
 
-    ./gradlew uploadArchives -Prelease=true -PnexusUsername=yourNexusUsername -PnexusPassword=yourNexusPassword -Psigning.keyId=yourGpgKeyId -Psigning.password=yourGpgSigningPassword
+    ./gradlew uploadArchives -Prelease=true -PnexusUsername=yourNexusUsername -PnexusPassword=yourNexusPassword
 
-Note that if you are running the above command from a source release you don't need `-Prelease=true`.
+Note that if you are running the above command from a source release you don't need `-Prelease=true`.  The above command assumes you have configured `$HOME/.gradle/gradle.properties` with your GPG key information.
 
 If you now visit the [Apache Nexus Repository](https://repository.apache.org) and click on Staging Repositories, you should see a repository named orgapachedatafu-xxxx, where xxxx is some number.  Select the repository and browse the content to make sure the set of files looks right.  If it looks correct then Close the repository.  The repository is now ready for testing.  If you look at the summary there is a URL for the repository that may be used to fetch the archives.
 
