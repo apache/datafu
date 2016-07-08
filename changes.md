@@ -1,4 +1,19 @@
-# 1.3.0 (upcoming release)
+# 1.3.1
+
+Additions:
+
+* New UDF CountDistinctUpTo that counts tuples within a bag to a preset limit (DATAFU-117)
+
+Improvements:
+
+* TupleFromBag and FirstTupleFromBag now implement Accumulator interface as well (DATAFU-114, DATAFU-115)
+
+Build System:
+
+* IntelliJ Idea support added to build file (DATAFU-103)
+* JDK version now validated when building (DATAFU-95)
+
+# 1.3.0
 
 Additions:
 
