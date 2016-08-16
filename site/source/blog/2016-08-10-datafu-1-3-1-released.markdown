@@ -20,16 +20,6 @@ license: >
 
 I'd like to announce the release of Apache DataFu (incubating) 1.3.1.
 
-The source release can be obtained from:
-
-http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.1/
-
-Artifacts for DataFu are published in Apache's Maven Repository:
-
-https://repository.apache.org/content/groups/public/org/apache/datafu/
-
-Please follow the [Quick Start](/docs/quick-start.html) for instructions on building from source or retrieving the artifacts in your build system.  A summary of [changes](https://github.com/apache/incubator-datafu/blob/1.3.1/changes.md) for 1.3.1 appears below.
-
 Additions:
 
 * New UDF CountDistinctUpTo that counts tuples within a bag to a preset limit (DATAFU-117)
@@ -42,3 +32,13 @@ Build System:
 
 * IntelliJ Idea support added to build file (DATAFU-103)
 * JDK version now validated when building (DATAFU-95)
+
+The source release can be obtained from:
+
+http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.1/
+
+Artifacts for DataFu are published in Apache's Maven Repository:
+
+https://repository.apache.org/content/groups/public/org/apache/datafu/
+
+Please follow the [Quick Start](/docs/quick-start.html) for instructions on building from source or retrieving the artifacts in your build system.
