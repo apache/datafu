@@ -49,7 +49,7 @@ With `Coalesce` we can clean up the code above.
 To replace any null value with 0:
 
 ```pig
-DEFINE EmptyBagToNullFields datafu.pig.util.Coalesce();
+DEFINE Coalesce datafu.pig.util.Coalesce();
 
 data = FOREACH data GENERATE Coalesce(val,0) as result;
 ```
