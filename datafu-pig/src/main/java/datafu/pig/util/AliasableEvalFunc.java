@@ -102,9 +102,25 @@ public abstract class AliasableEvalFunc<T> extends ContextualEvalFunc<T>
    */
   public abstract Schema getOutputSchema(Schema input);
 
+  /*
+   * Previously, this class worked by capturing the schema of the input tuple on the front-end and storing it into the UDFContext.,
+   * After {@link EvalFunc.getInputSchema} was introduced in Pig 0.11, the implementation was changed to use it and the 
+   * UDF context is used only as a fallback.
+   */
   @SuppressWarnings("unchecked")
   private Map<String, Integer> getAliasMap() {
-    return (Map<String, Integer>)getInstanceProperties().get(ALIAS_MAP_PROPERTY);
+    if (aliasToPosition == null) {
+      if (getInputSchema() == null) {
+        aliasToPosition = (Map<String, Integer>)getInstanceProperties().get(ALIAS_MAP_PROPERTY);
+      } else {
+        Map<String, Integer> aliasMap = new HashMap<String, Integer>();
+        constructFieldAliases(aliasMap, getInputSchema(), null);
+        log.debug("In instance: "+getInstanceName()+", creating alias map: " + aliasMap);
+        aliasToPosition = aliasMap;
+      }
+    }
+
+    return aliasToPosition;
   }
   
   private void setAliasMap(Map<String, Integer> aliases) {
