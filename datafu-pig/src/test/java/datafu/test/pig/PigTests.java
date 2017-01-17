@@ -50,12 +50,24 @@ public abstract class PigTests
     // however otherwise it is useful to see the errors
     Logger.getRootLogger().removeAllAppenders();
     Logger.getLogger(JvmMetrics.class).setLevel(Level.OFF);
+    //Test files will be created in the following sub-directory
+    new File(System.getProperty("user.dir")+File.separator+"build","test-files").mkdir();		
+    
   }
-  
+	  
   @org.testng.annotations.BeforeMethod
   public void beforeMethod(Method method)
-  {
+  {	
+    //working directory needs to be changed to the location of the test files for the PigTests to work properly
+    System.setProperty("user.dir", System.getProperty("user.dir")+File.separator+"build"+File.separator+"test-files");
     System.out.println("\n*** Running " + method.getName() + " ***");
+  }
+
+  @org.testng.annotations.AfterMethod 	
+  public void afterMethod(Method method)
+  {
+    //offset the change made in the location of the working directory in beforeMethod 
+    System.setProperty("user.dir", System.getProperty("user.dir").substring(0,System.getProperty("user.dir").lastIndexOf(File.separator+"build"+File.separator+"test-files")));
   }
   
   protected String[] getDefaultArgs()
