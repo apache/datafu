@@ -105,9 +105,9 @@ subprojects {
   apply plugin: 'nexus'
 
   nexus {
-    attachSources = true
+    attachSources = false
     attachTests = false
-    attachJavadoc = true
+    attachJavadoc = false
     sign = true
     repositoryUrl = 'https://repository.apache.org/service/local/staging/deploy/maven2'
     snapshotRepositoryUrl = 'https://repository.apache.org/content/repositories/snapshots'

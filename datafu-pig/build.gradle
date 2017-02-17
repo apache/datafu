@@ -48,10 +48,10 @@ configurations {
   }
 }
 
-eclipse { 
-  jdt { 
-    file { 
-      withProperties {  properties -> 
+eclipse {
+  jdt {
+    file {
+      withProperties {  properties ->
         // set up annotation processing, which we use so we can have multi-line strings in our tests
         properties.setProperty("org.eclipse.jdt.core.compiler.processAnnotations", "enabled")
       }
@@ -63,19 +63,19 @@ eclipse {
 tasks.eclipse.dependsOn(':build-plugin:assemble')
 
 // more annotation processor setup
-eclipseJdt { 
-  doFirst { 
+eclipseJdt {
+  doFirst {
     def f = file(".factorypath")
     def w = new FileWriter(f)
     def xml = new MarkupBuilder(w)
     xml.setDoubleQuotes(true)
-    xml."factorypath"() { 
+    xml."factorypath"() {
       "factorypathentry" (
-        kind: "EXTJAR", 
-        id: configurations.testCompile.find { 
+        kind: "EXTJAR",
+        id: configurations.testCompile.find {
           it.name.startsWith("build-plugin")
-        }, 
-        enabled: true, 
+        },
+        enabled: true,
         runInBatchMode: false
       )
     }
@@ -83,8 +83,8 @@ eclipseJdt {
   }
 }
 
-cleanEclipse { 
-  doLast { 
+cleanEclipse {
+  doLast {
     delete ".apt_generated"
     delete ".settings"
     delete ".factorypath"
@@ -92,7 +92,7 @@ cleanEclipse {
   }
 }
 
-jar 
+jar
 {
   // initial jar only includes the main classes of datafu, not the dependencies.
   // this is not the one we'll publish.
@@ -106,7 +106,12 @@ ext
 
 task jarWithDependencies(type: Autojar) {
   description 'Creates a jar that includes the dependencies (under their own namespaces)'
-  autojarFiles = [tasks.jar.getArchivePath().absoluteFile]
+  autojarFiles = [
+    tasks.jar.getArchivePath().absoluteFile,
+    "META-INF/LICENSE",
+    "META-INF/DISCLAIMER",
+    "META-INF/NOTICE"
+  ]
   targetConfiguration = configurations.autojarred
   autojarExtra = '-baeq'
 }
