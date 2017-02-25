@@ -1,3 +1,11 @@
+# 1.3.2
+
+Improvements:
+
+* LICENSE, NOTICE, and DISCLAIMER now included in META-INF of JARs.
+* Test files now generated to build/test-files within projects.
+* AliasableEvalFunc now uses getInputSchema.
+
 # 1.3.1
 
 Additions:
