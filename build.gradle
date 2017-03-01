@@ -42,6 +42,11 @@ apply from: file("gradle/dependency-versions.gradle")
 apply from: file("gradle/release.gradle")
 apply from: file("gradle/rat.gradle")
 
+// make the rat task run automatically along with the assemble tasks
+allprojects{
+  tasks.assemble.dependsOn ':rat'
+}
+
 rat {
   excludes = [
     '**/.git/**',
@@ -95,6 +100,17 @@ apply plugin: 'com.fizzpod.sweeney'
 sweeney {
   // Must use JDK 1.7
   enforce type: "equal", expect: "1.7", value: {System.getProperty('java.version').substring(0,3)}
+
+  // Ensure the assemble tasks depend on the rat task
+  def flag = true
+  project.allprojects.tasks.each{taskset->
+    taskset.each{task->
+      if(task.name.equals("assemble")){
+        flag = flag && task.getTaskDependencies().getDependencies().contains(tasks.rat)
+      }
+    }
+  }
+  enforce type: "bool", value: {flag}
 }
 
 allprojects {
