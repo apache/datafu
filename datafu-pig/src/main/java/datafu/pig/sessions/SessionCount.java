@@ -69,7 +69,7 @@ public class SessionCount extends AccumulatorEvalFunc<Long>
   public SessionCount(String timeSpec)
   {
     Period p = new Period("PT" + timeSpec.toUpperCase());
-    this.millis = p.toStandardSeconds().getSeconds() * 1000;
+    this.millis = p.toStandardDuration().getMillis();
     cleanup();
   }
 

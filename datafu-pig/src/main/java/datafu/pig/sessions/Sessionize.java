@@ -22,9 +22,7 @@ package datafu.pig.sessions;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.apache.pig.Accumulator;
 import org.apache.pig.AccumulatorEvalFunc;
-import org.apache.pig.EvalFunc;
 import org.apache.pig.builtin.Nondeterministic;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataBag;
@@ -82,7 +80,7 @@ public class Sessionize extends AccumulatorEvalFunc<DataBag>
   public Sessionize(String timeSpec)
   {
     Period p = new Period("PT" + timeSpec.toUpperCase());
-    this.millis = p.toStandardSeconds().getSeconds() * 1000;
+    this.millis = p.toStandardDuration().getMillis();
 
     cleanup();
   }

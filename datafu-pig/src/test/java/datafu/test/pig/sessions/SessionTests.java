@@ -23,12 +23,9 @@ import static org.testng.Assert.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.adrianwalker.multilinestring.Multiline;
 import org.apache.commons.lang.StringUtils;
@@ -48,7 +45,6 @@ public class SessionTests extends PigTests
 {
   /**
   
-
   define Sessionize datafu.pig.sessions.Sessionize('$TIME_WINDOW');
   
   views = LOAD 'input' AS (time:$TIME_TYPE, user_id:int, value:int);
@@ -86,7 +82,7 @@ public class SessionTests extends PigTests
       "2010-01-01T01:10:00Z\t3\t25",
       "2010-01-01T01:15:00Z\t3\t50",
       "2010-01-01T01:25:00Z\t3\t30",
-      "2010-01-01T01:30:00Z\t3\t15"  
+      "2010-01-01T01:30:00Z\t3\t15"
   };
   
   @Test
@@ -144,7 +140,7 @@ public class SessionTests extends PigTests
     for (String line : inputData)
     {
       String[] parts = line.split("\t");
-      Assert.assertEquals(3, parts.length);
+      assertEquals(3, parts.length);
       parts[0] = Long.toString(dateFormat.parse(parts[0]).getTime());
       lines.add(StringUtils.join(parts,"\t"));
     }
@@ -179,121 +175,84 @@ public class SessionTests extends PigTests
     assertTrue(userValues.get(2).containsKey(40));
     assertTrue(userValues.get(2).containsKey(50));
   }
-  
+
   @Test
-  public void sessionizeExecTest() throws Exception
+  public void sessionizeExecTestMatching() throws Exception
   {
-    Sessionize sessionize = new Sessionize("30m");
-    Tuple input = TupleFactory.getInstance().newTuple(1);
-    DataBag inputBag = BagFactory.getInstance().newDefaultBag();
-    input.set(0,inputBag);
-    
-    Tuple item;
-    List<Tuple> result;
-    DateTime dt;
-    
-    // test same session id
-    inputBag.clear();
-    dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(28).getMillis());
-    inputBag.add(item);
-    result = toList(sessionize.exec(input));
-    
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(2,result.get(0).size());
-    Assert.assertEquals(2,result.get(1).size());
-    // session ids match
-    Assert.assertTrue(result.get(0).get(1).equals(result.get(1).get(1))); 
-    
-    // test different session id
-    inputBag.clear();
-    dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(31).getMillis());
-    inputBag.add(item);
-    result = toList(sessionize.exec(input));
-    
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(2,result.get(0).size());
-    Assert.assertEquals(2,result.get(1).size());
-    // session ids don't match
-    Assert.assertFalse(result.get(0).get(1).equals(result.get(1).get(1)));
+    DateTime dt = new DateTime();
+
+    List<Tuple> result = runSessionizeExec("30m", dt, dt.plusMinutes(28));
+
+    assertEquals(2, result.size());
+    assertEquals(2,result.get(0).size());
+    assertEquals(2,result.get(1).size());
+    assertTrue(result.get(0).get(1).equals(result.get(1).get(1)));
   }
-  
+
+  @Test
+  public void sessionizeExecTestNonMatching() throws Exception
+  {
+    DateTime dt = new DateTime();
+
+    List<Tuple> result = runSessionizeExec("30m", dt, dt.plusMinutes(31));
+
+    assertEquals(2, result.size());
+    assertEquals(2,result.get(0).size());
+    assertEquals(2,result.get(1).size());
+    assertFalse(result.get(0).get(1).equals(result.get(1).get(1)));
+  }
+
+  @Test
+  public void sessionizeExecTestMs() throws Exception
+  {
+    DateTime dt = new DateTime();
+
+    List<Tuple> result = runSessionizeExec("0.450S", dt, dt.plusMillis(449));
+
+    assertEquals(2, result.size());
+    assertEquals(2,result.get(0).size());
+    assertEquals(2,result.get(1).size());
+    assertTrue(result.get(0).get(1).equals(result.get(1).get(1)));
+
+    result = runSessionizeExec("0.450S", dt, dt.plusMillis(451));
+    assertEquals(2, result.size());
+    assertEquals(2,result.get(0).size());
+    assertEquals(2,result.get(1).size());
+    assertFalse(result.get(0).get(1).equals(result.get(1).get(1)));
+  }
+
   @Test
   public void sessionizeAccumulateTest() throws Exception
   {
     Sessionize sessionize = new Sessionize("30m");
-    Tuple input = TupleFactory.getInstance().newTuple(1);
-    DataBag inputBag = BagFactory.getInstance().newDefaultBag();
-    input.set(0,inputBag);
-    
-    Tuple item;
-    List<Tuple> result;
-    DateTime dt;
-    
-    // test same session id
-    dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(28).getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    result = toList(sessionize.getValue());
-    
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(2,result.get(0).size());
-    Assert.assertEquals(2,result.get(1).size());
+    DateTime dt = new DateTime();
+
+    sessionize.accumulate(buildInputBag(dt, dt.plusMinutes(28)));
+    List<Tuple> result =  toList(sessionize.getValue());
+
+    assertEquals(2, result.size());
+    assertEquals(2,result.get(0).size());
+    assertEquals(2,result.get(1).size());
     // session ids match
-    Assert.assertTrue(result.get(0).get(1).equals(result.get(1).get(1))); 
-    
-    // test different session id
+    assertTrue(result.get(0).get(1).equals(result.get(1).get(1)));
+
     sessionize.cleanup();
+
+    // test with another bag; session ids shouldn't match
     dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(31).getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    result = toList(sessionize.getValue());
-    
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(2,result.get(0).size());
-    Assert.assertEquals(2,result.get(1).size());
-    // session ids don't match
-    Assert.assertFalse(result.get(0).get(1).equals(result.get(1).get(1)));
+    sessionize.accumulate(buildInputBag(dt, dt.plusMinutes(31)));
+    result =  toList(sessionize.getValue());
+
+    assertEquals(2, result.size());
+    assertEquals(2,result.get(0).size());
+    assertEquals(2,result.get(1).size());
+    assertFalse(result.get(0).get(1).equals(result.get(1).get(1)));
     
     sessionize.cleanup();
-    Assert.assertEquals(0,sessionize.getValue().size());
+    assertEquals(0, sessionize.getValue().size());
   }
   
-  private List<Tuple> toList(DataBag bag)
-  {
-    List<Tuple> result = new ArrayList<Tuple>();
-    for (Tuple t : bag)
-    {
-      result.add(t);
-    }
-    return result;
-  }
-  
+
   /**
   
 
@@ -350,81 +309,84 @@ public class SessionTests extends PigTests
   }
   
   @Test
-  public void sessionCountExecTest() throws Exception
+  public void sessionCountOneExecTest() throws Exception
   {
-    SessionCount sessionize = new SessionCount("30m");
-    Tuple input = TupleFactory.getInstance().newTuple(1);
-    DataBag inputBag = BagFactory.getInstance().newDefaultBag();
-    input.set(0,inputBag);
-    
-    Tuple item;
-    DateTime dt;
-    
-    // test same session id
-    inputBag.clear();
-    dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(28).getMillis());
-    inputBag.add(item);
-    Assert.assertEquals(1L,sessionize.exec(input).longValue()); 
-    
-    // test different session id
-    inputBag.clear();
-    dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(31).getMillis());
-    inputBag.add(item);
-    Assert.assertEquals(2L,sessionize.exec(input).longValue());
+    DateTime dt = new DateTime();
+    long count = runSessionCountExec("30m", dt, dt.plusMinutes(28));
+    assertEquals(1L, count);
   }
-  
+
+  @Test
+  public void sessionCountTwoExecTest() throws Exception
+  {
+    DateTime dt = new DateTime();
+    long count = runSessionCountExec("30m", dt, dt.plusMinutes(31));
+    assertEquals(2L, count);
+  }
+
+  @Test
+  public void sessionCountMsExecTest() throws Exception
+  {
+    DateTime dt = new DateTime();
+    long count = runSessionCountExec("0.450S", dt, dt.plusMillis(1));
+    assertEquals(1L, count);
+
+    count = runSessionCountExec("0.450S", dt, dt.plusMillis(451));
+    assertEquals(2L, count);
+  }
+
   @Test
   public void sessionCountAccumulateTest() throws Exception
   {
     SessionCount sessionize = new SessionCount("30m");
+    DateTime dt = new DateTime();
+    sessionize.accumulate(buildInputBag(dt, dt.plusMinutes(28)));
+    assertEquals(1L, sessionize.getValue().longValue());
+
+    sessionize.cleanup();
+    dt = new DateTime();
+
+    sessionize.accumulate(buildInputBag(dt, dt.plusMinutes(31)));
+    assertEquals(2L, sessionize.getValue().longValue());
+
+    sessionize.cleanup();
+    assertEquals(0, sessionize.getValue().longValue());
+  }
+
+  private static List<Tuple> toList(DataBag bag)
+  {
+    List<Tuple> result = new ArrayList<Tuple>();
+    for (Tuple t : bag)
+    {
+      result.add(t);
+    }
+    return result;
+  }
+
+  private static Tuple buildInputBag(DateTime ...dt) throws Exception
+  {
     Tuple input = TupleFactory.getInstance().newTuple(1);
     DataBag inputBag = BagFactory.getInstance().newDefaultBag();
     input.set(0,inputBag);
-    
-    Tuple item;
-    DateTime dt;
-    
-    // test same session id
-    dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(28).getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    Assert.assertEquals(1L,sessionize.getValue().longValue()); 
-    
-    // test different session id
-    sessionize.cleanup();
-    dt = new DateTime();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    item = TupleFactory.getInstance().newTuple(1);
-    item.set(0, dt.plusMinutes(31).getMillis());
-    inputBag.add(item);
-    sessionize.accumulate(input);
-    inputBag.clear();
-    Assert.assertEquals(2L,sessionize.exec(input).longValue());
-    
-    sessionize.cleanup();
-    Assert.assertEquals(0,sessionize.getValue().longValue());
+
+    for (DateTime time : dt)
+    {
+      inputBag.add(TupleFactory.getInstance().newTuple(Collections.singletonList(time.getMillis())));
+    }
+
+    return input;
+  }
+
+  private static List<Tuple> runSessionizeExec(String timespec, DateTime ...dt) throws Exception
+  {
+    Sessionize sessionize = new Sessionize(timespec);
+    return toList(sessionize.exec(buildInputBag(dt)));
+  }
+
+  private static Long runSessionCountExec(String timespec, DateTime ...dt) throws Exception
+  {
+    SessionCount sessionCount = new SessionCount(timespec);
+    return sessionCount.exec(buildInputBag(dt));
   }
 }
 
