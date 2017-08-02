@@ -1,5 +1,5 @@
 ---
-title: Mailing Lists - Community
+title: Issues - Community
 section_name: Community
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -18,14 +18,8 @@ license: >
    limitations under the License.
 ---
 
-# Mailing Lists
+# Issues
 
-We have a couple public mailing lists hosted by Apache:
+Tasks, bugs, feature requests, etc. are tracked in [JIRA](https://issues.apache.org/jira/browse/DATAFU).  Please report any non-security related issues there.
 
-* dev@datafu.incubator.apache.org ([subscribe](mailto:dev-subscribe@datafu.incubator.apache.org), [unsubscribe](mailto:dev-unsubscribe@datafu.incubator.apache.org), [archive](http://mail-archives.apache.org/mod_mbox/incubator-datafu-dev/))<br>
-  A list for discussion on DataFu development. Email here for help.
-
-* commits@datafu.incubator.apache.org ([subscribe](mailto:commits-subscribe@datafu.incubator.apache.org), [unsubscribe](mailto:commits-unsubscribe@datafu.incubator.apache.org), [archive](http://mail-archives.apache.org/mod_mbox/incubator-datafu-commits/))<br>
-  A list to track DataFu commits.
-
-For private matters, please email [private@datafu.incubator.apache.org](mailto:private@datafu.incubator.apache.org).
+For security-related issues, please email the private mailing list, [private@datafu.incubator.apache.org](mailto:private@datafu.incubator.apache.org).
