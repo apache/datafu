@@ -54,6 +54,8 @@ public abstract class PigTests
     Logger.getRootLogger().removeAllAppenders();
     Logger.getLogger(JvmMetrics.class).setLevel(Level.OFF);
     
+    System.setProperty("pig.import.search.path", System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources");
+
     // Test files will be created in the following sub-directory
     new File(System.getProperty("user.dir") + File.separator + "build", "test-files").mkdir();		
   }
@@ -233,14 +235,15 @@ public abstract class PigTests
   protected void assertOutput(PigTest test, String alias, String... expected) throws IOException, ParseException
   {
     List<Tuple> tuples = getLinesForAlias(test, alias);
-    assertEquals(expected.length, tuples.size());
+    assertEquals(expected.length, tuples.size(), "Mismatch in number of tuples");
     int i=0;
     for (String e : expected)
     {
-      assertEquals(tuples.get(i++).toString(), e);
+      String actual = tuples.get(i++).toString();
+      assertEquals(actual, e, "Expected " + e + " but found " + actual);
     }
   }
-  
+
   protected File deleteIfExists(File file)
   {
     if (file.exists())
