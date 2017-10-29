@@ -24,7 +24,7 @@ ext {
   commonsMathVersion="2.2"
   commonsIoVersion="2.4"
   fastutilVersion="6.5.7"
-  guavaVersion="11.0.2"
+  guavaVersion="20.0"
   hadoopVersion="2.7.0"
   jodaTimeVersion="1.6"
   log4jVersion="1.2.17"
