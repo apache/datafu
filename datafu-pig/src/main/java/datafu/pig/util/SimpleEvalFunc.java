@@ -98,7 +98,7 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 */
 
-public abstract class SimpleEvalFunc<T> extends EvalFunc<T>
+public abstract class SimpleEvalFunc<T> extends ContextualEvalFunc<T>
 {
   // TODO Add support for other UDF types (e.g., FilterFunc)
   // TODO Algebraic EvalFuncs 
