@@ -29,3 +29,6 @@ datafu-pig/docs
 datafu-pig/queries
 datafu-pig/query
 *.patch
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+gradlew*
