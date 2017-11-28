@@ -17,24 +17,29 @@
  * under the License.
  */
 
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+
+  // autojar only works with gradle versions < 4.0
+  // we need to fix it or find a different solution in order to upgrade gradle
+  dependencies {
+      classpath 'com.github.rholder:gradle-autojar:1.0.1'
+  }
+}
+
+plugins {
+    id "de.undercouch.download" version "3.3.0"
+}
+
 apply plugin: 'java'
 apply plugin: 'gradle-autojar'
-apply plugin: 'download-task'
 
 // append "-incubating" while still in the incubating process
 archivesBaseName = 'datafu-pig-incubating'
 
 import groovy.xml.MarkupBuilder
-
-buildscript {
-  repositories {
-      mavenCentral()
-  }
-  dependencies {
-      classpath 'com.github.rholder:gradle-autojar:1.0.1'
-      classpath 'de.undercouch:gradle-download-task:0.5'
-  }
-}
 
 // the autojarred configuration includes all JARs that will be included
 // in the final JAR via autojar
