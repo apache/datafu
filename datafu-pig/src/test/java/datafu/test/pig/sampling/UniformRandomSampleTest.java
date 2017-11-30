@@ -129,9 +129,9 @@ public class UniformRandomSampleTest extends PigTests {
     test2.runScript();
     assertOutput(test2, "sampled", "(" + k + ")");
 
-    double p = 0.05;
-    double k = 15;
-    int s = (int) Math.ceil(p * n);
+    p = 0.05;
+    k = 15;
+    s = (int) Math.ceil(p * n);
 
     PigTest testWithTwoCalls =
         createPigTestFromString(uniformRandomSampleWithTwoCallsTest, "p=" + p, "k=" + k, "n=" + n);

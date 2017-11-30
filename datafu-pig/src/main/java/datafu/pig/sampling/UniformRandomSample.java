@@ -67,7 +67,19 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
     private static final TupleFactory _TUPLE_FACTORY = TupleFactory.getInstance();
     private static final BagFactory _BAG_FACTORY = BagFactory.getInstance();
 
+    // required for tests 
+    // when absent, tests fail with InstantiationException
+    // by logic there should be either p or k and n parameters
+    public UniformRandomSample() {}
+
     protected static double p = 0d; // a fraction of the set came as input parameter
+    public UniformRandomSample(String ps) {
+        this.p = Double.parseDouble(ps);
+        if (this.p > 1) {
+            throw new RuntimeException("p should not exceed 1.0");
+        }
+    }
+
     public UniformRandomSample(double p) {
         // not sure how to implement the following: 
     	// on p = 0, no further calcs are needed, return empty set
@@ -121,6 +133,8 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
      */
 
     static public class Initial extends EvalFunc<Tuple> {
+
+        public Initial(){}
 
     	private static RandomDataImpl _RNG = new RandomDataImpl();
     	private static int nextInt(int n) {
@@ -191,6 +205,9 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
 
     // this intermediate is just for consistency
     static public class Intermed extends EvalFunc<Tuple> {
+
+        public Intermed() {}
+
     	@Override
         public Tuple exec(Tuple input) throws IOException {
             return input;
@@ -202,6 +219,8 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
     // remove excess in case more than requested items
     // were selected
     static public class Final extends EvalFunc<DataBag> {
+
+        public Final(){}
 
     	@Override
     	public DataBag exec(Tuple input) throws IOException {
