@@ -50,10 +50,10 @@ import java.util.TreeSet;
  * </p>
  *
  * <pre>
- * DEFINE URS datafu.pig.sampling.URandomSample();
+ * DEFINE URS datafu.pig.sampling.UniformRandomSample('p | k & n');
  *
- * item    = LOAD 'input' AS (x:double);
- * sampled = FOREACH (GROUP items ALL) GENERATE FLATTEN(URS(items, p||k));
+ * item    = LOAD 'input' AS (x:<type>);
+ * sampled = FOREACH (GROUP items ALL) GENERATE FLATTEN(URS(items));
  * </pre>
  *
  */
@@ -67,31 +67,14 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
     private static final TupleFactory _TUPLE_FACTORY = TupleFactory.getInstance();
     private static final BagFactory _BAG_FACTORY = BagFactory.getInstance();
 
-    // required for tests 
-    // when absent, tests fail with InstantiationException
-    // by logic there should be either p or k and n parameters
-    public UniformRandomSample() {}
-
-    protected static double p = 0d; // a fraction of the set came as input parameter
     public UniformRandomSample(String ps) {
-        this.p = Double.parseDouble(ps);
-        if (this.p > 1) {
-            throw new RuntimeException("p should not exceed 1.0");
-        }
-    }
-
-    public UniformRandomSample(double p) {
-        // not sure how to implement the following: 
-    	// on p = 0, no further calcs are needed, return empty set
-    	// on p = 1, return the input
-    	this.p = p;
-    }
-
-    protected static long k; // an exact expected number came as input parameter  
-    public UniformRandomSample(long k, long total_size) {
-    	// on k = input.size, return the input, no further calcs
-    	this.k = k;
-        this.p = (double) k / total_size;
+        super(ps);
+        // all parameters calculations should be done in nested classes constructors
+        // to allow multiple instantiations through calls like:
+        // DEFINE URS1 datafu.pig.sampling.UniformRandomSample('$p');
+        // DEFINE URS2 datafu.pig.sampling.UniformRandomSample('$k, $n');
+        // data = LOAD 'input' AS (A_id:chararray, B_id:chararray, C:int);
+        // sampled = FOREACH (GROUP data ALL) GENERATE URS1(data) as sample_1, URS2(data) AS sample_2;
     }
 
     @Override
@@ -117,7 +100,6 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
             if (inputFieldSchema.type != DataType.BAG) {
                 throw new RuntimeException("Expected a BAG as input");
             }
-
             return new Schema(new Schema.FieldSchema(super.getSchemaName(OUTPUT_BAG_NAME_PREFIX, input),
                           inputFieldSchema.schema, DataType.BAG));
     	} catch (FrontendException e) {
@@ -125,16 +107,58 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
     	}
     }
 
-    /**
-     * this Initial supposed to be executed in the mapper and each it's thread is
-     * independent on others, for cases when k % number_of_threads =/= 0 we will
-     * get more items in the final than has been requested
+    /*
+     * this Initial vectorizes input data, making 1 cal per element,
+     * for sampling 1 element processing doesn't make much sense,
+     * therefore, lets skip initial, just passing data through it
+     * and make actual calc in Intermed
      *
      */
 
     static public class Initial extends EvalFunc<Tuple> {
 
         public Initial(){}
+
+        public Initial(String pi){}
+
+    	@Override
+        public Tuple exec(Tuple input) throws IOException {
+            return input;
+        }
+    }
+
+    /*
+     * this intermediate is where a subset selection is done
+     */
+    static public class Intermed extends EvalFunc<Tuple> {
+
+        public Intermed() {}
+
+        private double p;
+        private long k = 0L;
+
+        public Intermed(String pi){
+            if (pi.contains(",")){
+                try {
+                    String[] ss = pi.split(",");
+                    k = Long.parseLong(ss[0].trim(), 10);
+                    long ts = Long.parseLong(ss[1].trim(), 10);
+                    p = (double) k / ts;
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("k and n should be numbers, got NumberFormatException:"+pi);
+                }
+            } else {
+                try {
+                    p = Double.parseDouble(pi);
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("p should be a number, got NumberFormatException:"+pi);
+                }
+            }
+            if (p > 1.0d) {
+                throw new RuntimeException("p should not exceed 1");
+            }
+
+        }
 
     	private static RandomDataImpl _RNG = new RandomDataImpl();
     	private static int nextInt(int n) {
@@ -143,75 +167,79 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
 
     	@Override
         public Tuple exec(Tuple input) throws IOException {
-            int numArgs = input.size();
-            int k_local;
-
-            if (numArgs != 2) {
-                throw new IllegalArgumentException("The input tuple should have two fields: "
-                    + "a bag of items and the sampling.");
-            }
-
             DataBag items = (DataBag) input.get(0);
+
+            DataBag selected = _BAG_FACTORY.newDefaultBag();
+            Tuple tu;
+            Tuple output = _TUPLE_FACTORY.newTuple();
+
+            if (items.size() == 0 || p == 0) {
+                return _TUPLE_FACTORY.newTuple();
+            } else if (items.size() == 1) {
+                tu = items.iterator().next();
+                selected.add(tu);
+                output.append(1);
+                output.append(selected);
+
+                return output;
+            } else if ( p == 1.0d){
+                selected.addAll(items);
+                output.append(items.size());
+                output.append(selected);
+
+                return output;
+    	    }
+
             // the set should not exceed int, if initial set is bigger than max_int,
             // split into sub-sets
-            if (items.size() > 2147483647){
+            if (items.size() > Integer.MAX_VALUE){
                 throw new IndexOutOfBoundsException("bag size is above int maximum");
             }
             int numItems = (int) items.size();
-            int in = (int) input.get(1);
-            if (in > 1){
-                // use global p, it doesn't change anyway 
-                k_local = (int) Math.ceil(p * numItems);
-            } else {
-                k_local = (int) Math.ceil(in * numItems);
-            }
 
-            DataBag selected = _BAG_FACTORY.newDefaultBag();
+            int k_local = (int) Math.ceil(p * numItems);
+            if (k_local == 0) return _TUPLE_FACTORY.newTuple();
 
             int x;
             SortedSet<Integer> nums = new TreeSet<Integer>();
+            numItems--;
             while (nums.size() < k_local){
     	        x = nextInt(numItems);
     	        nums.add(x);
     	    }
+
             int i=0;
             int j;
             Iterator<Integer> it = nums.iterator();
             Iterator<Tuple> it2 = items.iterator();
-
-    	    while (nums.size() > 0){
-    	        for ( j=i; j<it.next(); j++) {
-    		    it2.next();
+            tu = it2.next();
+            int ii = it.next();
+    	    while (it.hasNext()){
+    	        for ( j=i; j<ii; j++) {
+    		    tu = it2.next();
     	        }
-    	        selected.add(it2.next());
+    	        selected.add(tu);
     	        i=j+1;
-    	        nums.remove(it.next());
+                ii = it.next();
+    		tu = it2.next();
     	    }
+            for ( j=i; j<ii; j++) {
+                    tu = it2.next();
+            }
+            selected.add(tu);
+
             /*
              * The output tuple contains the following fields:
              * <number of items requested to be in the sample (int),>
              * number of processed items in this tuple (int),
              * a bag of selected items (bag).
              */
-            Tuple output = _TUPLE_FACTORY.newTuple();
 
-            //output.append(k_local);
-            output.append(numItems);
+            output.append(numItems+1);
             output.append(selected);
 
             return output;
       }
-    }
-
-    // this intermediate is just for consistency
-    static public class Intermed extends EvalFunc<Tuple> {
-
-        public Intermed() {}
-
-    	@Override
-        public Tuple exec(Tuple input) throws IOException {
-            return input;
-        }
     }
 
     // this final should be executed as reducer
@@ -222,27 +250,54 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
 
         public Final(){}
 
+        private double p;
+        private long k = 0L;
+
+        public Final(String pi){
+
+            if (pi.contains(",")){
+                try {
+                    String[] ss = pi.split(",");
+                    k = Long.parseLong(ss[0].trim(), 10);
+                    long ts = Long.parseLong(ss[1].trim(), 10);
+                    p = (double) k / ts;
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("k and n should be numbers, got NumberFormatException:"+pi);
+                }
+            } else {
+                try {
+                    p = Double.parseDouble(pi);
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("p should be a number, got NumberFormatException:"+pi);
+                }
+            }
+            if (p > 1.0d) {
+                throw new RuntimeException("p should not exceed 1");
+            }
+        }
+
     	@Override
     	public DataBag exec(Tuple input) throws IOException {
             DataBag bag = (DataBag) input.get(0);
 
-            long n_total = 0L; // number of overall items
+            if (bag.size() == 0) { return _BAG_FACTORY.newDefaultBag(); }
+
+            long n_total = 0L;
 
             DataBag selected = _BAG_FACTORY.newDefaultBag();
 
             Iterator<Tuple> it = bag.iterator();
             Tuple tuple = it.next();
             while(it.hasNext()) {
-                n_total += (long) tuple.get(0);
+                n_total += ((Number) tuple.get(0)).longValue();
                 selected.addAll((DataBag) tuple.get(1));
                 tuple = it.next();
             }
-            n_total += (long) tuple.get(0);
+            n_total += ((Number) tuple.get(0)).longValue();
             DataBag lastBag = (DataBag) tuple.get(1);
 
-    	    // k || p come from the parent
             long s; // final requested sample size
-            if (p > 0){
+            if (k == 0){
                 s = (long) Math.ceil(p * n_total);
             } else {
                 s = k;
