@@ -34,7 +34,12 @@ if (!isRelease) {
 // built.
 task prepare_release_config(type: Copy) {
   from "$rootDir/gradle.properties"
-  into "$rootDir"
+
+	// there is a bug in Gradle on Windows that prevents copy tasks from copying into the same folder.
+	// Therefore, we copy to a temporary dir, and use the copy method (which doesn't have this bug)
+	// to copy back into rootDir so the Windows build works, even though this is ugly.
+	// https://discuss.gradle.org/t/error-with-a-copy-task-on-windows/1803
+  into temporaryDir
   rename { filename ->
     filename + ".release" }
   filter { line ->
@@ -45,6 +50,13 @@ task prepare_release_config(type: Copy) {
       line
     }
   }
+	doLast {
+		copy {
+			from temporaryDir
+		  into "$rootDir"
+		  include 'gradle.properties.release'
+		}
+	}
 }
 
 task sourceRelease(type: Tar, dependsOn: prepare_release_config) {
