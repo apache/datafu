@@ -14,6 +14,7 @@ Improvements:
 * Upgraded to Guava 20.0. (DATAFU-48)
 * Updated Gradle to 3.5.1. (DATAFU-125)
 * Rat tasks automatically run during assemble. (DATAFU-118)
+* Building now works on Windows. (DATAFU-99)
 
 # 1.3.2
 
