@@ -25,8 +25,9 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Helper methods for dealing with multiple Avro input schemas.  A mapping is stored in the configuration
@@ -48,7 +49,7 @@ public class AvroMultipleInputsUtil
    * @return schema
    */
   public static Schema getInputKeySchemaForSplit(Configuration conf, InputSplit split) 
-  {
+  {    
     String path = ((FileSplit)split).getPath().toString();
     _log.info("Determining schema for input path " + path);
     JSONObject schemas;
@@ -56,28 +57,22 @@ public class AvroMultipleInputsUtil
     {
       schemas = getInputSchemas(conf);
     }
-    catch (JSONException e1)
+    catch (ParseException e1)
     {
       throw new RuntimeException(e1);
     }
     Schema schema = null;
     if (schemas != null)
     {
-      for (String key : JSONObject.getNames(schemas))
+      for (Object keyObj : schemas.keySet())
       {
+        String key = (String)keyObj;
         _log.info("Checking against " + key);
         if (path.startsWith(key))
         {
-          try
-          {
-            schema = new Schema.Parser().parse(schemas.getString(key));
-            _log.info("Input schema found: " + schema.toString(true));
-            break;
-          }
-          catch (JSONException e)
-          {
-            throw new RuntimeException(e);
-          }
+          schema = new Schema.Parser().parse((String)schemas.get(key));
+          _log.info("Input schema found: " + schema.toString(true));
+          break;
         }
       }
     }
@@ -95,6 +90,7 @@ public class AvroMultipleInputsUtil
    * @param schema The input key schema.
    * @param path the path to set the schema for
    */
+  @SuppressWarnings("unchecked")
   public static void setInputKeySchemaForPath(Job job, Schema schema, String path) 
   { 
     JSONObject schemas;    
@@ -103,7 +99,7 @@ public class AvroMultipleInputsUtil
       schemas = getInputSchemas(job.getConfiguration());
       schemas.put(path, schema.toString());
     }
-    catch (JSONException e)
+    catch (ParseException e)
     {
       throw new RuntimeException(e);
     }         
@@ -115,9 +111,9 @@ public class AvroMultipleInputsUtil
    * 
    * @param conf
    * @return mapping from path to input schem
-   * @throws JSONException
+   * @throws ParseException 
    */
-  private static JSONObject getInputSchemas(Configuration conf) throws JSONException
+  private static JSONObject getInputSchemas(Configuration conf) throws ParseException
   {
     JSONObject schemas;
     
@@ -129,7 +125,7 @@ public class AvroMultipleInputsUtil
     }
     else
     {
-      schemas = new JSONObject(schemasJson);
+      schemas = (JSONObject)new JSONParser().parse(schemasJson);
     }   
     
     return schemas;
