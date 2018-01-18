@@ -22,6 +22,8 @@ package datafu.pig.sampling;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.math.random.RandomDataImpl;
 import org.apache.pig.AlgebraicEvalFunc;
@@ -34,8 +36,6 @@ import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
 /**
  * Scalable uniform random sampling.
  *
@@ -107,61 +107,52 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
     	}
     }
 
-    /*
-     * this Initial vectorizes input data, making 1 cal per element,
-     * for sampling 1 element processing doesn't make much sense,
-     * therefore, lets skip initial, just passing data through it
-     * and make actual calc in Intermed
-     *
-     */
-
-    static public class Initial extends EvalFunc<Tuple> {
-
-        public Initial(){}
-
-        public Initial(String pi){}
-
-    	@Override
-        public Tuple exec(Tuple input) throws IOException {
-            return input;
-        }
-    }
-
-    /*
-     * this intermediate is where a subset selection is done
-     */
-    static public class Intermed extends EvalFunc<Tuple> {
-
-        public Intermed() {}
-
-        private double p;
-        private long k = 0L;
-
-        public Intermed(String pi){
-            if (pi.contains(",")){
+    protected static Tuple getPNK(String pi){
+        Tuple pnk = _TUPLE_FACTORY.newTuple();
+        long n, k;
+        double p;
+        String[] ss = pi.split(",");
+        if (pi.startsWith("0.") || pi.startsWith(".")){
+            try {
+                p = Double.parseDouble(ss[0].trim());
+                pnk.append(p);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("p should be a number, got NumberFormatException:"+pi);
+            }
+        } else {
+            if (ss.length == 2){
                 try {
-                    String[] ss = pi.split(",");
                     k = Long.parseLong(ss[0].trim(), 10);
-                    long ts = Long.parseLong(ss[1].trim(), 10);
-                    p = (double) k / ts;
+                    n = Long.parseLong(ss[1].trim(), 10);
+                    p = (double) k / n;
+                    pnk.append(p);
+                    pnk.append(k);
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("k and n should be numbers, got NumberFormatException:"+pi);
                 }
             } else {
-                try {
-                    p = Double.parseDouble(pi);
-                } catch (NumberFormatException e) {
-                    throw new RuntimeException("p should be a number, got NumberFormatException:"+pi);
-                }
+                throw new RuntimeException("2 parameters are required k and n, got:"+pi);
             }
-            if (p > 1.0d) {
-                throw new RuntimeException("p should not exceed 1");
-            }
+        } 
+        return pnk;
+    }
 
+    /**
+     * 1st mapped data processing step, can't be skipped 
+     *
+     */
+    static public class Initial extends EvalFunc<Tuple> {
+
+        public Initial() {}
+
+        private Tuple pnk; 
+ 
+        public Initial(String pi){
+            pnk = getPNK(pi);
         }
 
     	private static RandomDataImpl _RNG = new RandomDataImpl();
-    	private static int nextInt(int n) {
+    	synchronized private static int nextInt(int n) {
             return _RNG.nextInt(0, n);
     	}
 
@@ -170,25 +161,22 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
             DataBag items = (DataBag) input.get(0);
 
             DataBag selected = _BAG_FACTORY.newDefaultBag();
+            Tuple extra = _TUPLE_FACTORY.newTuple();
             Tuple tu;
             Tuple output = _TUPLE_FACTORY.newTuple();
+            Double p = (Double) pnk.get(0);
 
-            if (items.size() == 0 || p == 0) {
+            if (items.size() == 0 || p == 0d) {
                 return _TUPLE_FACTORY.newTuple();
             } else if (items.size() == 1) {
                 tu = items.iterator().next();
-                selected.add(tu);
+                extra = tu;
                 output.append(1);
                 output.append(selected);
+                output.append(extra);
 
                 return output;
-            } else if ( p == 1.0d){
-                selected.addAll(items);
-                output.append(items.size());
-                output.append(selected);
-
-                return output;
-    	    }
+            } 
 
             // the set should not exceed int, if initial set is bigger than max_int,
             // split into sub-sets
@@ -197,13 +185,32 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
             }
             int numItems = (int) items.size();
 
-            int k_local = (int) Math.ceil(p * numItems);
-            if (k_local == 0) return _TUPLE_FACTORY.newTuple();
+            int k_down = (int) Math.floor(p * numItems);
+            int k_up = (int) Math.ceil(p * numItems);
+            if (k_up == 0) return _TUPLE_FACTORY.newTuple();
 
             int x;
-            SortedSet<Integer> nums = new TreeSet<Integer>();
             numItems--;
-            while (nums.size() < k_local){
+            SortedSet<Integer> nums = new TreeSet<Integer>();
+            int kk = k_up;
+
+            // if we need to return more than a half of input elements
+            // insteaed of addition it make sense to make exclusion
+            // I mean 
+            // p <= 0.5
+            // add selected randomly elements to output set
+            // p > 0.5
+            // add all elements except randomly selected
+            // for exclusion if we need an extra element
+            // take the 1st, since at the end eventually no 
+            // elements to take from have left   
+
+            if (p <= 0.5){
+                k_down = numItems - k_down + 1;
+                k_up = numItems - k_up + 1;
+                kk = k_down;
+            }
+            while (nums.size() < kk){
     	        x = nextInt(numItems);
     	        nums.add(x);
     	    }
@@ -214,33 +221,131 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
             Iterator<Tuple> it2 = items.iterator();
             tu = it2.next();
             int ii = it.next();
-    	    while (it.hasNext()){
-    	        for ( j=i; j<ii; j++) {
-    		    tu = it2.next();
-    	        }
-    	        selected.add(tu);
-    	        i=j+1;
-                ii = it.next();
-    		tu = it2.next();
-    	    }
-            for ( j=i; j<ii; j++) {
-                    tu = it2.next();
-            }
-            selected.add(tu);
 
+            if (p > 0.5){
+                while(i == ii){
+                    i++;
+                    ii = it.next();
+    	            tu = it2.next();
+                }
+                // add the 1st valid element
+                if (k_down == k_up){
+                    selected.add(tu);
+                } else {
+                    extra=tu;
+                }
+                tu = it2.next();
+                i++;
+            }
+
+    	    while (it.hasNext()){
+                if (p <= 0.5){
+    	            for ( j=i; j<ii; j++) {
+    		        tu = it2.next();
+    	            }
+    	            selected.add(tu);
+                } else {
+    	            for ( j=i; j<ii; j++) {
+       	                selected.add(tu);
+    		        tu = it2.next();
+    	            }
+                }
+                i=j+1;
+                ii = it.next();
+    	        tu = it2.next();
+    	    }
+            if (p <= 0.5){
+                for ( j=i; j<ii; j++) {
+                    tu = it2.next();
+                }
+                if (k_down == k_up){
+                    selected.add(tu);
+                } else {
+                    extra=tu;
+                }
+            } else {
+                for ( j=i; j<ii; j++) {
+                    selected.add(tu);
+                    tu = it2.next();
+                }
+                if (it2.hasNext()){
+                    tu = it2.next();
+                }
+                while (it2.hasNext()) {
+                    selected.add(tu);
+                    tu = it2.next();
+                }
+            }
             /*
              * The output tuple contains the following fields:
-             * <number of items requested to be in the sample (int),>
              * number of processed items in this tuple (int),
-             * a bag of selected items (bag).
+             * a bag of selected items (bag),
+             * an extra tuple from the original set for cases 
+             * when the exact number/fraction can't be obtained 
+             * (tuple).
              */
 
             output.append(numItems+1);
             output.append(selected);
+            output.append(extra);
 
             return output;
       }
     }
+
+    /**
+     * this intermediate is where a subset selection is done
+     */
+    static public class Intermed extends EvalFunc<Tuple> {
+
+        public Intermed(){}
+
+        private Tuple pnk; 
+
+        public Intermed(String pi){
+            pnk = getPNK(pi); 
+        }
+
+    	@Override
+        public Tuple exec(Tuple input) throws IOException {
+            DataBag bag = (DataBag) input.get(0);    
+            DataBag selected = _BAG_FACTORY.newDefaultBag();
+            DataBag extra = _BAG_FACTORY.newDefaultBag();
+            long numItems = 0L;
+            long gotItems = 0L;
+            long required;
+
+            for (Tuple tuple : bag){
+                numItems += ((Number) tuple.get(0)).longValue();
+                gotItems += ((Number)((DataBag) tuple.get(1)).size()).longValue();
+                selected.addAll((DataBag) tuple.get(1));
+                extra.add((Tuple) tuple.get(2));
+            }
+
+            Double p = (Double) pnk.get(0);
+            long required_up = (long) Math.ceil(p * numItems);
+           
+            if (extra.size() > 0) {
+                Iterator<Tuple> it = extra.iterator();
+                Tuple tu = it.next();
+                if (extra.size() == 1 && gotItems < required_up) {
+                    selected.add(tu);
+                } else {
+                    while (gotItems < required_up && it.hasNext()){
+                        selected.add(tu);
+                        gotItems++;
+                        tu = it.next();
+                    }
+                }
+            }
+
+            Tuple output = _TUPLE_FACTORY.newTuple();
+            output.append(numItems);
+            output.append(selected);
+            return output;
+        }
+    }
+
 
     // this final should be executed as reducer
     // merges all selected bags into the output
@@ -250,30 +355,10 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
 
         public Final(){}
 
-        private double p;
-        private long k = 0L;
+        private Tuple pnk; 
 
         public Final(String pi){
-
-            if (pi.contains(",")){
-                try {
-                    String[] ss = pi.split(",");
-                    k = Long.parseLong(ss[0].trim(), 10);
-                    long ts = Long.parseLong(ss[1].trim(), 10);
-                    p = (double) k / ts;
-                } catch (NumberFormatException e) {
-                    throw new RuntimeException("k and n should be numbers, got NumberFormatException:"+pi);
-                }
-            } else {
-                try {
-                    p = Double.parseDouble(pi);
-                } catch (NumberFormatException e) {
-                    throw new RuntimeException("p should be a number, got NumberFormatException:"+pi);
-                }
-            }
-            if (p > 1.0d) {
-                throw new RuntimeException("p should not exceed 1");
-            }
+            pnk = getPNK(pi); 
         }
 
     	@Override
@@ -297,10 +382,11 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
             DataBag lastBag = (DataBag) tuple.get(1);
 
             long s; // final requested sample size
-            if (k == 0){
-                s = (long) Math.ceil(p * n_total);
+            if (pnk.size() > 1){
+                s = ((Number) pnk.get(1)).longValue();
             } else {
-                s = k;
+                Double p = (Double) pnk.get(0);
+                s = (long) Math.ceil(p * n_total);
             }
 
             it = lastBag.iterator();
