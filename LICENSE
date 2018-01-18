@@ -210,6 +210,15 @@ subcomponents is subject to the terms and conditions of the following
 licenses.
 
 -----------------------------------------------------------------------
+ The Apache License, Version 2.0
+-----------------------------------------------------------------------
+
+The Apache DataFu project bundles the following files under the Apache License, Version 2.0:
+
+- Bootstrap v3.0.3 (http://getbootstrap.com) - Copyright 2013 Twitter, Inc.
+- Glyphicons fonts v3.1.1 (http://glyphicons.com/) - Copyright (c) 2010-2014 Jan Kovařík
+
+-----------------------------------------------------------------------
  The MIT License
 -----------------------------------------------------------------------
 
@@ -217,7 +226,6 @@ The Apache DataFu project bundles the following files under the MIT License:
 
 - normalize.css v2.0.1 (http://git.io/normalize) - Copyright (c) Nicolas Gallagher and Jonathan Neal
 - jquery-2.0.3.min.js v2.0.3 (http://jquery.com/) - Copyright (c) 2005, 2013 jQuery Foundation, Inc.
-- Glyphicons fonts v3.1.1 (http://glyphicons.com/) - Copyright (c) 2010-2014 Jan Kovařík
 
 All rights reserved.
 
