@@ -1,20 +1,20 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2018 IICOLL
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 package datafu.pig.sampling;
@@ -133,20 +133,20 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
             } else {
                 throw new RuntimeException("2 parameters are required k and n, got:"+pi);
             }
-        } 
+        }
         return pnk;
     }
 
     /**
-     * 1st mapped data processing step, can't be skipped 
+     * 1st mapped data processing step, can't be skipped
      *
      */
     static public class Initial extends EvalFunc<Tuple> {
 
         public Initial() {}
 
-        private Tuple pnk; 
- 
+        private Tuple pnk;
+
         public Initial(String pi){
             pnk = getPNK(pi);
         }
@@ -176,7 +176,7 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
                 output.append(extra);
 
                 return output;
-            } 
+            }
 
             // the set should not exceed int, if initial set is bigger than max_int,
             // split into sub-sets
@@ -196,14 +196,14 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
 
             // if we need to return more than a half of input elements
             // insteaed of addition it make sense to make exclusion
-            // I mean 
+            // I mean
             // p <= 0.5
             // add selected randomly elements to output set
             // p > 0.5
             // add all elements except randomly selected
             // for exclusion if we need an extra element
-            // take the 1st, since at the end eventually no 
-            // elements to take from have left   
+            // take the 1st, since at the end eventually no
+            // elements to take from have left
 
             if (p <= 0.5){
                 k_down = numItems - k_down + 1;
@@ -280,8 +280,8 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
              * The output tuple contains the following fields:
              * number of processed items in this tuple (int),
              * a bag of selected items (bag),
-             * an extra tuple from the original set for cases 
-             * when the exact number/fraction can't be obtained 
+             * an extra tuple from the original set for cases
+             * when the exact number/fraction can't be obtained
              * (tuple).
              */
 
@@ -294,23 +294,24 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
     }
 
     /**
-     * this intermediate is where a subset selection is done
+     * this intermediate is for initial selection join into bigger chunks
      */
     static public class Intermed extends EvalFunc<Tuple> {
 
         public Intermed(){}
 
-        private Tuple pnk; 
+        private Tuple pnk;
 
         public Intermed(String pi){
-            pnk = getPNK(pi); 
+            pnk = getPNK(pi);
         }
 
     	@Override
         public Tuple exec(Tuple input) throws IOException {
-            DataBag bag = (DataBag) input.get(0);    
+            DataBag bag = (DataBag) input.get(0);
             DataBag selected = _BAG_FACTORY.newDefaultBag();
-            DataBag extra = _BAG_FACTORY.newDefaultBag();
+            DataBag in_extra = _BAG_FACTORY.newDefaultBag();
+            Tuple out_extra = _TUPLE_FACTORY.newTuple();
             long numItems = 0L;
             long gotItems = 0L;
             long required;
@@ -319,46 +320,50 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
                 numItems += ((Number) tuple.get(0)).longValue();
                 gotItems += ((Number)((DataBag) tuple.get(1)).size()).longValue();
                 selected.addAll((DataBag) tuple.get(1));
-                extra.add((Tuple) tuple.get(2));
+                in_extra.add((Tuple) tuple.get(2));
             }
 
             Double p = (Double) pnk.get(0);
             long required_up = (long) Math.ceil(p * numItems);
-           
-            if (extra.size() > 0) {
-                Iterator<Tuple> it = extra.iterator();
+            long required_down = (long) Math.floor(p * numItems);
+
+            if (in_extra.size() > 0) {
+                Iterator<Tuple> it = in_extra.iterator();
                 Tuple tu = it.next();
-                if (extra.size() == 1 && gotItems < required_up) {
+                if (in_extra.size() == 1 && gotItems < required_down) {
                     selected.add(tu);
                 } else {
-                    while (gotItems < required_up && it.hasNext()){
+                    while (gotItems < required_down && it.hasNext()){
                         selected.add(tu);
                         gotItems++;
                         tu = it.next();
                     }
+                    if (tu != null && required_down < required_up) { out_extra = tu; }
                 }
             }
 
             Tuple output = _TUPLE_FACTORY.newTuple();
             output.append(numItems);
             output.append(selected);
+            output.append(out_extra);
             return output;
         }
     }
 
 
-    // this final should be executed as reducer
-    // merges all selected bags into the output
-    // remove excess in case more than requested items
-    // were selected
+    /**
+     * this final should be executed as reducer
+     * merges all selected bags into the output
+     * adding extra in case more elements needed
+     */
     static public class Final extends EvalFunc<DataBag> {
 
         public Final(){}
 
-        private Tuple pnk; 
+        private Tuple pnk;
 
         public Final(String pi){
-            pnk = getPNK(pi); 
+            pnk = getPNK(pi);
         }
 
     	@Override
@@ -370,16 +375,19 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
             long n_total = 0L;
 
             DataBag selected = _BAG_FACTORY.newDefaultBag();
+            DataBag extra = _BAG_FACTORY.newDefaultBag();
 
             Iterator<Tuple> it = bag.iterator();
             Tuple tuple = it.next();
             while(it.hasNext()) {
                 n_total += ((Number) tuple.get(0)).longValue();
                 selected.addAll((DataBag) tuple.get(1));
+                extra.add((Tuple) tuple.get(2));
                 tuple = it.next();
             }
             n_total += ((Number) tuple.get(0)).longValue();
-            DataBag lastBag = (DataBag) tuple.get(1);
+            selected.addAll((DataBag) tuple.get(1));
+            extra.add((Tuple) tuple.get(2));
 
             long s; // final requested sample size
             if (pnk.size() > 1){
@@ -389,7 +397,7 @@ public class UniformRandomSample extends AlgebraicEvalFunc<DataBag> {
                 s = (long) Math.ceil(p * n_total);
             }
 
-            it = lastBag.iterator();
+            it = extra.iterator();
             while(it.hasNext() && selected.size() < s ) {
     	        selected.add(it.next());
             }
