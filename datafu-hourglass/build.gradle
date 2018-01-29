@@ -102,7 +102,7 @@ task copyDemoDependencies(type: Copy, dependsOn: replace_demo_dependencies_dir) 
 dependencies {
   // core dependencies, listed as dependencies in pom
   core "log4j:log4j:$log4jVersion"
-  core "org.json:json:$jsonVersion"
+  core "com.googlecode.json-simple:json-simple:$jsonVersion"
   core "org.apache.avro:avro:$avroVersion"
   core "org.apache.avro:avro-compiler:$avroVersion"
   core "org.apache.commons:commons-math:$commonsMathVersion"
@@ -159,8 +159,8 @@ modifyPom {
         version "$log4jVersion"
       }
       dependency {
-        groupId 'org.json'
-        artifactId 'json'
+        groupId 'com.googlecode.json-simple'
+        artifactId 'json-simple'
         version "$jsonVersion"
       }
       dependency {

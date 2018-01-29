@@ -1,3 +1,21 @@
+# 1.3.3
+
+Additions:
+
+* UDF for hash functions such as murmur3 and others. (DATAFU-47)
+* UDF for diffing tuples. (DATAFU-119)
+* Support for macros in DataFu.  Macros count_all_non_distinct and count_distinct_keys were added. (DATAFU-123)
+* Macro for TFIDF. (DATAFU-61)
+
+Improvements:
+
+* Added lifecylce hooks to ContextualEvalFunc. (DATAFU-50)
+* SessionCount and Sessionize now support millisecond precision. (DATAFU-124)
+* Upgraded to Guava 20.0. (DATAFU-48)
+* Updated Gradle to 3.5.1. (DATAFU-125)
+* Rat tasks automatically run during assemble. (DATAFU-118)
+* Building now works on Windows. (DATAFU-99)
+
 # 1.3.2
 
 Improvements:

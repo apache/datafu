@@ -36,7 +36,7 @@ ext {
   wagonHttpVersion="1.0-beta-2"
   openNlpVersion="1.5.3"
   openNlpMaxEntVersion="3.0.3"
-  jsonVersion="20090211"
+  jsonVersion="1.1.1"
   jsr311Version="1.1.1"
   slf4jVersion="1.6.4"
 }
