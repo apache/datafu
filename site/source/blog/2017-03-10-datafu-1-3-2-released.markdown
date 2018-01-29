@@ -1,7 +1,6 @@
 ---
-title: Javadoc - Apache DataFu Hourglass
-section_name: Apache DataFu Hourglass
-latest: 1.3.1
+title: Apache DataFu (incubating) 1.3.2 Released
+author: Matthew Hayes
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -19,10 +18,20 @@ license: >
    limitations under the License.
 ---
 
-# Javadoc
+I'd like to announce the release of Apache DataFu (incubating) 1.3.2.
 
-The latest Javadocs available are for release [<%= current_page.data.latest %>](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.latest %>/).
+Improvements:
 
-Previous versions:
+* LICENSE, NOTICE, and DISCLAIMER now included in META-INF of JARs.
+* Test files now generated to build/test-files within projects.
+* AliasableEvalFunc now uses getInputSchema.
 
-* [1.3.0](http://datafu.incubator.apache.org/docs/datafu/1.3.0/)
+The source release can be obtained from:
+
+https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.2/
+
+Artifacts for DataFu are published in Apache's Maven Repository:
+
+https://repository.apache.org/content/groups/public/org/apache/datafu/
+
+Please visit the [Download](/docs/download.html) page for instructions on building from source or retrieving the artifacts in your build system.

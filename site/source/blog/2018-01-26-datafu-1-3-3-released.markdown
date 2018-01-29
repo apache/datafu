@@ -1,5 +1,5 @@
 ---
-title: Apache DataFu (incubating) 1.3.1 Released
+title: Apache DataFu (incubating) 1.3.3 Released
 author: Matthew Hayes
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -18,24 +18,27 @@ license: >
    limitations under the License.
 ---
 
-I'd like to announce the release of Apache DataFu (incubating) 1.3.1.
+I'd like to announce the release of Apache DataFu (incubating) 1.3.3.
 
 Additions:
 
-* New UDF CountDistinctUpTo that counts tuples within a bag to a preset limit (DATAFU-117)
+* UDF for hash functions such as murmur3 and others. (DATAFU-47)
+* UDF for diffing tuples. (DATAFU-119)
+* Support for macros in DataFu.  Macros count_all_non_distinct and count_distinct_keys were added. (DATAFU-123)
+* Macro for TFIDF. (DATAFU-61)
 
 Improvements:
 
-* TupleFromBag and FirstTupleFromBag now implement Accumulator interface as well (DATAFU-114, DATAFU-115)
-
-Build System:
-
-* IntelliJ Idea support added to build file (DATAFU-103)
-* JDK version now validated when building (DATAFU-95)
+* Added lifecylce hooks to ContextualEvalFunc. (DATAFU-50)
+* SessionCount and Sessionize now support millisecond precision. (DATAFU-124)
+* Upgraded to Guava 20.0. (DATAFU-48)
+* Updated Gradle to 3.5.1. (DATAFU-125)
+* Rat tasks automatically run during assemble. (DATAFU-118)
+* Building now works on Windows. (DATAFU-99)
 
 The source release can be obtained from:
 
-https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.1/
+http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.3/
 
 Artifacts for DataFu are published in Apache's Maven Repository:
 

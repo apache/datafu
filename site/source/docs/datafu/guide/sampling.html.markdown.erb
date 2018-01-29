@@ -1,6 +1,6 @@
 ---
 title: Sampling - Guide - Apache DataFu Pig
-version: 1.3.1
+version: 1.3.3
 section_name: Apache DataFu Pig - Guide
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -35,7 +35,7 @@ generated sample.
 
 #### Simple Random Sample Without Replacement
 
-[SimpleRandomSample](/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SimpleRandomSample.html)
+[SimpleRandomSample](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SimpleRandomSample.html)
 implements scalable simple random sampling.
 It can be used to generate a sample of size of exactly `ceil(p*n)` without replacement from a population of size `n`,
 where `p` is the sampling
@@ -64,8 +64,8 @@ For example, the following takes a 1% stratified sample using a label and a prop
 
 #### Simple Random Sample With Replacement
 
-[SimpleRandomSampleWithReplacementVote](/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SimpleRandomSampleWithReplacementVote.html) and
-[SimpleRandomSampleWithReplacementElect](/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SimpleRandomSampleWithReplacementElect.html)
+[SimpleRandomSampleWithReplacementVote](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SimpleRandomSampleWithReplacementVote.html) and
+[SimpleRandomSampleWithReplacementElect](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SimpleRandomSampleWithReplacementElect.html)
 together implements a scalable algorithm for simple random sampling with replacement.
 These can be used to generate a sample of a specific size, with probability at least 99.99%.
 
@@ -110,7 +110,7 @@ bootstrap  = FOREACH (GROUP sampled ALL) GENERATE
 
 A weighted sample is similar to a simple random sample without replacement in that it generates a sample
 with a specific size.  The difference is that the probability of selecting each item can be different.
-[WeightedSample](/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/WeightedSample.html)
+[WeightedSample](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/WeightedSample.html)
 provides an implementation of this.
 
 `WeightedSample` operates on a bag of items, where each item has a weight attached to it.  It iteratively selects tems from the
@@ -161,7 +161,7 @@ DUMP result;
 ```
 
 One simple technique for generating weights that can be used with `WeightedSample` is to use DataFu's
-[Enumerate](/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/Enumerate.html) UDF, which can be used
+[Enumerate](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/Enumerate.html) UDF, which can be used
 to append each item's tuple with its index within the bag.
 
 Again, suppose we have a bag with values `a`, `b`, `c`, `d`, but this time without weights.
@@ -218,7 +218,7 @@ The problem with this approach though is that the join can be very expensive if 
 Sampling reduces the data size, but it has to be applied after the join because the same `(user_id,item_id)`
 pairs won't be selected from `impressions` and `clicks`.
 
-[SampleByKey](/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SampleByKey.html)
+[SampleByKey](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sampling/SampleByKey.html)
 solves this problem by allowing us to sample consistently across multiple relations.  By this we mean
 that if a "key" appears in the sample output for one relation, then the same key will appear in every
 other relation as well.  This guarantees that we can apply the join after sampling.

@@ -24,9 +24,9 @@ I'd like to announce the release of Apache DataFu (incubating) 1.3.0.  This is t
 
 You can obtain the source release from:
 
-http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-1.3.0/
+https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.0/
 
-Please follow the [Quick Start](/docs/quick-start.html) for instructions on building.  A summary of [changes](https://github.com/apache/incubator-datafu/blob/1.3.0/changes.md) for 1.3.0 appears below.
+Please follow the [Download](/docs/download.html) page for instructions on building.  A summary of [changes](https://github.com/apache/incubator-datafu/blob/1.3.0/changes.md) for 1.3.0 appears below.
 
 Additions:
 
