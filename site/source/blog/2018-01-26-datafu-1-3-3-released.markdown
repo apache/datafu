@@ -24,7 +24,7 @@ Additions:
 
 * UDF for hash functions such as murmur3 and others. (DATAFU-47)
 * UDF for diffing tuples. (DATAFU-119)
-* Support for macros in DataFu.  Macros count_all_non_distinct and count_distinct_keys were added. (DATAFU-123)
+* Support for macros in DataFu.  Macros `count_all_non_distinct` and `count_distinct_keys` were added. (DATAFU-123)
 * Macro for TFIDF. (DATAFU-61)
 
 Improvements:
