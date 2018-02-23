@@ -59,6 +59,30 @@ Dir['./lib/*'].each { |f| require f }
 
 # Methods defined in the helpers block are available in templates
 helpers do
+  # Use this for the current release.
+  def current_source_release_link(version)
+    "<a href=\"http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-#{version}/\">
+     apache-datafu-incubating-#{version}</a>
+     [ <a href=\"https://www.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.asc\">
+     PGP</a> ]
+     [ <a href=\"https://www.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.md5\">
+     MD5</a> ]
+     [ <a href=\"https://www.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.sha512\">
+     SHA512</a> ]"
+  end
+
+  # Use this for releases > 1.3.2 and < the current release
+  def archived_source_release_link(version)
+    "<a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz\">
+     apache-datafu-incubating-#{version}</a>
+     [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.asc\">
+     PGP</a> ]
+     [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.md5\">
+     MD5</a> ]
+     [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.sha512\">
+     SHA512</a> ]"
+  end
+
   def inner_text(html)
     Nokogiri.HTML(html).text.gsub(/\s+/, " ")
   end
