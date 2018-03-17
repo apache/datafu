@@ -33,8 +33,8 @@ follow the wiki link above.
 
 If you haven't done so already:
 
-    git clone https://git-wip-us.apache.org/repos/asf/incubator-datafu.git
-    cd incubator-datafu
+    git clone https://git-wip-us.apache.org/repos/asf/datafu.git
+    cd datafu
 
 ### Generate Eclipse Files
 

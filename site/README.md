@@ -34,7 +34,7 @@ This will produces the content in the `/build` directory.
 
 The static website content is located in another repo:
 
-    svn co https://svn.apache.org/repos/asf/incubator/datafu apache-datafu-website
+    svn co https://svn.apache.org/repos/asf/datafu apache-datafu-website
 
 ## Commit the changes
 
@@ -46,7 +46,7 @@ with new content:
 
 Now copy the built content to the `apache-datafu-website` folder, replacing the old `site` folder:
 
-    cp -r ~/Projects/incubator-datafu/site/build site
+    cp -r ~/Projects/datafu/site/build site
 
 This procedure unfortunately removes the javadocs too, which we want to keep and are not stored in the git repo.  We should add a script to make this easier.  In the meantime you can revert the deleted javadoc files with something resembling the commands below.  Check the `revert_list.txt` file before proceeding.
 
@@ -55,8 +55,8 @@ This procedure unfortunately removes the javadocs too, which we want to keep and
 
 If this is a new release, make sure you have built the javadocs first.  If you are in the release branch for the repo, you can run `gradle assemble -Prelease=true` to generate the javadocs.  The `release=true` flag ensure SNAPSHOT does not appear in the name.  If you are building from the source release this isn't necessary and `gradle assemble` is fine.  Copy the new javadocs from the release into the site.
 
-    cp -r ~/Projects/incubator-datafu/datafu-pig/build/docs/javadoc site/docs/datafu/x.y.z
-    cp -r ~/Projects/incubator-datafu/datafu-hourglass/build/docs/javadoc site/docs/hourglass/x.y.z
+    cp -r ~/Projects/datafu/datafu-pig/build/docs/javadoc site/docs/datafu/x.y.z
+    cp -r ~/Projects/datafu/datafu-hourglass/build/docs/javadoc site/docs/hourglass/x.y.z
     svn add site/docs/datafu/x.y.z
     svn add site/docs/hourglass/x.y.z
 

@@ -24,8 +24,8 @@ license: >
 ### Median
 
 Apache DataFu has two UDFs that can be used to compute the [median](http://en.wikipedia.org/wiki/Median) of a bag.
-[Median](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/Median.html) computes the median exactly, but
-requires that the input bag be sorted.  [StreamingMedian](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingMedian.html),
+[Median](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/Median.html) computes the median exactly, but
+requires that the input bag be sorted.  [StreamingMedian](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingMedian.html),
 on the other hand, does not require that the bag be sorted, however it computes only an estimate of the median.  But, because it does not require
 the input bag to be sorted, it is more efficient.
 
@@ -48,8 +48,8 @@ we divide an ordered data set into segments, and the quantiles are the values be
 most familiar with are those for median and percentiles.
 
 Similar to median, DataFu has two UDFs that can compute quantiles.  The median UDFs are in fact just wrappers around the quantile UDFs.
-[Quantile](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/Quantile.html) computes the quantiles of a sorted bag exactly,
-and [StreamingQuantile](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingQuantile.html) computes an estimate of
+[Quantile](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/Quantile.html) computes the quantiles of a sorted bag exactly,
+and [StreamingQuantile](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/StreamingQuantile.html) computes an estimate of
 the quantiles of a bag that does not need to be sorted.
 
 Let's take a look at computing the median using `StreamingQuantile`:
@@ -66,7 +66,7 @@ quantiles = FOREACH (GROUP input ALL) GENERATE Quantile(input.val);
 
 ### Variance
 
-[Variance](http://en.wikipedia.org/wiki/Variance) can be computed using the [VAR](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/VAR.html)
+[Variance](http://en.wikipedia.org/wiki/Variance) can be computed using the [VAR](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/stats/VAR.html)
 UDF:
 
 ```pig

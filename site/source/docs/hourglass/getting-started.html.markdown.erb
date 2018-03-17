@@ -97,7 +97,7 @@ This will produce output looking something like this:
     {"id":6}
     {"id":44}
 
-Now run the `countbyid` command, which executes the sample [CountById](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/CountById.java) job.
+Now run the `countbyid` command, which executes the sample [CountById](https://github.com/apache/datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/CountById.java) job.
 This will count the number of events for each ID value.
 
     $HOURGLASS_CMD countbyid -libjars ${LIBJARS} /data/event /output
@@ -144,7 +144,7 @@ We can download the new output and inspect the counts:
     hadoop fs -copyToLocal /output/20130315/part-r-00000.avro temp.avro
     $TO_JSON_CMD temp.avro | head
 
-The implementation of the `CountById` job can be found [here](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/CountById.java).
+The implementation of the `CountById` job can be found [here](https://github.com/apache/datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/CountById.java).
 A more detailed explanation of how the job works and how it is implemented can be found in our
 [blog post](/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html).
 
@@ -164,7 +164,7 @@ Let's start by cleaning up the output directory:
 
 If you have been following along from the previous example, you already have fifteen days of input data available,
 so we don't need to regenerate it.  We can run the `cardinality` command to execute the two jobs.  This executes
-the sample jobs in [EstimateCardinality](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/EstimateCardinality.java).
+the sample jobs in [EstimateCardinality](https://github.com/apache/datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/EstimateCardinality.java).
 
     $HOURGLASS_CMD cardinality -libjars ${LIBJARS} /data/event /intermediate /output 15
 
@@ -194,7 +194,7 @@ We can now inspect the output again:
 
 This produces the expected result of 200.
 
-The implementation of the `EstimateCardinality` job can be found [here](https://github.com/apache/incubator-datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/EstimateCardinality.java).
+The implementation of the `EstimateCardinality` job can be found [here](https://github.com/apache/datafu/blob/master/datafu-hourglass/src/test/java/datafu/hourglass/demo/EstimateCardinality.java).
 A more detailed explanation of how the job works and how it is implemented can be found in our
 [blog post](/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html).
 

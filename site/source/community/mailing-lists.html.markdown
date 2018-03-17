@@ -22,10 +22,10 @@ license: >
 
 We have a couple public mailing lists hosted by Apache:
 
-* dev@datafu.incubator.apache.org ([subscribe](mailto:dev-subscribe@datafu.incubator.apache.org), [unsubscribe](mailto:dev-unsubscribe@datafu.incubator.apache.org), [archive](http://mail-archives.apache.org/mod_mbox/incubator-datafu-dev/))<br>
+* dev@datafu.apache.org ([subscribe](mailto:dev-subscribe@datafu.apache.org), [unsubscribe](mailto:dev-unsubscribe@datafu.apache.org), [archive](https://mail-archives.apache.org/mod_mbox/datafu-dev/))<br>
   A list for discussion on DataFu development. Email here for help.
 
-* commits@datafu.incubator.apache.org ([subscribe](mailto:commits-subscribe@datafu.incubator.apache.org), [unsubscribe](mailto:commits-unsubscribe@datafu.incubator.apache.org), [archive](http://mail-archives.apache.org/mod_mbox/incubator-datafu-commits/))<br>
+* commits@datafu.apache.org ([subscribe](mailto:commits-subscribe@datafu.apache.org), [unsubscribe](mailto:commits-unsubscribe@datafu.apache.org), [archive](https://mail-archives.apache.org/mod_mbox/datafu-commits/))<br>
   A list to track DataFu commits.
 
-For private matters, please email [private@datafu.incubator.apache.org](mailto:private@datafu.incubator.apache.org).
+For private matters, please email [private@datafu.apache.org](mailto:private@datafu.apache.org).

@@ -41,7 +41,7 @@ data = FOREACH data GENERATE (val1 IS NOT NULL ? val1 :
 
 The above code is very hard to follow, and it is very cumersome to write.  To solve this problem,
 Apache DataFu provides the useful
-[Coalesce](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/util/Coalesce.html).  This is
+[Coalesce](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/util/Coalesce.html).  This is
 very similar to the [COALESCE](http://msdn.microsoft.com/en-us/library/ms190349.aspx) available
 in some SQL implementations.  It simply takes the first non-null value from the arguments passed in.
 With `Coalesce` we can clean up the code above.
@@ -112,7 +112,7 @@ bag with a bag having just a single tuple with null values.  Using these tricks 
 simulate a left join on multiple relations.
 
 To clean up this code, DataFu provides the
-[EmptyBagToNullFields](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/EmptyBagToNullFields.html)
+[EmptyBagToNullFields](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/EmptyBagToNullFields.html)
 UDF.  This performs the same logic above and makes the code much easier to write and understand:
 
 ```pig

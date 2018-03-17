@@ -22,4 +22,4 @@ license: >
 
 Tasks, bugs, feature requests, etc. are tracked in [JIRA](https://issues.apache.org/jira/browse/DATAFU).  Please report any non-security related issues there.
 
-For security-related issues, please email the private mailing list, [private@datafu.incubator.apache.org](mailto:private@datafu.incubator.apache.org).
+For security-related issues, please email the private mailing list, [private@datafu.apache.org](mailto:private@datafu.apache.org).

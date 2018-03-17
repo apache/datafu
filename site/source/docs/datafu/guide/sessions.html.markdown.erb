@@ -39,7 +39,7 @@ typically a very brief session?  Apache DataFu provides UDFs that help in this s
 
 ### Sessionization
 
-The [Sessionize](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sessions/Sessionize.html)
+The [Sessionize](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sessions/Sessionize.html)
 UDF can be used to assign unique session IDs to events within a stream.  Events are passed to the
 UDF in time-sorted order.  If two consecutive events are separated by a sufficient amount of time, then
 they are assigned to a different session.
@@ -118,9 +118,9 @@ DUMP very_engaged_users;
 
 ### Counting Sessions
 
-[SessionCount](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sessions/SessionCount.html)
+[SessionCount](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sessions/SessionCount.html)
 can be used to count sessions.  It works very similarly to
-[Sessionize](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sessions/Sessionize.html).
+[Sessionize](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/sessions/Sessionize.html).
 
 One useful application of `SessionCount` is in counting page views.  This is a useful statistic
 to track for any website.  However, user's sometimes hit refresh.  Or they may inadvertently take

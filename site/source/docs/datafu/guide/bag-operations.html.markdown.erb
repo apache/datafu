@@ -28,7 +28,7 @@ operations on bags that come up in practice.
 
 ### Counting Items in Bags
 
-The [CountEach](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/CountEach.html) UDF
+The [CountEach](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/CountEach.html) UDF
 can be used to count the number of instances of items within a bag.  It produces a new bag of the
 distinct items with their respective counts appended.
 
@@ -62,7 +62,7 @@ items = FOREACH (GROUP items BY memberId) GENERATE
 
 ### Bag Concatenation
 
-[BagConcat](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagConcat.html) can be used
+[BagConcat](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagConcat.html) can be used
 to concatenate the tuples from two or more bags into a single bag:
 
 ```pig
@@ -74,7 +74,7 @@ input = LOAD 'input' AS (B1: bag{T: tuple(v:INT)}, B2: bag{T: tuple(v:INT)}, B3:
 -- ({(1),(2),(3),(4),(5),(6),(7)})
 output = FOREACH input GENERATE BagConcat(B1,B2,B3);
 ```
-[BagConcat](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagConcat.html) can also be
+[BagConcat](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagConcat.html) can also be
 used to concatenate all tuples present in a bag of bags.
 
 ```pig
@@ -92,7 +92,7 @@ Pig has a `GROUP` operation that can be applied to a relation.  It produces a ne
 tuples are grouped by a particular key.  A bag in the relation contains the grouped tuples for that key.  The key
 is represented by a `group` parameter.
 
-[BagGroup](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagGroup.html) mimics the `GROUP`
+[BagGroup](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagGroup.html) mimics the `GROUP`
 operation from Pig.  The difference between them is that `BagGroup` operates within a bag, rather than on a relation.
 This can be useful when operating on bags that are not very large in size.  We can operate on the tuples within
 this bag without involving `GROUP`, which would result in another MapReduce job.  With `BagGroup` we can avoid this.
@@ -129,7 +129,7 @@ data3 = FOREACH data2 {
 
 ### Append to Bag
 
-[AppendToBag](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/AppendToBag.html) can be
+[AppendToBag](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/AppendToBag.html) can be
 used to append a tuple to a bag:
 
 ```pig
@@ -144,7 +144,7 @@ output = FOREACH input GENERATE AppendToBag(B,T);
 
 ### Prepend to Bag
 
-[PrependToBag](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/PrependToBag.html) can be
+[PrependToBag](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/PrependToBag.html) can be
 used to prepend a tuple to a bag:
 
 ```pig
@@ -161,7 +161,7 @@ output = FOREACH input GENERATE PrependToBag(B,T);
 
 Pig has a `JOIN` operator, but unfortunately it only operates on relations.  Thus, if you wish to join
 tuples from two bags, you must first flatten, then join, then re-group.  To make this process simpler DataFu
-provides a [BagLeftOuterJoin](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagLeftOuterJoin.html)
+provides a [BagLeftOuterJoin](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/BagLeftOuterJoin.html)
 UDF.
 
 Let's walk through an example where this is useful.  Suppose that we are building a recommendation system.
@@ -181,7 +181,7 @@ features: {user_id:int, items:{(item_id:int, impression_count:int, accept_count:
 ```
 
 Using DataFu's
-[CountEach](http://datafu.incubator.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/CountEach.html)
+[CountEach](https://datafu.apache.org/docs/datafu/<%= current_page.data.version %>/datafu/pig/bags/CountEach.html)
 we can efficiently produce the counts per item for impressions, accepts, and rejects as separate
 bags per member using a single MapReduce job:
 
