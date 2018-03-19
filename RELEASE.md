@@ -1,8 +1,6 @@
 # Apache DataFu Release Guide
 
-This will guide you through the source release process for Apache DataFu.
-
-For general information on the Apache Incubator release process, see the [Release Management](http://incubator.apache.org/guides/releasemanagement.html) page.
+This will guide you through the source release process for Apache DataFu.  See [Software Product Releases](http://www.apache.org/dev/#releases) for general information on the Apache release process.
 
 ## Prerequisites
 
@@ -52,8 +50,8 @@ First, clean any files unknown to git (WARNING: this removes all untracked files
 
 Alternatively, you can make a fresh clone of the repository to a separate directory:
 
-    git clone https://git-wip-us.apache.org/repos/asf/incubator-datafu.git incubator-datafu-release
-    cd incubator-datafu-release
+    git clone https://git-wip-us.apache.org/repos/asf/datafu.git datafu-release
+    cd datafu-release
 
 The source tarball needs to be signed.  You can do this either manually or automatically.  To have it signed automatically you'll need to perform a one-time configuration step.  Edit `$HOME/.gradle/gradle.properties` and add your GPG key information:
 
@@ -78,15 +76,15 @@ If you have GPG v2 installed then you'll need to use `gpg2` instead.
 
 ## Upload the Source Release
 
-You should make the release candidate available in [https://dist.apache.org/repos/dist/dev/incubator/datafu](https://dist.apache.org/repos/dist/dev/incubator/datafu).  For example, if you are releasing release candidate RC0 for version `x.y.z` then you should upload the source distribution files to:
+You should make the release candidate available in [https://dist.apache.org/repos/dist/dev/datafu](https://dist.apache.org/repos/dist/dev/datafu).  For example, if you are releasing release candidate RC0 for version `x.y.z` then you should upload the source distribution files to:
 
-    https://dist.apache.org/repos/dist/dev/incubator/datafu/incubator-datafu-x.y.z-rc0/
+    https://dist.apache.org/repos/dist/dev/datafu/datafu-x.y.z-rc0/
 
 To create a release folder and check it out (be sure to substitute x.y.z for the actual version):
 
-    svn mkdir https://dist.apache.org/repos/dist/dev/incubator/datafu/apache-datafu-incubating-x.y.z-rc0
-    svn co https://dist.apache.org/repos/dist/dev/incubator/datafu/apache-datafu-incubating-x.y.z-rc0 apache-datafu-incubating-x.y.z-rc0
-    cd apache-datafu-incubating-x.y.z-rc0
+    svn mkdir https://dist.apache.org/repos/dist/dev/datafu/apache-datafu-x.y.z-rc0
+    svn co https://dist.apache.org/repos/dist/dev/datafu/apache-datafu-x.y.z-rc0 apache-datafu-x.y.z-rc0
+    cd apache-datafu-x.y.z-rc0
 
 You could then add the source release as described above and commit.
 
@@ -94,7 +92,7 @@ You could then add the source release as described above and commit.
 
 You should tag the release candidate in git.  Assuming you are releasing release candidate RC0 for version `x.y.z` then you can attach a tag to the current commit with:
 
-    git tag -s release-x.y.z-rc0 -m 'Apache DataFu (incubating) x.y.z RC0'
+    git tag -s release-x.y.z-rc0 -m 'Apache DataFu x.y.z RC0'
 
 Then push the tag:
 
@@ -122,8 +120,8 @@ Let's suppose you have a Gradle project you'd like to use to test DataFu.  You c
 You can now depend on the versions of the archives in this Staging Repository in your `build.gradle`:
 
     dependencies {
-      compile "org.apache.datafu:datafu-pig-incubating:x.y.z"
-      compile "org.apache.datafu:datafu-hourglass-incubating:x.y.z"
+      compile "org.apache.datafu:datafu-pig:x.y.z"
+      compile "org.apache.datafu:datafu-hourglass:x.y.z"
     }
 
 You could also visit the Staging Repository URL in your browser and download the files for testing.
@@ -135,7 +133,7 @@ At this point you should have:
 1. Published a source release for testing
 2. Staged artifacts in Nexus built from that source archive for testing
 
-Now you can call a vote in the DataFu dev mailing list for release.   Look in the archives at previous votes for an example.  If the vote passes then you may call a vote in the Incubator general mailing list (this is necessary because DataFu is still incubating).
+Now you can call a vote in the DataFu dev mailing list for release.   Look in the archives at previous votes for an example.
 
 ## Testing the source release
 
@@ -155,24 +153,29 @@ Again, setting `release=true` prevents `-SNAPSHOT` from being appended to the ve
 
 ## Publishing the release
 
-Once the Incubator general vote has passed, you can publish the source release and artifacts.
+Once the vote has passed, you can publish the source release and artifacts.
 
 ### Source release
 
-The DataFu source release are checked into SVN under [https://dist.apache.org/repos/dist/release/incubator/datafu](https://dist.apache.org/repos/dist/release/incubator/datafu).
+The DataFu source release are checked into SVN under [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu).
 
 To see all the previous releases:
 
-    svn list https://dist.apache.org/repos/dist/release/incubator/datafu
+    svn list https://dist.apache.org/repos/dist/release/datafu
 
 Create a directory for the release (replace `x.y.z` with the release number):
 
-    svn mkdir https://dist.apache.org/repos/dist/release/incubator/datafu/apache-datafu-incubating-x.y.z
-    svn co https://dist.apache.org/repos/dist/release/incubator/datafu/apache-datafu-incubating-x.y.z apache-datafu-incubating-x.y.z-release
-    cd apache-datafu-incubating-x.y.z-release
+    svn mkdir https://dist.apache.org/repos/dist/release/datafu/apache-datafu-x.y.z
+    svn co https://dist.apache.org/repos/dist/release/datafu/apache-datafu-x.y.z apache-datafu-x.y.z-release
+    cd apache-datafu-x.y.z-release
 
-Now copy the source release files into this directory and commit them.  Within 24 hours they will be distributed to the mirrors.  Then it should be available for download at `http://www.apache.org/dyn/closer.cgi/incubator/datafu/apache-datafu-incubating-x.y.z/`.
+Now copy the source release files into this directory and commit them.  Within 24 hours they will be distributed to the mirrors.  Then it should be available for download at `http://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-x.y.z/`.
 
 ### Artifacts
 
 To distribute the artifacts, simple select the staged repository for DataFu that you prepared in Nexus and chooose Release.  They should then be available within the next day or so in the [central repository](http://search.maven.org/).
+
+### Clean up old releases
+
+Once a source release has been committed to the release path [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu), the source releases under [https://dist.apache.org/repos/dist/dev/datafu](https://dist.apache.org/repos/dist/dev/datafu) can be removed.  Also the older releases under [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu) can be removed, as old releases are archived automatically through a
+separate process.
