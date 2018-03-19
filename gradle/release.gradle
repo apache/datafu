@@ -63,7 +63,7 @@ task sourceRelease(type: Tar, dependsOn: prepare_release_config) {
   description = "Build a source release, specifically excluding the build directories and gradle wrapper files"
   compression = Compression.GZIP
 
-  baseName "apache-datafu-incubating-sources-${releaseVersion}"
+  baseName "apache-datafu-sources-${releaseVersion}"
 
   from(project.rootDir) {
     // don't include gradle.properties because we use a modified version
@@ -127,14 +127,14 @@ subprojects {
 
   modifyPom {
     project {
-      name 'Apache DataFu (incubating)'
+      name 'Apache DataFu'
       description 'Librares that make easier to solve data problems using Hadoop and higher level languages based on it.'
-      url 'http://datafu.incubator.apache.org/'
+      url 'https://datafu.apache.org/'
 
       scm {
-        url 'https://git-wip-us.apache.org/repos/asf?p=incubator-datafu.git;a=tree'
-        connection 'scm:http://git-wip-us.apache.org/repos/asf/incubator-datafu.git'
-        developerConnection 'scm:https://git-wip-us.apache.org/repos/asf/incubator-datafu.git'
+        url 'https://git-wip-us.apache.org/repos/asf?p=datafu.git;a=tree'
+        connection 'scm:http://git-wip-us.apache.org/repos/asf/datafu.git'
+        developerConnection 'scm:https://git-wip-us.apache.org/repos/asf/datafu.git'
       }
 
       licenses {

@@ -36,8 +36,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'gradle-autojar'
 
-// append "-incubating" while still in the incubating process
-archivesBaseName = 'datafu-pig-incubating'
+archivesBaseName = 'datafu-pig'
 
 import groovy.xml.MarkupBuilder
 
@@ -213,21 +212,23 @@ compileTestJava.doFirst {
 }
 
 // open NLP models used for testing.  these are not shipped with datafu.
-task downloadOpenNlpModels << {
-  download {
-    src 'http://opennlp.sourceforge.net/models-1.5/en-pos-maxent.bin'
-    dest file('data/en-pos-maxent.bin')
-    onlyIfNewer true
-  }
-  download {
-    src 'http://opennlp.sourceforge.net/models-1.5/en-sent.bin'
-    dest file('data/en-sent.bin')
-    onlyIfNewer true
-  }
-  download {
-    src 'http://opennlp.sourceforge.net/models-1.5/en-token.bin'
-    dest file('data/en-token.bin')
-    onlyIfNewer true
+task downloadOpenNlpModels {
+ doLast {
+    download {
+      src 'http://opennlp.sourceforge.net/models-1.5/en-pos-maxent.bin'
+      dest file('data/en-pos-maxent.bin')
+      onlyIfNewer true
+    }
+    download {
+      src 'http://opennlp.sourceforge.net/models-1.5/en-sent.bin'
+      dest file('data/en-sent.bin')
+      onlyIfNewer true
+    }
+    download {
+      src 'http://opennlp.sourceforge.net/models-1.5/en-token.bin'
+      dest file('data/en-token.bin')
+      onlyIfNewer true
+    }
   }
 }
 

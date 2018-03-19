@@ -62,6 +62,7 @@ rat {
     'gradle/wrapper/**',
     '.reviewboardrc',
     'gradlew',
+    'gradlew.bat',
     '**/changes.md',
     '**/README.md',
     '**/.ruby-version',

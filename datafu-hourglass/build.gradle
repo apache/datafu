@@ -19,8 +19,7 @@
 
 apply plugin: 'java'
 
-// append "-incubating" while still in the incubating process
-archivesBaseName = 'datafu-hourglass-incubating'
+archivesBaseName = 'datafu-hourglass'
 
 import groovy.xml.MarkupBuilder
 
@@ -75,13 +74,15 @@ task testJar(type: Jar) {
 
 def demoDependenciesDir = new File("$buildDir/demo_dependencies")
 
-task replace_demo_dependencies_dir() << {
-  println "Creating $demoDependenciesDir"
+task replace_demo_dependencies_dir() {
+  doLast {
+    println "Creating $demoDependenciesDir"
 
-  if (demoDependenciesDir.exists()) {
-    demoDependenciesDir.deleteDir()
+    if (demoDependenciesDir.exists()) {
+      demoDependenciesDir.deleteDir()
+    }
+    demoDependenciesDir.mkdirs()
   }
-  demoDependenciesDir.mkdirs()
 }
 
 task copyDemoDependencies(type: Copy, dependsOn: replace_demo_dependencies_dir) {
