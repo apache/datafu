@@ -1,3 +1,9 @@
+# 1.4.0
+
+Changes:
+
+* Removed MD5 hash for source release artifact.
+
 # 1.3.3
 
 Additions:
