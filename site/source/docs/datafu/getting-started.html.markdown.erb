@@ -1,6 +1,6 @@
 ---
 title: Apache DataFu Pig - Getting Started
-version: 1.3.3
+version: 1.4.0
 section_name: Getting Started
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -98,7 +98,7 @@ We can clearly see that the median is 2 for this data set.  First we'll start up
 then register the DataFu JAR:
 
 ```pig
-register datafu-pig-incubating-<%= current_page.data.version %>.jar
+register datafu-pig-<%= current_page.data.version %>.jar
 ```
 
 To compute the median we'll use DataFu's `StreamingMedian`, which computes an estimate of the median but has the benefit

@@ -20,7 +20,7 @@ license: >
 
 At LinkedIn, we make extensive use of [Apache Pig](http://pig.apache.org/) for performing [data analysis on Hadoop](http://engineering.linkedin.com/hadoop/user-engagement-powered-apache-pig-and-hadoop). Pig is a simple, high-level programming language that consists of just a few dozen operators and makes it easy to write MapReduce jobs. For more advanced tasks, Pig also supports [User Defined Functions](http://pig.apache.org/docs/r0.9.1/udf.html) (UDFs), which let you integrate custom code in Java, Python, and JavaScript into your Pig scripts.
 
-Over time, as we worked on data intensive products such as [People You May Know](http://www.linkedin.com/pymk-results) and [Skills](http://www.linkedin.com/skills/), we developed a large number of UDFs at LinkedIn. Today, I'm happy to announce that we have consolidated these UDFs into a single, general-purpose library called [DataFu](http://datafu.incubator.apache.org/) and we are open sourcing it under the Apache 2.0 license.
+Over time, as we worked on data intensive products such as [People You May Know](http://www.linkedin.com/pymk-results) and [Skills](http://www.linkedin.com/skills/), we developed a large number of UDFs at LinkedIn. Today, I'm happy to announce that we have consolidated these UDFs into a single, general-purpose library called [DataFu](http://datafu.apache.org/) and we are open sourcing it under the Apache 2.0 license.
 
 DataFu includes UDFs for common statistics tasks, PageRank, set operations, bag operations, and a comprehensive suite of tests. Read on to learn more.
 
@@ -49,16 +49,16 @@ Quantile UDF example script:
 
 ```pig
 define Quartile datafu.pig.stats.Quantile('0.0','0.25','0.5','0.75','1.0');
- 
+
 temperature = LOAD 'temperature.txt' AS (id:chararray, temp:double);
- 
+
 temperature = GROUP temperature BY id;
- 
+
 temperature_quartiles = FOREACH temperature {
   sorted = ORDER temperature by temp; -- must be sorted
   GENERATE group as id, Quartile(sorted.temp) as quartiles;
 }
- 
+
 DUMP temperature_quartiles
 ```
 
@@ -78,16 +78,16 @@ StreamingQuantile UDF example script:
 
 ```pig
 define Quartile datafu.pig.stats.StreamingQuantile('0.0','0.25','0.5','0.75','1.0');
- 
+
 temperature = LOAD 'temperature.txt' AS (id:chararray, temp:double);
- 
+
 temperature = GROUP temperature BY id;
- 
+
 temperature_quartiles = FOREACH temperature {
   -- sort not necessary
   GENERATE group as id, Quartile(temperature.temp) as quartiles;
 }
- 
+
 DUMP temperature_quartiles
 ```
 
