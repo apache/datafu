@@ -21,12 +21,6 @@ buildscript {
   repositories {
       mavenCentral()
   }
-
-  // autojar only works with gradle versions < 4.0
-  // we need to fix it or find a different solution in order to upgrade gradle
-  dependencies {
-      classpath 'com.github.rholder:gradle-autojar:1.0.1'
-  }
 }
 
 plugins {
@@ -34,7 +28,7 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'gradle-autojar'
+apply plugin: datafu.autojar.GradleAutojarPlugin
 
 archivesBaseName = 'datafu-pig'
 

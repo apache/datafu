@@ -1,6 +1,6 @@
 /dist/
 *.release
-/.gradle/
+.gradle/
 build/
 annotation-plugin.jar
 .factorypath
