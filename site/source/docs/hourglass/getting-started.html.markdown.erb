@@ -64,7 +64,7 @@ Assuming you've set up the `hadoop` command to run against your Hadoop cluster, 
 
 Let's define some shorthand commands to run the Hourglass JAR and dump JSON from an Avro file:
 
-    export HOURGLASS_CMD="hadoop jar datafu-hourglass/build/libs/datafu-hourglass-incubating-<%= current_page.data.version %>-tests.jar datafu.hourglass.demo.Main"
+    export HOURGLASS_CMD="hadoop jar datafu-hourglass/build/libs/datafu-hourglass-<%= current_page.data.version %>-tests.jar datafu.hourglass.demo.Main"
 
     export TO_JSON_CMD="java -jar datafu-hourglass/build/demo_dependencies/avro-tools-1.7.4.jar tojson"
 

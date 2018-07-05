@@ -98,9 +98,17 @@ rat {
 
 apply plugin: 'com.fizzpod.sweeney'
 
+def isRelease = ext.release.toBoolean()
+
 sweeney {
-  // Must use JDK 1.7
-  enforce type: "equal", expect: "1.7", value: {System.getProperty('java.version').substring(0,3)}
+  // Make sure official releases are built with Java version 1.7, as this is the minimum version required by Hadoop 2.7.
+  if (isRelease) {
+    enforce type: "equal", expect: "1.7", value: {System.getProperty('java.version').substring(0,3)}
+  }
+  // Otherwise required at least Java version 1.7
+  else {
+    enforce type: "range", expect: "[1.7,)", value: {System.getProperty('java.version')}
+  }
 
   // Ensure the assemble tasks depend on the rat task
   def flag = true

@@ -1,7 +1,7 @@
 ---
 title: Download - Apache DataFu
 section_name: Getting Started
-version: 1.3.3
+version: 1.4.0
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -27,37 +27,38 @@ Apache DataFu is available for download as a source release and as compiled arti
 
 The latest source release can be found here:
 
-* <%= current_source_release_link("1.3.3") %>
+* <%= current_source_release_link("1.4.0") %>
 
 Previous releases:
 
+* <%= archived_incubator_source_release_link("1.3.3") %>
 * [apache-datafu-incubating-sources-1.3.2.tgz](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.2/apache-datafu-incubating-sources-1.3.2.tgz) [ [PGP](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.2/apache-datafu-incubating-sources-1.3.2.tgz.asc) ] [ [MD5](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.2/apache-datafu-incubating-sources-1.3.2.tgz.MD5) ] [ [SHA512](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.2/apache-datafu-incubating-sources-1.3.2.tgz.SHA-512) ]
 * [apache-datafu-incubating-sources-1.3.1.tgz](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.1/apache-datafu-incubating-sources-1.3.1.tgz) [ [PGP](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.1/apache-datafu-incubating-sources-1.3.1.tgz.asc) ] [ [MD5](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.1/apache-datafu-incubating-sources-1.3.1.tgz.MD5) ] [ [SHA512](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.1/apache-datafu-incubating-sources-1.3.1.tgz.SHA-512) ]
 * [apache-datafu-incubating-sources-1.3.0.tgz](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.0/apache-datafu-incubating-sources-1.3.0.tgz) [ [PGP](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.0/apache-datafu-incubating-sources-1.3.0.tgz.asc) ] [ [MD5](https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-1.3.0/apache-datafu-incubating-sources-1.3.0.tgz.MD5) ]
 
 ### Validation
 
-It is important to validate the release using either the PGP signature (`.asc` file) or hashes (`.md5` or `.sha512` files).  For more information on verification of Apache releases, see [here](https://www.apache.org/info/verification.html).  The `KEYS` file can be found [here](https://www.apache.org/dist/incubator/datafu/KEYS).
+It is important to validate the release using either the PGP signature (`.asc` file) or hashes (`.md5` or `.sha512` files).  For more information on verification of Apache releases, see [here](https://www.apache.org/info/verification.html).  The `KEYS` file can be found [here](https://www.apache.org/dist/datafu/KEYS).
 
 Once fetched, the `KEYS` file can be imported and the `.asc` file can used to verify the release.
 
 ```
 gpg --import KEYS
-gpg --verify apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz.asc apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz
+gpg --verify apache-datafu-sources-<%= current_page.data.version %>.tgz.asc apache-datafu-sources-<%= current_page.data.version %>.tgz
 ```
 
 The `md5sum` tool can be used to compute an MD5 hash that can be compared against the `.md5` file:
 
 ```
-md5sum apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz
-cat apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz.md5
+md5sum apache-datafu-sources-<%= current_page.data.version %>.tgz
+cat apache-datafu-sources-<%= current_page.data.version %>.tgz.md5
 ```
 
 The `sha512sum` tool can be used to compute a SHA-512 hash that can be compared against the `.sha512` file:
 
 ```
-sha512sum apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz
-cat apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz.md5
+sha512sum apache-datafu-sources-<%= current_page.data.version %>.tgz
+cat apache-datafu-sources-<%= current_page.data.version %>.tgz.md5
 ```
 
 Note that the hashes are only intended to check that the file has been downloaded correctly.  They do not provide guarantees on the authenticity of the file.  The signature should instead be used for this purpose.  For more information see [here](https://www.apache.org/info/verification.html).
@@ -66,8 +67,8 @@ Note that the hashes are only intended to check that the file has been downloade
 
 Make sure you have [Gradle](http://gradle.org/gradle-download/) installed.  Extract the source and bootstrap the `gradlew` script that's used for building.  The `gradlew` script uses the specific version of Gradle that DataFu is intended to be built with.
 
-    tar xvf apache-datafu-incubating-sources-<%= current_page.data.version %>.tgz
-    cd apache-datafu-incubating-sources-<%= current_page.data.version %>
+    tar xvf apache-datafu-sources-<%= current_page.data.version %>.tgz
+    cd apache-datafu-sources-<%= current_page.data.version %>
     gradle -b bootstrap.gradle
 
 To build the JARs, run:
@@ -91,23 +92,23 @@ Assuming your local maven repository is at `~/.m2`, you should see the DataFu ar
 
 The latest release can be found in [Apache's Maven Repository for DataFu](https://repository.apache.org/content/groups/public/org/apache/datafu):
 
-* [datafu-pig-incubating-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-pig-incubating/<%= current_page.data.version %>/)
-* [datafu-hourglass-incubating-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-hourglass-incubating/<%= current_page.data.version %>/)
+* [datafu-pig-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-pig/<%= current_page.data.version %>/)
+* [datafu-hourglass-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-hourglass/<%= current_page.data.version %>/)
 
 You can also use a dependency management system to download the DataFu artifacts and all their dependencies.
 
 Gradle:
 
 ```groovy
-compile "org.apache.datafu:datafu-pig-incubating:<%= current_page.data.version %>"
-compile "org.apache.datafu:datafu-hourglass-incubating:<%= current_page.data.version %>"
+compile "org.apache.datafu:datafu-pig:<%= current_page.data.version %>"
+compile "org.apache.datafu:datafu-hourglass:<%= current_page.data.version %>"
 ```
 
 Ivy:
 
 ```xml
-<dependency org="org.apache.datafu" name="datafu-pig-incubating" rev="<%= current_page.data.version %>"/>
-<dependency org="org.apache.datafu" name="datafu-hourglass-incubating" rev="<%= current_page.data.version %>"/>
+<dependency org="org.apache.datafu" name="datafu-pig" rev="<%= current_page.data.version %>"/>
+<dependency org="org.apache.datafu" name="datafu-hourglass" rev="<%= current_page.data.version %>"/>
 ```
 
 Maven:
@@ -115,12 +116,12 @@ Maven:
 ```xml
 <dependency>
   <groupId>org.apache.datafu</groupId>
-  <artifactId>datafu-pig-incubating</artifactId>
+  <artifactId>datafu-pig</artifactId>
   <version><%= current_page.data.version %></version>
 </dependency>
 <dependency>
   <groupId>org.apache.datafu</groupId>
-  <artifactId>datafu-hourglass-incubating</artifactId>
+  <artifactId>datafu-hourglass</artifactId>
   <version><%= current_page.data.version %></version>
 </dependency>
 ```
