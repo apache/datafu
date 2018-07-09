@@ -30,7 +30,6 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.adrianwalker.multilinestring.Multiline;
-import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.Tuple;
@@ -519,5 +518,44 @@ public class SamplingTests extends PigTests
       Assert.assertFalse(String.format("Found duplicate of %d",i), found.contains(i));
       found.add(i);
     }
+  }
+
+  private void prepareDataForSampleByKeysTest() throws IOException {
+      writeLinesToFile("input",
+        "1\ta\t20140201",
+        "4\td\t20140201",
+        "2\tb\t20110201",
+        "6\tf\t20140201",
+        "4\td2\t20140301",
+        "3\tc\t20160201" );
+      writeLinesToFile("input2", "1", "2", "3", "4");
+  }
+
+  /**
+  import 'datafu/sample_by_keys.pig';
+
+  big_table = LOAD 'input' AS (key1: int, val: chararray, dt: chararray);
+  keys = LOAD 'input2' AS (key2: int);
+
+  data = sample_by_keys(big_table, keys, 'key1', 'key2');
+
+  STORE data INTO 'output';
+   */
+  @Multiline
+  private String sampleByKeysTest;
+
+  @Test
+  public void sampleByKeysTest() throws Exception
+  {
+    prepareDataForSampleByKeysTest();
+
+    PigTest test = createPigTestFromString(sampleByKeysTest);
+
+    assertOutput(test, "data",
+    "(1,a,20140201)",
+    "(2,b,20110201)",
+    "(3,c,20160201)",
+    "(4,d2,20140301)",
+    "(4,d,20140201)");
   }
 }
