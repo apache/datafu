@@ -51,6 +51,7 @@ import com.clearspring.analytics.stream.cardinality.HyperLogLogPlus;
  * This is a streaming implementation, and therefore the input data does not need to be sorted.
  * </p>
  *
+ * @deprecated This will be removed in the next major release.
  */
 public class HyperLogLogPlusPlus extends AlgebraicEvalFunc<Long>
 {
