@@ -92,7 +92,8 @@ rat {
     'datafu-pig/input*',
     'datafu-pig/docs',
     'datafu-pig/queries',
-    'datafu-pig/query'
+    'datafu-pig/query',
+		'datafu-spark/derby.log'
   ]
 }
 

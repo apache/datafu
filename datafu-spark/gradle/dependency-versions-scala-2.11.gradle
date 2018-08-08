@@ -16,5 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+ext {
+  scalaVersion = "2.11"
+  scalaLibVersion = "2.11.8"
+  // Extra options for the compiler:
+  // -feature: Give detailed warnings about language feature use (rather than just 'there were 4 warnings')
+  // -language:implicitConversions: Allow the use of implicit conversions without warning or library import
+  // -language:reflectiveCalls: Allow the automatic use of reflection to access fields without warning or library import
+	//  scalaOptions = "-feature -language:implicitConversions -language:reflectiveCalls"
+	scalaOptions = "-language:implicitConversions"
 
-include "build-plugin","datafu-pig","datafu-hourglass","datafu-spark"
+  scalatraVersion = "2.5.0"
+  jettyVersion = "9.2.7.v20150116"
+}

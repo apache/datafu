@@ -1,0 +1,180 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+}
+
+plugins {
+    id "de.undercouch.download" version "3.3.0"
+}
+
+apply from: file("gradle/dependency-versions-scala-" + scalaVersion + ".gradle")
+
+apply plugin: 'scala'
+apply plugin: datafu.autojar.GradleAutojarPlugin
+
+// allprojects is from samza
+allprojects {
+	// For all scala compilation, add extra compiler options, taken from version-specific
+  // dependency-versions-scala file applied above.
+  tasks.withType(ScalaCompile) {
+    scalaCompileOptions.additionalParameters = [ scalaOptions ]
+	}
+}
+
+archivesBaseName = 'datafu-spark_' + scalaVersion
+
+import groovy.xml.MarkupBuilder
+
+// the autojarred configuration includes all JARs that will be included
+// in the final JAR via autojar
+configurations.create('autojarred')
+
+configurations.create('jarjar')
+
+configurations {
+  compile {
+    extendsFrom autojarred
+  }
+}
+
+cleanEclipse {
+  doLast {
+    delete ".apt_generated"
+    delete ".settings"
+    delete ".factorypath"
+    delete "bin"
+  }
+}
+
+jar
+{
+  // initial jar only includes the main classes of datafu, not the dependencies.
+  // this is not the one we'll publish.
+  classifier = "core"
+}
+
+ext
+{
+  autojarBuildDir = tasks.jar.destinationDir
+}
+
+task jarWithDependencies(type: Autojar) {
+  description 'Creates a jar that includes the dependencies (under their own namespaces)'
+  autojarFiles = [
+    tasks.jar.getArchivePath().absoluteFile,
+    "META-INF/LICENSE",
+    "META-INF/DISCLAIMER",
+    "META-INF/NOTICE"
+  ]
+  targetConfiguration = configurations.autojarred
+  autojarExtra = '-baeq'
+}
+
+def outputFile = file(tasks.jar.getArchivePath().absoluteFile.toString().replace("-core","-jarjar"))
+
+task jarWithDependenciesNamespaced(dependsOn: jarWithDependencies) {
+  description 'Creates the jar that includes dependencies (under a datafu namespace)'
+
+  doLast {
+    project.ant {
+      taskdef name: "jarjar", classname: "com.tonicsystems.jarjar.JarJarTask", classpath: configurations.jarjar.asPath
+      jarjar(jarfile: outputFile, filesetmanifest: "merge") {
+        zipfileset(src: tasks.jarWithDependencies.autojarOutput)
+        rule pattern: "org.apache.commons.math.**", result: "datafu.org.apache.commons.math.@1"
+        rule pattern: "com.google.common.**", result: "datafu.com.google.common.@1"
+      }
+    }
+  }
+}
+
+task finalJar(type: Jar, dependsOn: jarWithDependenciesNamespaced) {
+  description 'Creates the final jar'
+
+  from(zipTree(outputFile))
+}
+
+// don't publish the core archive, as this doesn't have the dependencies
+configurations.archives.artifacts.removeAll { return it.classifier == "core"; }
+
+artifacts {
+  archives finalJar
+}
+
+// forcing scala joint compilation is from samza -------------------------
+
+// Force scala joint compilation
+sourceSets.main.scala.srcDir "src/main/java"
+sourceSets.test.scala.srcDir "src/test/java"
+
+// Disable the Javac compiler by forcing joint compilation by scalac. This is equivalent to setting
+// tasks.compileTestJava.enabled = false
+sourceSets.main.java.srcDirs = []
+sourceSets.test.java.srcDirs = []
+
+dependencies {
+		// all these dependencies are taken from samza	
+    compile "org.scala-lang:scala-library:$scalaLibVersion"
+
+  // dependencies that are packaged into the jar using autojar
+  // autojar only includes what is needed
+  autojarred "org.apache.commons:commons-math:$commonsMathVersion"
+  autojarred "com.google.guava:guava:$guavaVersion"
+
+  // needed to run jarjar
+  jarjar "com.googlecode.jarjar:jarjar:1.3"
+
+	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":2.2.0_0.10.0"
+	testCompile "org.scalatest:scalatest_" + scalaVersion + ":2.2.0"
+}
+
+modifyPom {
+  project {
+    dependencies {
+      // No dependencies because everything we need is autojarred.
+    }
+  }
+}
+
+// we need to set up the build for hadoop 3
+if (hadoopVersion.startsWith("2.")) {
+  dependencies {
+    // needed for compilation only.  obviously don't need to autojar this.
+    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
+		compile "org.apache.spark:spark-core_" + scalaVersion + ":2.2.0"
+		compile "org.apache.spark:spark-hive_" + scalaVersion + ":2.2.0"
+  }
+} else {
+  dependencies {
+    // needed for compilation only.  obviously don't need to autojar this.
+    compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+  }
+}
+
+test {
+  systemProperty 'datafu.jar.dir', file('build/libs')
+  systemProperty 'datafu.data.dir', file('data')
+
+  maxHeapSize = "2G"
+}

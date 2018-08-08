@@ -1,0 +1,6 @@
+/bin
+/test-output
+/data
+/.apt_generated/
+/out
+derby.log
