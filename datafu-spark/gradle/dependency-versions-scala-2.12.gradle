@@ -17,6 +17,7 @@
  * under the License.
  */
 ext {
+  sparkVersion = "2.3.0"
   scalaVersion = "2.12"
   scalaLibVersion = "2.12.1"
   // Extra options for the compiler:
