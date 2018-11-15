@@ -93,6 +93,13 @@ object SparkDFUtils extends SparkDFUtilsTrait {
     df2
   }
 
+ /**
+  * Returns a DataFrame with the given column (should be a StructType) replaced by its inner fields.
+  * This method only flattens a single level of nesting.
+  * @param df DataFrame to operate on
+  * @param colName column name for a column of type StructType
+  * @return DataFrame representing the data after the operation
+  */
   override def flatten(df: DataFrame, colName: String): DataFrame = {
     val outerFields = df.schema.fields.map(_.name).toSet
     val flattenFields = df.schema(colName).dataType.asInstanceOf[StructType].fields.filter(f => !outerFields.contains(f.name)).map("`" + colName + "`.`" + _.name + "`")

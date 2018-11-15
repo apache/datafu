@@ -35,7 +35,7 @@ import scala.collection.mutable.WrappedArray
 import org.apache.spark.sql.types._
 
 @RunWith(classOf[JUnitRunner])
-class DedupTests extends FunSuite with DataFrameSuiteBase {
+class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
   
   import DataFrameOps._
   
@@ -51,8 +51,10 @@ class DedupTests extends FunSuite with DataFrameSuiteBase {
 	
   //var df : DataFrame = spark.read.format("csv").option("header", "true").load("src/test/resources/dedup.csv")
  
-  lazy val inputDataFrame = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4"))).toDF("col_grp", "col_ord", "col_str").cache
-              
+  lazy val inputRDD = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4")))
+  
+  lazy val inputDataFrame = inputRDD.toDF("col_grp", "col_ord", "col_str").cache
+  
   test("dedup") {
     val expected : DataFrame = sc.parallelize(List(("b",1),("a",3))).toDF("col_grp", "col_ord")
 
@@ -199,6 +201,28 @@ class DedupTests extends FunSuite with DataFrameSuiteBase {
       )).toDF("key","val_skewed","key","val")
   
       assertDataFrameEquals(expected2, actual2)
+    }
+
+    test("test_changeSchema") {
+
+      val actual = inputDataFrame.changeSchema("fld1","fld2", "fld3")
+    
+      val expected : DataFrame = inputRDD.toDF("fld1","fld2", "fld3")
+
+      actual.show
+      
+      assertDataFrameEquals(expected, actual)
+    }
+
+    test("test_flatten") {
+
+      val input = inputDataFrame.withColumn("struct_col", expr("struct(col_grp, col_ord)")).select("struct_col")
+    
+      val expected : DataFrame = inputDataFrame.select("col_grp", "col_ord")
+      
+      val actual = input.flatten("struct_col")
+      
+      assertDataFrameEquals(expected, actual)
     }
 
     def compare(expected: DataFrame, actual: DataFrame) = {

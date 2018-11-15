@@ -37,8 +37,6 @@ object DataFrameOps {
 
     def changeSchema(newScheme: String*): DataFrame = SparkDFUtils.changeSchema(df, newScheme: _*)
 
-    def filterOut(str: String): DataFrame = df.filter("not (" + str + ")")
-
     def joinWithRange(colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long = 2^8) =
       SparkDFUtils.joinWithRange(df, colSingle, dfRange, colRangeStart, colRangeEnd, DECREASE_FACTOR)
 
