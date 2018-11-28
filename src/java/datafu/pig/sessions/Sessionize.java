@@ -18,6 +18,7 @@ package datafu.pig.sessions;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.apache.pig.Accumulator;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.BagFactory;
 import org.apache.pig.data.DataBag;
@@ -28,8 +29,6 @@ import org.apache.pig.impl.logicalLayer.FrontendException;
 import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Sessionizes an input stream.
@@ -46,7 +45,7 @@ import com.google.common.collect.ImmutableList;
  * 
  * %declare TIME_WINDOW  30m
  * 
- * define Sessionize com.linkedin.pig.date.Sessionize('$TIME_WINDOW');
+ * define Sessionize datafu.pig.sessions.Sessionize('$TIME_WINDOW');
  *
  * -- sessionize the visit stream
  * VIEWS = group VIEWS by member_id;
@@ -61,7 +60,7 @@ import com.google.common.collect.ImmutableList;
  * }
  * </pre>
  */
-public class Sessionize extends EvalFunc<DataBag>
+public class Sessionize extends EvalFunc<DataBag> implements Accumulator<DataBag>
 {
   private final long millis;
 
@@ -87,7 +86,7 @@ public class Sessionize extends EvalFunc<DataBag>
     return outputBag;
   }
 
-  //@Override
+  @Override
   public void accumulate(Tuple input) throws IOException
   {
     for (Tuple t : (DataBag) input.get(0)) {
@@ -109,13 +108,13 @@ public class Sessionize extends EvalFunc<DataBag>
     }
   }
 
-  //@Override
+  @Override
   public DataBag getValue()
   {
     return outputBag;
   }
 
-  //@Override
+  @Override
   public void cleanup()
   {
     this.last_date = null;
@@ -165,22 +164,5 @@ public class Sessionize extends EvalFunc<DataBag>
     catch (FrontendException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public static void main(String[] args) throws IOException
-  {
-    TupleFactory tupleFactory = TupleFactory.getInstance();
-    BagFactory bagFactory = BagFactory.getInstance();
-
-    DataBag bag = bagFactory.newDefaultBag();
-
-    bag.add(tupleFactory.newTuple(ImmutableList.of("2010-01-01T01:00:00Z", 1234)));
-    bag.add(tupleFactory.newTuple(ImmutableList.of("2010-01-01T01:15:00Z", 1234)));
-    bag.add(tupleFactory.newTuple(ImmutableList.of("2010-01-01T01:31:00Z", 1234)));
-    bag.add(tupleFactory.newTuple(ImmutableList.of("2010-01-01T01:35:00Z", 1234)));
-    bag.add(tupleFactory.newTuple(ImmutableList.of("2010-01-01T02:30:00Z", 1234)));
-
-    EvalFunc fn = new Sessionize("30m");
-    System.out.println(fn.exec(tupleFactory.newTuple(bag)));
   }
 }
