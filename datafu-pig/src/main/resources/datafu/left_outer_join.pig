@@ -18,23 +18,22 @@
  */
 
 /**
- *  Counts all the rows in a relation
+ *  Used to do a left outer join of three relations
  *
- *  relation - the relation to count
- */
-DEFINE count_all_non_distinct(alias) returns res {
-  grp_all = GROUP $alias ALL;
-  $res = FOREACH grp_all GENERATE COUNT($alias);
-};
-
-/**
- *  Counts all the distinct keys in a relation
+ *	relation1 - the first relation to join
+ *	key1 - the field from the first relation on which to group
+ *	relation2 - the second relation to join
+ *	key2 - the field from the second relation on which to group
+ *	relation3 - the third relation to join
+ *	key3 - the field from the third relation on which to group
  *
- *  relation - the relation to count
- *  key - the field to check distinctness
  */
-DEFINE count_distinct_keys(alias, key) returns res {
-  just_key = FOREACH $alias GENERATE $key;
-  dist_data = DISTINCT just_key;
-  $res = count_all_non_distinct(dist_data);
+DEFINE left_outer_join(relation1, key1, relation2, key2, relation3, key3) returns joined {
+  DEFINE EmptyBagToNullFields datafu.pig.bags.EmptyBagToNullFields();
+  
+  cogrouped = COGROUP $relation1 BY $key1, $relation2 BY $key2, $relation3 BY $key3;
+  $joined = FOREACH cogrouped GENERATE
+    FLATTEN($relation1),
+    FLATTEN(EmptyBagToNullFields($relation2)),
+    FLATTEN(EmptyBagToNullFields($relation3));
 };

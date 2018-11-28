@@ -38,8 +38,7 @@ public class MacroTests extends PigTests
   STORE cnt INTO 'output';
 
    */
-  @Multiline
-  private String countDistinctTest;
+  @Multiline private static String countDistinctTest;
 
   @Test
   public void countDistinctTest() throws Exception
@@ -74,8 +73,7 @@ public class MacroTests extends PigTests
   STORE cnt INTO 'output';
 
    */
-  @Multiline
-  private String countTest;
+  @Multiline private static String countTest;
 
   @Test
   public void countTest() throws Exception
@@ -99,4 +97,40 @@ public class MacroTests extends PigTests
     assertOutput(test, "cnt", "(31)");
   }
 
+  /**
+
+  import 'datafu/left_outer_join.pig';
+
+  data1 = LOAD 'first' AS (id:chararray, num1:int);
+  data2 = LOAD 'second' AS (id2:chararray, num2:int);
+  data3 = LOAD 'third' AS (id:chararray, num3:int);
+
+  joined = left_outer_join(data1, id, data2, id2, data3, id);
+  STORE joined INTO 'output';
+
+   */
+  @Multiline private static String leftOuterJoinTest;
+
+  @Test
+  public void leftOuterJoinTest() throws Exception
+  {
+    PigTest test = createPigTestFromString(leftOuterJoinTest);
+
+    writeLinesToFile("first","A1\t1","A2\t2","A3\t3","A4\t4","A5\t5","A6\t6");
+
+    writeLinesToFile("second","A1\t11","B2\t12","A3\t13","A4\t14","B5\t15","B6\t16");
+
+    writeLinesToFile("third","A1\t111","A2\t112","A3\t113","B4\t114","A5\t115", "C6\t116");
+
+    test.runScript();
+
+    assertOutput(test, "joined",
+    		"(A1,1,A1,11,A1,111)",
+    		"(A2,2,,,A2,112)",
+    		"(A3,3,A3,13,A3,113)",
+    		"(A4,4,A4,14,,)",
+    		"(A5,5,,,A5,115)",
+    		"(A6,6,,,,)"
+	);
+  }
 }
