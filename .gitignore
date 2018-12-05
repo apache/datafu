@@ -32,3 +32,5 @@ datafu-pig/query
 gradle/wrapper/gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper.properties
 gradlew*
+datafu-spark/spark-warehouse
+datafu-spark/metastore_db

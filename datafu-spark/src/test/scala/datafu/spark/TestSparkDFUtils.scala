@@ -150,21 +150,21 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       val notSkewed = sqlContext.createDataFrame((1 to 10).map(i => (i.toString, s"str$i"))).toDF("key", "val")
 
       val expected = sqlContext.createDataFrame(List(
-          ("2","str2", "k"),
-          ("1","str1", "e"),
-          ("1","str1", "d"),
-          ("1","str1", "c"),
+          ("1","str1", "a"),
           ("1","str1", "b"),
-          ("1","str1", "a")
+          ("1","str1", "c"),
+          ("1","str1", "d"),
+          ("1","str1", "e"),
+          ("2","str2", "k")
       )).toDF("key","val","val_skewed")
 
       val actual1 = notSkewed.broadcastJoinSkewed(skewed,"key", 1)
 
-      assertDataFrameEquals(expected, actual1)
+      assertDataFrameEquals(expected, actual1.sort($"val_skewed"))
       
       val actual2 = notSkewed.broadcastJoinSkewed(skewed,"key", 2)
 
-      assertDataFrameEquals(expected, actual2)
+      assertDataFrameEquals(expected, actual2.sort($"val_skewed"))
     }
   
     // because of nulls in expected data, an actual schema needs to be used
@@ -186,7 +186,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
           ("2","k","2","str2")
       )).toDF("key","val_skewed","key","val")
   
-      assertDataFrameEquals(expected1, actual1)
+      assertDataFrameEquals(expected1, actual1.sort($"val_skewed")) // assertDataFrameEquals cares about order but we don't
       
       val actual2 = skewed.as("a").joinSkewed(notSkewed.as("b"),expr("a.key = b.key"), 3, "left_outer")
   
@@ -200,7 +200,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
           expJoinSkewed("0","k",null,null)
       )).toDF("key","val_skewed","key","val")
   
-      assertDataFrameEquals(expected2, actual2)
+      assertDataFrameEquals(expected2, actual2.sort($"val_skewed")) // assertDataFrameEquals cares about order but we don't
     }
 
     test("test_changeSchema") {

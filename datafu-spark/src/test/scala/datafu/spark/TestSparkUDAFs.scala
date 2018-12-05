@@ -27,11 +27,20 @@ import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.slf4j.LoggerFactory
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.internal.StaticSQLConf.CATALOG_IMPLEMENTATION
 
 @RunWith(classOf[JUnitRunner])
 class UdafTests extends FunSuite with DataFrameSuiteBase {
 
   import spark.implicits._
+
+  /**
+   * taken from https://github.com/holdenk/spark-testing-base/issues/234#issuecomment-390150835
+   * 
+   * Solves problem with Hive in Spark 2.3.0 in spark-testing-base
+   */
+  override def conf: SparkConf = super.conf.set(CATALOG_IMPLEMENTATION.key, "hive")
   
   val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -64,9 +73,11 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
     spark.sql("insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
     spark.sql("insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
 
-    assertDataFrameEquals(
-      sqlContext.createDataFrame(List(mapExp(Map()))),
-      spark.table("mas_table").groupBy().agg(mas($"arr").as("map_col")))
+    val expected = sqlContext.createDataFrame(List(mapExp(Map())))
+    
+    val actual = spark.table("mas_table").groupBy().agg(mas($"arr").as("map_col"))
+    
+    assertDataFrameEquals(expected, actual)
   }
 
   test("test multiarrayset max keys") {

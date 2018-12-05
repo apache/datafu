@@ -93,7 +93,9 @@ rat {
     'datafu-pig/docs',
     'datafu-pig/queries',
     'datafu-pig/query',
-		'datafu-spark/derby.log'
+    'datafu-spark/metastore_db/**',
+    'datafu-spark/spark-warehouse/**',
+    'datafu-spark/derby.log'
   ]
 }
 
