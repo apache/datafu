@@ -67,10 +67,12 @@ task sourceRelease(type: Tar, dependsOn: prepare_release_config) {
 
   from(project.rootDir) {
     // don't include gradle.properties because we use a modified version
+    exclude '.java-version'
     exclude "gradle.properties"
-    exclude '**/build'
     exclude 'build'
+    exclude '**/build'
     exclude '.gradle'
+    exclude '**/.gradle'
     exclude 'gradlew'
     exclude 'gradlew.bat'
     exclude 'gradle/wrapper/gradle-wrapper.jar'
