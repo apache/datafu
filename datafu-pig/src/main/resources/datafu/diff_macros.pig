@@ -17,6 +17,14 @@
  * under the License.
  */
 
+/**
+ *  Produces a human-readable description of the rows and fields changed between two relations.
+ *
+ *  diff_macro_old - the old, baseline relation
+ *  diff_macro_new - the new relation to be checked
+ *  diff_macro_pk - the key on which to join/compare individual rows
+ *  diff_macro_ignored_field - an optional field which can be ignored in the comparison, like a timestamp
+ */
 DEFINE diff_macro(diff_macro_old, diff_macro_new, diff_macro_pk, diff_macro_ignored_field) returns diffs {
 
 	DEFINE TupleDiff datafu.pig.util.TupleDiff;
