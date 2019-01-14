@@ -28,6 +28,10 @@ import scala.collection.{Map, mutable}
 
 object SparkUDAFs {
 
+  /**
+    * Like Google's MultiSets.
+    * Aggregate function that creates a map of key to its count.
+    */
   class MultiSet() extends UserDefinedAggregateFunction {
 
     def inputSchema: StructType = new StructType().add("key", StringType)
@@ -67,6 +71,10 @@ object SparkUDAFs {
 
   }
 
+  /**
+    * Essentially the same as MultiSet, but gets an Array for input.
+    * There is an extra option to limit the number of keys (like CountDistinctUpTo)
+    */
   class MultiArraySet[T : Ordering](dt : DataType = StringType, maxKeys: Int = -1) extends UserDefinedAggregateFunction {
 
     def inputSchema: StructType = new StructType().add("key", ArrayType(dt))
@@ -129,7 +137,9 @@ object SparkUDAFs {
 
   }
 
-  // Merge maps of kind string -> set<string>
+  /**
+    * Merge maps of kind string -> set<string>
+    */
   class MapSetMerge extends UserDefinedAggregateFunction {
 
     def inputSchema: StructType = new StructType().add("key", dataType)
