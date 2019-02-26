@@ -149,4 +149,37 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
       df.withColumn("asd", SparkOverwriteUDAFs.minValueByKey($"col_ord", $"col_str").over(Window.partitionBy("col_grp"))))
   }
 
+  case class exp5(col_grp: String, col_ord: Option[Int])
+  
+  test("countDistinctUpTo") {
+    import datafu.spark.SparkUDAFs.CountDistinctUpTo
+    
+    val countDistinctUpTo3 = new CountDistinctUpTo(3)
+    val countDistinctUpTo6 = new CountDistinctUpTo(6)
+    
+    val inputDF = sqlContext.createDataFrame(List(
+        exp5("b", Option(1)),
+        exp5("a", Option(1)),
+        exp5("a", Option(2)),
+        exp5("a", Option(3)),
+        exp5("a", Option(4))
+      ))
+
+    val results3DF = sqlContext.createDataFrame(List(
+        exp5("b", Option(1)),
+        exp5("a", Option(3))
+    ))
+
+    val results6DF = sqlContext.createDataFrame(List(
+        exp5("b", Option(1)),
+        exp5("a", Option(4))
+    ))
+    
+    inputDF.groupBy("col_grp").agg(countDistinctUpTo3($"col_ord").as("col_ord")).show
+    
+    assertDataFrameEquals(results3DF, inputDF.groupBy("col_grp").agg(countDistinctUpTo3($"col_ord").as("col_ord")))
+    
+    assertDataFrameEquals(results6DF, inputDF.groupBy("col_grp").agg(countDistinctUpTo6($"col_ord").as("col_ord")))
+  }
+  
 }
