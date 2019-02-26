@@ -40,6 +40,10 @@ object DataFrameOps {
     def joinWithRange(colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long = 2^8) =
       SparkDFUtils.joinWithRange(df, colSingle, dfRange, colRangeStart, colRangeEnd, DECREASE_FACTOR)
 
+    def joinWithRangeAndDedup(colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long = 2^8, dedupSmallRange: Boolean = true): DataFrame = {
+      SparkDFUtils.joinWithRangeAndDedup(df, colSingle, dfRange, colRangeStart, colRangeEnd, DECREASE_FACTOR, dedupSmallRange)
+    }
+
     def broadcastJoinSkewed(skewed: DataFrame, joinCol: String, numberCustsToBroadcast: Int): DataFrame = {
       SparkDFUtils.broadcastJoinSkewed(df, skewed, joinCol, numberCustsToBroadcast)
     }

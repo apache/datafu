@@ -37,7 +37,7 @@ allprojects {
 	}
 }
 
-archivesBaseName = 'datafu-spark_' + scalaVersion
+archivesBaseName = 'datafu-spark_' + scalaVersion + '_' + sparkVersion
 
 import groovy.xml.MarkupBuilder
 

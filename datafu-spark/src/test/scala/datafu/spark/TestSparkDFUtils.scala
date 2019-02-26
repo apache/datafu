@@ -126,21 +126,45 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
        assertDataFrameEquals(expected, actual)
     }
 
-   	case class expRangeJoin(col_grp:String, col_ord:Option[Int], col_str:String, start:Option[Int], end:Option[Int], desc:String)
-  
+   	case class expRangeJoin2(col_grp:String, col_ord:Option[Int], col_str:String, start:Option[Int], end:Option[Int], desc:String)
+   	case class expRangeJoin1(col_grp:String, col_ord:Int, col_str:String, start:Option[Int], end:Option[Int], desc:String)
+
     test("join_with_range") {
       val df = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4"))).toDF("col_grp", "col_ord", "col_str")
    	  val dfr = sc.parallelize(List((1, 2,"asd1"), (1, 4, "asd2"), (3, 5,"asd3"), (3, 10,"asd4"))).toDF("start", "end", "desc")
   
       val expected = sqlContext.createDataFrame(List(
-          expRangeJoin("b",Option(1),"asd4",Option(1),Option(2),"asd1"),
-          expRangeJoin("a",Option(3),"asd3",Option(3),Option(5),"asd3"),
-          expRangeJoin("a",Option(2),"asd2",Option(1),Option(2),"asd1")
-
+        expRangeJoin1("a",1,"asd1",Option(1),Option(2),"asd1"),
+        expRangeJoin1("a",1,"asd1",Option(1),Option(4),"asd2"),
+        expRangeJoin1("a",2,"asd2",Option(1),Option(2),"asd1"),
+        expRangeJoin1("a",2,"asd2",Option(1),Option(4),"asd2"),
+        expRangeJoin1("a",3,"asd3",Option(1),Option(4),"asd2"),
+        expRangeJoin1("a",3,"asd3",Option(3),Option(5),"asd3"),
+        expRangeJoin1("a",3,"asd3",Option(3),Option(10),"asd4"),
+        expRangeJoin1("b",1,"asd4",Option(1),Option(2),"asd1"),
+        expRangeJoin1("b",1,"asd4",Option(1),Option(4),"asd2")
       ))
       
       val actual = df.joinWithRange("col_ord", dfr, "start", "end")
+      actual.show()
       
+      assertDataFrameEquals(expected, actual)
+  }
+
+  test("join_with_range_and_dedup") {
+      val df = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4"))).toDF("col_grp", "col_ord", "col_str")
+   	  val dfr = sc.parallelize(List((1, 2,"asd1"), (1, 4, "asd2"), (3, 5,"asd3"), (3, 10,"asd4"))).toDF("start", "end", "desc")
+
+      val expected = sqlContext.createDataFrame(List(
+          expRangeJoin2("b",Option(1),"asd4",Option(1),Option(2),"asd1"),
+          expRangeJoin2("a",Option(3),"asd3",Option(3),Option(5),"asd3"),
+          expRangeJoin2("a",Option(2),"asd2",Option(1),Option(2),"asd1")
+
+      ))
+
+      val actual = df.joinWithRangeAndDedup("col_ord", dfr, "start", "end")
+      actual.show()
+
       assertDataFrameEquals(expected, actual)
   }
   

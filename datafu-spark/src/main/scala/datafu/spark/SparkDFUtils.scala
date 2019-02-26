@@ -20,16 +20,59 @@ package datafu.spark
 
 import java.util.{List => JavaList}
 
-import org.apache.log4j.Logger
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{LongType, SparkOverwriteUDAFs, StructType}
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.util.SizeEstimator
 
-object SparkDFUtils extends SparkDFUtilsTrait {
+/**
+  * class definition so we could expose this functionality in PySpark
+  */
+class SparkDFUtilsBridge {
+
+  def dedup(df: DataFrame, groupCol: Column, orderCols: JavaList[Column]): DataFrame = {
+    val converted = convertJavaListToSeq(orderCols)
+    SparkDFUtils.dedup(df = df, groupCol = groupCol, orderCols = converted: _*)
+  }
+
+  def dedupTopN(df: DataFrame, n: Int, groupCol: Column, orderCols: JavaList[Column]): DataFrame = {
+    val converted = convertJavaListToSeq(orderCols)
+    SparkDFUtils.dedupTopN(df = df, n = n, groupCol = groupCol, orderCols = converted: _*)
+  }
+
+  def dedup2(df: DataFrame, groupCol: Column, orderByCol: Column, desc: Boolean, columnsFilter: JavaList[String], columnsFilterKeep: Boolean): DataFrame = {
+    val columnsFilter_converted = convertJavaListToSeq(columnsFilter)
+    SparkDFUtils.dedup2(df = df, groupCol = groupCol, orderByCol = orderByCol, desc = desc, moreAggFunctions = Nil, columnsFilter = columnsFilter_converted, columnsFilterKeep = columnsFilterKeep)
+  }
+
+  def changeSchema(df: DataFrame, newScheme: JavaList[String]): DataFrame = {
+    val newScheme_converted = convertJavaListToSeq(newScheme)
+    SparkDFUtils.changeSchema(df = df, newScheme = newScheme_converted: _*)
+  }
+
+  def joinSkewed(dfLeft: DataFrame, dfRight: DataFrame, joinExprs: Column, numShards: Int, joinType: String): DataFrame = {
+    SparkDFUtils.joinSkewed(dfLeft = dfLeft, dfRight = dfRight, joinExprs = joinExprs, numShards = numShards, joinType = joinType)
+  }
+
+  def broadcastJoinSkewed(notSkewed: DataFrame, skewed: DataFrame, joinCol: String, numRowsToBroadcast: Int): DataFrame = {
+    SparkDFUtils.broadcastJoinSkewed(notSkewed = notSkewed, skewed = skewed, joinCol = joinCol, numRowsToBroadcast = numRowsToBroadcast)
+  }
+
+  def joinWithRange(dfSingle: DataFrame, colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long): DataFrame = {
+    SparkDFUtils.joinWithRange(dfSingle = dfSingle, colSingle = colSingle, dfRange = dfRange, colRangeStart = colRangeStart, colRangeEnd = colRangeEnd, DECREASE_FACTOR = DECREASE_FACTOR)
+  }
+
+  def joinWithRangeAndDedup(dfSingle: DataFrame, colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long, dedupSmallRange: Boolean): DataFrame = {
+    SparkDFUtils.joinWithRangeAndDedup(dfSingle = dfSingle, colSingle = colSingle, dfRange = dfRange, colRangeStart = colRangeStart, colRangeEnd = colRangeEnd, DECREASE_FACTOR = DECREASE_FACTOR, dedupSmallRange = dedupSmallRange)
+  }
+
+  private def convertJavaListToSeq[T](list: JavaList[T]): Seq[T] = {
+    scala.collection.JavaConverters.asScalaIteratorConverter(list.iterator()).asScala.toList
+  }
+}
+
+object SparkDFUtils {
 
   /**
     * Used to get the 'latest' record (after ordering according to the provided order columns) in each group.
@@ -40,19 +83,21 @@ object SparkDFUtils extends SparkDFUtilsTrait {
     * @param orderCols columns to order the records according to
     * @return DataFrame representing the data after the operation
     */
-  override def dedup(df: DataFrame, groupCol: Column, orderCols: Column*): DataFrame = {
+  def dedup(df: DataFrame, groupCol: Column, orderCols: Column*): DataFrame = {
+    df.dropDuplicates()
     dedupTopN(df, 1, groupCol, orderCols: _*)
   }
 
   /**
     * Used get the top N records (after ordering according to the provided order columns) in each group.
+    *
     * @param df DataFrame to operate on
     * @param n number of records to return from each group
     * @param groupCol column to group by the records
     * @param orderCols columns to order the records according to
     * @return DataFrame representing the data after the operation
     */
-  override def dedupTopN(df: DataFrame, n: Int, groupCol: Column, orderCols: Column*): DataFrame = {
+  def dedupTopN(df: DataFrame, n: Int, groupCol: Column, orderCols: Column*): DataFrame = {
     val w = Window.partitionBy(groupCol).orderBy(orderCols: _*)
     df.withColumn("rn", row_number.over(w)).where(col("rn") <= n).drop("rn")
   }
@@ -71,7 +116,7 @@ object SparkDFUtils extends SparkDFUtilsTrait {
     *                          those columns in the result
     * @return DataFrame representing the data after the operation
     */
-  override def dedup2(df: DataFrame, groupCol: Column, orderByCol: Column, desc: Boolean = true, moreAggFunctions: Seq[Column] = Nil, columnsFilter: Seq[String] = Nil, columnsFilterKeep: Boolean = true): DataFrame = {
+  def dedup2(df: DataFrame, groupCol: Column, orderByCol: Column, desc: Boolean = true, moreAggFunctions: Seq[Column] = Nil, columnsFilter: Seq[String] = Nil, columnsFilterKeep: Boolean = true): DataFrame = {
     val newDF = if (columnsFilter == Nil)
       df.withColumn("sort_by_column", orderByCol)
     else {
@@ -80,7 +125,6 @@ object SparkDFUtils extends SparkDFUtilsTrait {
       else
         df.select(df.columns.filter(colName => !columnsFilter.contains(colName)).map(colName => new Column(colName)):_*).withColumn("sort_by_column", orderByCol)
     }
-
 
     val aggFunc = if (desc) SparkOverwriteUDAFs.maxValueByKey(_:Column, _:Column)
                   else      SparkOverwriteUDAFs.minValueByKey(_:Column, _:Column)
@@ -115,7 +159,7 @@ object SparkDFUtils extends SparkDFUtilsTrait {
   * @param colName column name for a column of type StructType
   * @return DataFrame representing the data after the operation
   */
-  override def flatten(df: DataFrame, colName: String): DataFrame = {
+  def flatten(df: DataFrame, colName: String): DataFrame = {
     assert(df.schema(colName).dataType.isInstanceOf[StructType], s"Column $colName must be of type Struct")
     val outerFields = df.schema.fields.map(_.name).toSet
     val flattenFields = df.schema(colName).dataType.asInstanceOf[StructType].fields.filter(f => !outerFields.contains(f.name)).map("`" + colName + "`.`" + _.name + "`")
@@ -124,11 +168,12 @@ object SparkDFUtils extends SparkDFUtilsTrait {
 
   /**
   * Returns a DataFrame with the column names renamed to the column names in the new schema
+  *
   * @param df DataFrame to operate on
   * @param newScheme new column names
   * @return DataFrame representing the data after the operation
   */
-  override def changeSchema(df: DataFrame, newScheme: String*): DataFrame =
+  def changeSchema(df: DataFrame, newScheme: String*): DataFrame =
     df.select(df.columns.zip(newScheme).map {case (oldCol: String, newCol: String) => col(oldCol).as(newCol)}: _*)
 
   /**
@@ -144,7 +189,7 @@ object SparkDFUtils extends SparkDFUtilsTrait {
     * @param joinType join type
     * @return joined DataFrame
     */
-  override def joinSkewed(dfLeft: DataFrame, dfRight: DataFrame, joinExprs: Column, numShards: Int = 10, joinType: String = "inner"): DataFrame = {
+  def joinSkewed(dfLeft: DataFrame, dfRight: DataFrame, joinExprs: Column, numShards: Int = 10, joinType: String = "inner"): DataFrame = {
     // skew join based on salting
     // salts the left DF by adding another random column and join with the right DF after duplicating it
     val ss = dfLeft.sparkSession
@@ -158,13 +203,14 @@ object SparkDFUtils extends SparkDFUtilsTrait {
     * splits both of the DFs to two parts according to the skewed keys.
     * 1. Map-join: broadcasts the skewed-keys part of the not skewed DF to the skewed-keys part of the skewed DF
     * 2. Regular join: between the remaining two parts.
+    *
     * @param notSkewed not skewed DataFrame
     * @param skewed skewed DataFrame
     * @param joinCol join column
     * @param numRowsToBroadcast num of rows to broadcast
     * @return DataFrame representing the data after the operation
     */
-  override def broadcastJoinSkewed(notSkewed: DataFrame, skewed: DataFrame, joinCol: String, numRowsToBroadcast: Int): DataFrame = {
+  def broadcastJoinSkewed(notSkewed: DataFrame, skewed: DataFrame, joinCol: String, numRowsToBroadcast: Int): DataFrame = {
     val ss = notSkewed.sparkSession
     import ss.implicits._
     val skewedKeys = skewed.groupBy(joinCol).count().sort($"count".desc).limit(numRowsToBroadcast).drop("count")
@@ -212,11 +258,13 @@ object SparkDFUtils extends SparkDFUtilsTrait {
     * +----------+---------+----------+
     *
     * OUTPUT:
-    * +-------+----------+---------+-------+
-    * |time   |start_time|end_time |desc   |
-    * +-------+----------+---------+-------+
-    * |11:55  |11:50     |12:15    | lunch |
-    * +-------+----------+---------+-------+
+    * +-------+----------+---------+---------+
+    * |time   |start_time|end_time |desc     |
+    * +-------+----------+---------+---------+
+    * |11:55  |10:00     |12:00    | meeting |
+    * +-------+----------+---------+---------+
+    * |11:55  |11:50     |12:15    | lunch   |
+    * +-------+----------+---------+---------+
     *
     * @param dfSingle - DataFrame that contains the point column
     * @param colSingle - the point column's name
@@ -226,43 +274,58 @@ object SparkDFUtils extends SparkDFUtilsTrait {
     * @param DECREASE_FACTOR - resolution factor. instead of exploding the range column directly, we first decrease its resolution by this factor
     * @return
     */
-  override def joinWithRange(dfSingle: DataFrame, colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long): DataFrame = {
+  def joinWithRange(dfSingle: DataFrame, colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long): DataFrame = {
+    val dfJoined = joinWithRangeInternal(dfSingle, colSingle, dfRange, colRangeStart, colRangeEnd, DECREASE_FACTOR)
+    dfJoined.drop("range_start", "range_end", "decreased_range_single", "single", "decreased_single", "range_size")
+  }
+
+  private def joinWithRangeInternal(dfSingle: DataFrame, colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long): DataFrame = {
 
     import org.apache.spark.sql.functions.udf
     val rangeUDF = udf((start: Long, end: Long) => (start to end).toArray)
     val dfRange_exploded = dfRange.withColumn("range_start", col(colRangeStart).cast(LongType))
                                   .withColumn("range_end"  , col(colRangeEnd).cast(LongType))
                                   .withColumn("decreased_range_single", explode(rangeUDF(col("range_start")/lit(DECREASE_FACTOR),
-                                                                                         col("range_end"  )/lit(DECREASE_FACTOR))))
+                                                                                                   col("range_end")  /lit(DECREASE_FACTOR))))
 
-    val dfJoined =
     dfSingle.withColumn("single", floor(col(colSingle).cast(LongType)))
             .withColumn("decreased_single", floor(col(colSingle).cast(LongType)/lit(DECREASE_FACTOR)))
             .join(dfRange_exploded, col("decreased_single") === col("decreased_range_single"), "left_outer")
             .withColumn("range_size", expr("(range_end - range_start + 1)"))
             .filter("single>=range_start and single<=range_end")
-
-    dedup2(dfJoined, col(colSingle), col("range_size"), desc = false)
-      .drop("range_start", "range_end", "decreased_range_single", "single", "decreased_single", "range_size")
-
   }
-}
 
+  /**
+    * Run joinWithRange and afterwards run dedup
+    *
+    * @param dedupSmallRange -  by small/large range
+    *
+    *  OUTPUT for dedupSmallRange = "true":
+    * +-------+----------+---------+---------+
+    * |time   |start_time|end_time |desc     |
+    * +-------+----------+---------+---------+
+    * |11:55  |11:50     |12:15    | lunch   |
+    * +-------+----------+---------+---------+
+    *
+    *  OUTPUT for dedupSmallRange = "false":
+    * +-------+----------+---------+---------+
+    * |time   |start_time|end_time |desc     |
+    * +-------+----------+---------+---------+
+    * |11:55  |10:00     |12:00    | meeting |
+    * +-------+----------+---------+---------+
+    *
+    */
+  def joinWithRangeAndDedup(dfSingle: DataFrame, colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long, dedupSmallRange: Boolean): DataFrame = {
 
-trait SparkDFUtilsTrait {
-  def dedup(df: DataFrame, groupCol: Column, orderCols: Column*): DataFrame
+    val dfJoined = joinWithRangeInternal(dfSingle, colSingle, dfRange, colRangeStart, colRangeEnd, DECREASE_FACTOR)
 
-  def dedupTopN(df: DataFrame, n: Int, groupCol: Column, orderCols: Column*): DataFrame
+    // "range_start" is here for consistency
+    val dfDeduped = if (dedupSmallRange) {
+      dedup2(dfJoined, col(colSingle), struct("range_size", "range_start"), desc = false)
+    } else {
+      dedup2(dfJoined, col(colSingle), struct(expr("-range_size"), col("range_start")), desc = true)
+    }
 
-  def dedup2(df: DataFrame, groupCol: Column, orderByCol: Column, desc: Boolean, moreAggFunctions: Seq[Column], columnsFilter: Seq[String], columnsFilterKeep: Boolean): DataFrame
-
-  def flatten(df: DataFrame, colName: String): DataFrame
-
-  def changeSchema(df: DataFrame, newScheme: String*): DataFrame
-
-  def joinSkewed(dfLeft: DataFrame, dfRight: DataFrame, joinExprs: Column, numShards: Int, joinType: String): DataFrame
-
-  def broadcastJoinSkewed(notSkewed: DataFrame, skewed: DataFrame, joinCol: String, numberCustsToBroadcast: Int): DataFrame
-
-  def joinWithRange(dfSingle: DataFrame, colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long): DataFrame
+    dfDeduped.drop("range_start", "range_end", "decreased_range_single", "single", "decreased_single", "range_size")
+  }
 }
