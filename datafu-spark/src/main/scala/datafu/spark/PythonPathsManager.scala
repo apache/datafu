@@ -53,12 +53,10 @@ abstract class PythonResource(val resourcePath: String, val isAbsolutePath: Bool
   *
   * 1) When launching spark:
   *   the files need to be added to spark.executorEnv.PYTHONPATH
-  *   on cluster mode this is handled by com.paypal.risk.ars.bigdata.execution_fw.hadoop.spark.SparkTask
-  *   and on test mode by com.paypal.risk.ars.bigdata.hadoop.spark.utils.SparkTestManager
   *
   * 2) When executing python file via bridge:
   *   the files need to be added to the process PYTHONPATH. This is different than the previous phase because
-  *   this python process is spawn by zonkey, not by spark, and always on the driver.
+  *   this python process is spawned by datafu-spark, not by spark, and always on the driver.
   */
 object PythonPathsManager {
 
