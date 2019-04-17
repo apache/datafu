@@ -22,18 +22,18 @@ from pyspark_utils.df_utils import PySparkDFUtils
 df_utils = PySparkDFUtils()
 
 df_people = sqlContext.createDataFrame([
-...     ("a", "Alice", 34),
-...     ("a", "Sara", 33),
-...     ("b", "Bob", 36),
-...     ("b", "Charlie", 30),
-...     ("c", "David", 29),
-...     ("c", "Esther", 32),
-...     ("c", "Fanny", 36),
-...     ("c", "Zoey", 36)],
-...     ["id", "name", "age"])
+     ("a", "Alice", 34),
+     ("a", "Sara", 33),
+     ("b", "Bob", 36),
+     ("b", "Charlie", 30),
+     ("c", "David", 29),
+     ("c", "Esther", 32),
+     ("c", "Fanny", 36),
+     ("c", "Zoey", 36)],
+     ["id", "name", "age"])
 
 func_dedup_res = df_utils.dedup(dataFrame=df_people, groupCol=df_people.id,
-...                              orderCols=[df_people.age.desc(), df_people.name.desc()])
+                                orderCols=[df_people.age.desc(), df_people.name.desc()])
 
 func_dedup_res.registerTempTable("dedup")
 
