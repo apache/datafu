@@ -62,7 +62,7 @@ sourceSets.test.java.srcDirs = []
 dependencies {
     compile "org.scala-lang:scala-library:$scalaLibVersion"
 
-    testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_0.10.0"
+    testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
 	  testCompile "org.scalatest:scalatest_" + scalaVersion + ":" + sparkVersion
 }
 
@@ -84,6 +84,8 @@ if (hadoopVersion.startsWith("2.")) {
 test {
   systemProperty 'datafu.jar.dir', file('build/libs')
   systemProperty 'datafu.data.dir', file('data')
+
+  systemProperty 'datafu.spark.version', sparkVersion
 
   maxHeapSize = "2G"
 }

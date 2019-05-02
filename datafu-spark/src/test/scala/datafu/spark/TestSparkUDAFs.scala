@@ -22,6 +22,8 @@ import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.types.SparkOverwriteUDAFs
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.Row
 import org.junit.Assert
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -29,6 +31,7 @@ import org.scalatest.junit.JUnitRunner
 import org.slf4j.LoggerFactory
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.internal.StaticSQLConf.CATALOG_IMPLEMENTATION
+import org.apache.spark.rdd.RDD
 
 @RunWith(classOf[JUnitRunner])
 class UdafTests extends FunSuite with DataFrameSuiteBase {
@@ -44,7 +47,15 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  lazy val df = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4"))).toDF("col_grp", "col_ord", "col_str")
+ 	val inputSchema = List(
+      StructField("col_grp", StringType, true),
+      StructField("col_ord", IntegerType, false),
+      StructField("col_str", StringType, true)
+  )
+
+  lazy val inputRDD = sc.parallelize(Seq(Row("a", 1, "asd1"), Row("a", 2, "asd2"), Row("a", 3, "asd3"), Row("b", 1, "asd4")))
+  
+  lazy val df = sqlContext.createDataFrame(inputRDD, StructType(inputSchema)).cache
 
   case class mapExp(map_col: Map[String, Int])
   case class mapArrExp(map_col: Map[String, Array[String]])
@@ -138,14 +149,21 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
 
   case class exp4(col_grp: String, col_ord: Int, col_str: String, asd: String)
 
+    val minKeyValueWindowExpectedSchema = List(
+      StructField("col_grp",StringType,true),
+      StructField("col_ord",IntegerType,false),
+      StructField("col_str",StringType,true),
+      StructField("asd",StringType,true)
+    )
+
   test("minKeyValue window") {
     assertDataFrameEquals(
-      sqlContext.createDataFrame(List(
-        exp4("b", 1, "asd4", "asd4"),
-        exp4("a", 1, "asd1", "asd1"),
-        exp4("a", 2, "asd2", "asd1"),
-        exp4("a", 3, "asd3", "asd1")
-      )),
+      sqlContext.createDataFrame(sc.parallelize(Seq(
+        Row("b", 1, "asd4", "asd4"),
+        Row("a", 1, "asd1", "asd1"),
+        Row("a", 2, "asd2", "asd1"),
+        Row("a", 3, "asd3", "asd1")
+      )), StructType(minKeyValueWindowExpectedSchema)),
       df.withColumn("asd", SparkOverwriteUDAFs.minValueByKey($"col_ord", $"col_str").over(Window.partitionBy("col_grp"))))
   }
 

@@ -32,7 +32,12 @@ datafu-pig/query
 gradle/wrapper/gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper.properties
 gradlew*
-datafu-scala-spark/out
-datafu-scala-spark/derby.log
+datafu-spark/out
+datafu-spark/derby.log
 datafu-spark/spark-warehouse
 datafu-spark/metastore_db
+datafu-spark/bin
+datafu-spark/test-output
+datafu-spark/data
+datafu-spark/.apt_generated/
+

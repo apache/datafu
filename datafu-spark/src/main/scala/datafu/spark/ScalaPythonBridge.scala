@@ -35,8 +35,10 @@ case class ScalaPythonBridgeRunner(extraPath: String = "") {
   val logger = LoggerFactory.getLogger(this.getClass)
   //for the bridge we take the full resolved location, since this runs on the driver where the files are local:
   logger.info("constructing PYTHONPATH")
+  
+  // we include multiple options for py4j because on any given cluster only one should be found
   val pythonPath = (PythonPathsManager.getAbsolutePaths() ++
-    Array("pyspark.zip", "py4j-0.10.6-src.zip") ++
+    Array("pyspark.zip", "py4j-0.10.4-src.zip", "py4j-0.10.6-src.zip", "py4j-0.10.7-src.zip", "py4j-0.10.8.1-src.zip") ++
     Option(extraPath).getOrElse("").split(",")).distinct
 
   logger.info("Bridge PYTHONPATH: " + pythonPath.mkString(":"))

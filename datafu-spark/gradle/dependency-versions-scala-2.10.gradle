@@ -17,14 +17,10 @@
  * under the License.
  */
 ext {
-  sparkVersion = "2.3.0"
   scalaVersion = "2.10"
   scalaLibVersion = "2.10.4"
+  sparkTestingBaseVersion = "0.11.0"
   // Extra options for the compiler:
   // -feature: Give detailed warnings about language feature use (rather than just 'there were 4 warnings')
-  // -language:implicitConversions: Allow the use of implicit conversions without warning or library import
-  // -language:reflectiveCalls: Allow the automatic use of reflection to access fields without warning or library import
-//  scalaOptions = "-feature -language:implicitConversions -language:reflectiveCalls"
-  scalatraVersion = "2.2.1"
-  jettyVersion = "9.2.7.v20150116"
+  scalaOptions = "-feature"
 }

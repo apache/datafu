@@ -23,6 +23,27 @@ class PysparkResource extends PythonResource(PathsResolver.pyspark, true)
 class Py4JResource extends PythonResource(PathsResolver.py4j, true)
 
 object PathsResolver {
-  val pyspark = ResourceCloning.cloneResource(getClass.getResource("/built_in_pyspark_lib/pyspark.zip"), "pyspark_cloned.zip").getPath
-  val py4j = ResourceCloning.cloneResource(getClass.getResource("/built_in_pyspark_lib/py4j-0.10.6-src.zip"), "py4j_cloned.zip").getPath
+  
+  val sparkSystemVersion = System.getProperty("datafu.spark.version")
+  
+  val py4js = Map(
+      "2.1.0" -> "0.10.4",
+      "2.1.1" -> "0.10.4",
+      "2.1.2" -> "0.10.4",
+      "2.1.3" -> "0.10.4",
+      "2.2.0" -> "0.10.7",
+      "2.2.1" -> "0.10.7",
+      "2.2.2" -> "0.10.7",
+      "2.3.0" -> "0.10.6",
+      "2.3.1" -> "0.10.7",
+      "2.3.2" -> "0.10.7",
+      "2.4.0" -> "0.10.8.1"
+  )
+
+	val sparkVersion = if (sparkSystemVersion == null) "2.3.0" else sparkSystemVersion
+  
+  val py4jVersion = py4js.getOrElse(sparkVersion, "0.10.6") // our default
+  
+  val pyspark = ResourceCloning.cloneResource(getClass.getResource("/built_in_pyspark_lib/pyspark-" + sparkVersion + ".zip"), "pyspark_cloned.zip").getPath
+  val py4j = ResourceCloning.cloneResource(getClass.getResource("/built_in_pyspark_lib/py4j-" + py4jVersion + "-src.zip"), "py4j_cloned.zip").getPath
 }

@@ -20,6 +20,7 @@ package datafu.spark
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.Row
 
 import org.apache.spark.sql.functions._
 
@@ -34,6 +35,8 @@ import scala.collection.mutable.WrappedArray
 
 import org.apache.spark.sql.types._
 
+import org.apache.spark.rdd.RDD
+
 @RunWith(classOf[JUnitRunner])
 class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
   
@@ -41,40 +44,45 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
   
 	import spark.implicits._
 
- 	case class exp4(col2: String, col_grp:String, col_ord:Option[Int], col_str:String)
+	val inputSchema = List(
+      StructField("col_grp", StringType, true),
+      StructField("col_ord", IntegerType, false),
+      StructField("col_str", StringType, true)
+  )
 
-	case class exp3(col_grp:String, col_ord:Option[Int], col_str:String)
+  val dedupSchema = List(
+    StructField("col_grp", StringType, true),
+    StructField("col_ord", IntegerType, false)
+  )
 
-	case class exp2(col_grp:String, col_ord:Option[Int])
-	
-	case class exp2n(col_grp:String, col_ord:Int)
-	
-  //var df : DataFrame = spark.read.format("csv").option("header", "true").load("src/test/resources/dedup.csv")
- 
-  lazy val inputRDD = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4")))
+  lazy val inputRDD = sc.parallelize(Seq(Row("a", 1, "asd1"), Row("a", 2, "asd2"), Row("a", 3, "asd3"), Row("b", 1, "asd4")))
   
-  lazy val inputDataFrame = inputRDD.toDF("col_grp", "col_ord", "col_str").cache
-  
+  lazy val inputDataFrame = sqlContext.createDataFrame(inputRDD, StructType(inputSchema)).cache
+
   test("dedup") {
-    val expected : DataFrame = sc.parallelize(List(("b",1),("a",3))).toDF("col_grp", "col_ord")
+    val expected : DataFrame = sqlContext.createDataFrame(sc.parallelize(Seq(Row("b",1),Row("a",3))), StructType(dedupSchema))
 
     assertDataFrameEquals(expected, inputDataFrame.dedup($"col_grp", $"col_ord".desc).select($"col_grp", $"col_ord"))
   }
 
+ 	case class dedup_exp(col2: String, col_grp:String, col_ord:Option[Int], col_str:String)
+
   test("dedup2_by_int") {
 
-   	val expectedByIntDf : DataFrame = sqlContext.createDataFrame(List(exp4("asd4","b",Option(1),"asd4"),exp4("asd1","a",Option(3),"asd3")))
+   	val expectedByIntDf : DataFrame = sqlContext.createDataFrame(List(dedup_exp("asd4","b",Option(1),"asd4"),dedup_exp("asd1","a",Option(3),"asd3")))
 
     val actual = inputDataFrame.dedup2($"col_grp", $"col_ord", moreAggFunctions = Seq(min($"col_str")))
 
     assertDataFrameEquals(expectedByIntDf, actual)
   }
 
+  	case class dedup_exp2(col_grp:String, col_ord:Option[Int], col_str:String)
+
     test("dedup2_by_string_asc") {
 
       val actual = inputDataFrame.dedup2($"col_grp", $"col_str", desc = false)
     
-      val expectedByStringDf : DataFrame = sqlContext.createDataFrame(List(exp3("b",Option(1),"asd4"),exp3("a",Option(1),"asd1")))
+      val expectedByStringDf : DataFrame = sqlContext.createDataFrame(List(dedup_exp2("b",Option(1),"asd4"),dedup_exp2("a",Option(1),"asd1")))
 
       assertDataFrameEquals(expectedByStringDf, actual)
     }
@@ -83,7 +91,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
       val actual = inputDataFrame.dedup2($"col_grp", expr("cast(concat('-',col_ord) as int)"), desc = false)
     
-      val expectedComplex : DataFrame = sqlContext.createDataFrame(List(exp3("b",Option(1),"asd4"),exp3("a",Option(3),"asd3")))
+      val expectedComplex : DataFrame = sqlContext.createDataFrame(List(dedup_exp2("b",Option(1),"asd4"),dedup_exp2("a",Option(3),"asd3")))
 
       assertDataFrameEquals(expectedComplex, actual)
     }
@@ -113,61 +121,82 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
           expComplex("a", Option(1), "asd1", Array("a","1"), inner("a",1), Map("a" -> 1))
       ))
                   
-//      compare(expected, actual)
-      
       assertDataFrameEquals(expected, actual)
     }
+
+    val dedupTopNExpectedSchema = List(
+      StructField("col_grp", StringType, true),
+      StructField("col_ord", IntegerType, false)
+    )
 
     test("test_dedup_top_n") {
       val actual = inputDataFrame.dedupTopN(2, $"col_grp", $"col_ord".desc).select($"col_grp", $"col_ord")
       
-      val expected = sqlContext.createDataFrame(List(exp2n("b",1), exp2n("a",3), exp2n("a",2)))
+      val expected = sqlContext.createDataFrame(sc.parallelize(Seq(Row("b",1), Row("a",3), Row("a",2))), StructType(dedupTopNExpectedSchema))
       
        assertDataFrameEquals(expected, actual)
     }
 
-   	case class expRangeJoin2(col_grp:String, col_ord:Option[Int], col_str:String, start:Option[Int], end:Option[Int], desc:String)
-   	case class expRangeJoin1(col_grp:String, col_ord:Int, col_str:String, start:Option[Int], end:Option[Int], desc:String)
+    val schema2 = List(
+      StructField("start", IntegerType, false),
+      StructField("end", IntegerType, false),
+      StructField("desc", StringType, true)
+    )
 
+    val expectedSchemaRangedJoin = List(
+        StructField("col_grp",StringType,true),
+        StructField("col_ord",IntegerType,false),
+        StructField("col_str",StringType,true),
+        StructField("start",IntegerType,true),
+        StructField("end",IntegerType,true),
+        StructField("desc",StringType,true)
+    )
+    
     test("join_with_range") {
-      val df = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4"))).toDF("col_grp", "col_ord", "col_str")
-   	  val dfr = sc.parallelize(List((1, 2,"asd1"), (1, 4, "asd2"), (3, 5,"asd3"), (3, 10,"asd4"))).toDF("start", "end", "desc")
+      val joinWithRangeDataFrame = sqlContext.createDataFrame(sc.parallelize(Seq(Row(1, 2,"asd1"), Row(1, 4, "asd2"), Row(3, 5,"asd3"), Row(3, 10,"asd4"))),StructType(schema2))
   
-      val expected = sqlContext.createDataFrame(List(
-        expRangeJoin1("a",1,"asd1",Option(1),Option(2),"asd1"),
-        expRangeJoin1("a",1,"asd1",Option(1),Option(4),"asd2"),
-        expRangeJoin1("a",2,"asd2",Option(1),Option(2),"asd1"),
-        expRangeJoin1("a",2,"asd2",Option(1),Option(4),"asd2"),
-        expRangeJoin1("a",3,"asd3",Option(1),Option(4),"asd2"),
-        expRangeJoin1("a",3,"asd3",Option(3),Option(5),"asd3"),
-        expRangeJoin1("a",3,"asd3",Option(3),Option(10),"asd4"),
-        expRangeJoin1("b",1,"asd4",Option(1),Option(2),"asd1"),
-        expRangeJoin1("b",1,"asd4",Option(1),Option(4),"asd2")
-      ))
+      val expected = sqlContext.createDataFrame(sc.parallelize(Seq(
+        Row("b",1,"asd4",1,2,"asd1"),
+        Row("a",2,"asd2",1,2,"asd1"),
+        Row("a",1,"asd1",1,2,"asd1"),
+        Row("b",1,"asd4",1,4,"asd2"),
+        Row("a",3,"asd3",1,4,"asd2"),
+        Row("a",2,"asd2",1,4,"asd2"),
+        Row("a",1,"asd1",1,4,"asd2"),
+        Row("a",3,"asd3",3,5,"asd3"),
+        Row("a",3,"asd3",3,10,"asd4")
+      )), StructType(expectedSchemaRangedJoin))
       
-      val actual = df.joinWithRange("col_ord", dfr, "start", "end")
-      actual.show()
+      val actual = inputDataFrame.joinWithRange("col_ord", joinWithRangeDataFrame, "start", "end")
       
       assertDataFrameEquals(expected, actual)
   }
 
-  test("join_with_range_and_dedup") {
-      val df = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4"))).toDF("col_grp", "col_ord", "col_str")
-   	  val dfr = sc.parallelize(List((1, 2,"asd1"), (1, 4, "asd2"), (3, 5,"asd3"), (3, 10,"asd4"))).toDF("start", "end", "desc")
+      val expectedSchemaRangedJoinWithDedup = List(
+        StructField("col_grp",StringType,true),
+        StructField("col_ord",IntegerType,true),
+        StructField("col_str",StringType,true),
+        StructField("start",IntegerType,true),
+        StructField("end",IntegerType,true),
+        StructField("desc",StringType,true)
+    )
 
-      val expected = sqlContext.createDataFrame(List(
-          expRangeJoin2("b",Option(1),"asd4",Option(1),Option(2),"asd1"),
-          expRangeJoin2("a",Option(3),"asd3",Option(3),Option(5),"asd3"),
-          expRangeJoin2("a",Option(2),"asd2",Option(1),Option(2),"asd1")
+    test("join_with_range_and_dedup") {
+          val df = sc.parallelize(List(("a", 1, "asd1"), ("a", 2, "asd2"), ("a", 3, "asd3"), ("b", 1, "asd4"))).toDF("col_grp", "col_ord", "col_str")
+       	  val dfr = sc.parallelize(List((1, 2,"asd1"), (1, 4, "asd2"), (3, 5,"asd3"), (3, 10,"asd4"))).toDF("start", "end", "desc")
+    
+          val expected = sqlContext.createDataFrame(sc.parallelize(Seq(
+              Row("b",1,"asd4",1,2,"asd1"),
+              Row("a",3,"asd3",3,5,"asd3"),
+              Row("a",2,"asd2",1,2,"asd1")
+          )), StructType(expectedSchemaRangedJoinWithDedup))
+    
+          
+          val actual = df.joinWithRangeAndDedup("col_ord", dfr, "start", "end")
+    
+          assertDataFrameEquals(expected, actual)
+    }
 
-      ))
-
-      val actual = df.joinWithRangeAndDedup("col_ord", dfr, "start", "end")
-      actual.show()
-
-      assertDataFrameEquals(expected, actual)
-  }
-  
     test("broadcastJoinSkewed") {
       val skewedList = List(("1", "a"), ("1", "b"), ("1", "c"), ("1", "d"), ("1", "e"),("2", "k"),("0", "k"))
       val skewed = sqlContext.createDataFrame(skewedList).toDF("key", "val_skewed")
@@ -227,13 +256,17 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       assertDataFrameEquals(expected2, actual2.sort($"val_skewed")) // assertDataFrameEquals cares about order but we don't
     }
 
+    val changedSchema = List(
+      StructField("fld1", StringType, true),
+      StructField("fld2", IntegerType, false),
+      StructField("fld3", StringType, true)
+  )
+  
     test("test_changeSchema") {
 
       val actual = inputDataFrame.changeSchema("fld1","fld2", "fld3")
     
-      val expected : DataFrame = inputRDD.toDF("fld1","fld2", "fld3")
-
-      actual.show
+      val expected = sqlContext.createDataFrame(inputRDD, StructType(changedSchema))
       
       assertDataFrameEquals(expected, actual)
     }
@@ -245,20 +278,6 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       val expected : DataFrame = inputDataFrame.select("col_grp", "col_ord")
       
       val actual = input.flatten("struct_col")
-      
-      assertDataFrameEquals(expected, actual)
-    }
-
-    def compare(expected: DataFrame, actual: DataFrame) = {
-      println ("expected: " + expected.schema)
-      
-      expected.show
-      
-      println ("actual: " + actual.schema)
-      
-      actual.show
-      
-      assert("Schemas not equal!!!", expected.schema, actual.schema)
       
       assertDataFrameEquals(expected, actual)
     }
