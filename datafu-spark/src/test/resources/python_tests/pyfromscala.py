@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Some usage exmaples of python-Scala functionality
+# Some usage examples of python-Scala functionality
 
 # print the PYTHONPATH
 import sys

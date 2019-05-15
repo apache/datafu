@@ -213,7 +213,7 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
     )
   }
 
-  case class Exp5(colGrp: String, colOrd: Option[Int])
+  case class Exp5(col_grp: String, col_ord: Option[Int])
 
   test("countDistinctUpTo") {
     import datafu.spark.SparkUDAFs.CountDistinctUpTo

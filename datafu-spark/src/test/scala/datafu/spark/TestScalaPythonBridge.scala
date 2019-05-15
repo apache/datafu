@@ -83,7 +83,7 @@ class TestScalaPythonBridge extends FunSuite {
     val dfin = spark.sparkContext.parallelize(1 to 10).toDF("num")
     dfin.createOrReplaceTempView("dfin")
 
-    runner.runPythonFile("example_tests/pyfromscala.py")
+    runner.runPythonFile("python_tests/pyfromscala.py")
 
     // try to invoke python udf from scala code
     assert(
@@ -100,13 +100,13 @@ class TestScalaPythonBridge extends FunSuite {
   }
 
   test("pyfromscala_with_error.py") {
-    val t = Try(runner.runPythonFile("example_tests/pyfromscala_with_error.py"))
+    val t = Try(runner.runPythonFile("python_tests/pyfromscala_with_error.py"))
     assert(t.isFailure)
     assert(t.failed.get.isInstanceOf[RuntimeException])
   }
 
   test("SparkDFUtilsBridge") {
-    runner.runPythonFile("example_tests/df_utils_tests.py")
+    runner.runPythonFile("python_tests/df_utils_tests.py")
     assertTable("dedup", "[a,Alice,34], [b,Bob,36], [c,Zoey,36]")
     assertTable(
       "dedupTopN",
@@ -126,4 +126,4 @@ class TestScalaPythonBridge extends FunSuite {
 
 }
 
-class ExampleFiles extends PythonResource("example_tests")
+class ExampleFiles extends PythonResource("python_tests")

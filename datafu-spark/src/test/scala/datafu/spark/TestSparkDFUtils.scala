@@ -111,7 +111,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
     assertDataFrameEquals(expectedComplex, actual)
   }
 
-  case class Inner(colGrp: String, colOrd: Int)
+  case class Inner(col_grp: String, col_ord: Int)
 
   case class expComplex(
                          col_grp: String,
