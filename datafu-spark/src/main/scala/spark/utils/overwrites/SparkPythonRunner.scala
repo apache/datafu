@@ -18,23 +18,25 @@ package org.apache.spark.deploy
 
 import java.io._
 
-import datafu.spark.ScalaPythonBridge
-import org.apache.log4j.Logger
-import org.apache.spark.api.python.PythonUtils
-import org.apache.spark.util.Utils
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
+import datafu.spark.ScalaPythonBridge
+import org.apache.log4j.Logger
+
+import org.apache.spark.api.python.PythonUtils
+import org.apache.spark.util.Utils
+
 /**
-  * We wrap Spark's PythonRunner because we failed on premature python process closing.
-  * in PythonRunner the python process exits immediately when finished to read the filename,
-  * this caused us to Accumulators Exceptions when the driver tries to get accumulation data
-  * from the python gateway.
-  * Instead, like in Zeppelin, we create an "interactive" python process, feed it the python
-  * script and not closing the gateway.
-  */
-case class SparkPythonRunner(pyPaths: String, otherArgs: Array[String] = Array()) {
+ * We wrap Spark's PythonRunner because we failed on premature python process closing.
+ * in PythonRunner the python process exits immediately when finished to read the filename,
+ * this caused us to Accumulators Exceptions when the driver tries to get accumulation data
+ * from the python gateway.
+ * Instead, like in Zeppelin, we create an "interactive" python process, feed it the python
+ * script and not closing the gateway.
+ */
+case class SparkPythonRunner(pyPaths: String,
+                             otherArgs: Array[String] = Array()) {
 
   val logger: Logger = Logger.getLogger(getClass)
   val (reader, writer, process) = initPythonEnv()
@@ -49,7 +51,8 @@ case class SparkPythonRunner(pyPaths: String, otherArgs: Array[String] = Array()
   private def initPythonEnv(): (BufferedReader, BufferedWriter, Process) = {
 
     val pythonExec =
-      sys.env.getOrElse("PYSPARK_DRIVER_PYTHON", sys.env.getOrElse("PYSPARK_PYTHON", "python"))
+      sys.env.getOrElse("PYSPARK_DRIVER_PYTHON",
+                        sys.env.getOrElse("PYSPARK_PYTHON", "python"))
 
     // Format python filename paths before adding them to the PYTHONPATH
     val formattedPyFiles = PythonRunner.formatPaths(pyPaths)
@@ -79,39 +82,33 @@ case class SparkPythonRunner(pyPaths: String, otherArgs: Array[String] = Array()
     pathElements += PythonUtils.sparkPythonPath
     pathElements += sys.env.getOrElse("PYTHONPATH", "")
     val pythonPath = PythonUtils.mergePythonPaths(pathElements: _*)
-    logger.info(s"Running python with PYTHONPATH:\n\t${formattedPyFiles.mkString(",")}")
+    logger.info(
+      s"Running python with PYTHONPATH:\n\t${formattedPyFiles.mkString(",")}")
 
     // Launch Python process
-    //val builder = new ProcessBuilder((Seq(pythonExec, formattedPythonFile) ++ otherArgs).asJava)
-    val builder = new ProcessBuilder((Seq(pythonExec, "-iu") ++ otherArgs).asJava)
+    val builder = new ProcessBuilder(
+      (Seq(pythonExec, "-iu") ++ otherArgs).asJava)
     val env = builder.environment()
     env.put("PYTHONPATH", pythonPath)
     // This is equivalent to setting the -u flag; we use it because ipython doesn't support -u:
     env.put("PYTHONUNBUFFERED", "YES") // value is needed to be set to a non-empty string
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
     builder.redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
-    //try {
-      val process = builder.start()
-      //new RedirectThread(process.getInputStream, System.out, "redirect output").start()
-      val writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream))
-      val reader = new BufferedReader(new InputStreamReader(process.getInputStream))
-
-      //      val exitCode = process.waitFor()
-      //      if (exitCode != 0) {
-      //        throw new SparkUserAppException(exitCode)
-      //      }
-    //} finally {
-      //      gatewayServer.shutdown()
-    //}
+    val process = builder.start()
+    val writer = new BufferedWriter(
+      new OutputStreamWriter(process.getOutputStream))
+    val reader = new BufferedReader(
+      new InputStreamReader(process.getInputStream))
 
     (reader, writer, process)
   }
 
-
-  private def execFile(filename: String, writer: BufferedWriter, reader: BufferedReader): String = {
+  private def execFile(filename: String,
+                       writer: BufferedWriter,
+                       reader: BufferedReader): String = {
     writer.write("import traceback\n")
     writer.write("try:\n")
-    writer.write("    execfile('"+filename+"')\n")
+    writer.write("    execfile('" + filename + "')\n")
     writer.write("    print (\"*!?flush reader!?*\")\n")
     writer.write("except Exception as e:\n")
     writer.write("    traceback.print_exc()\n")
@@ -120,19 +117,19 @@ case class SparkPythonRunner(pyPaths: String, otherArgs: Array[String] = Array()
     writer.flush()
     var output = ""
     var line: String = reader.readLine
-    while (!line.contains("*!?flush reader!?*") && !line.contains("*!?flush error reader!?*")) {
-      //logger.debug("Read line from python shell : " + line)
-      System.out.println(line)
+    while (!line.contains("*!?flush reader!?*") && !line.contains(
+             "*!?flush error reader!?*")) {
+      logger.info(line)
       if (line == "...") {
-        //logger.warn("Syntax error ! ")
         output += "Syntax error ! "
       }
       output += "\r" + line + "\n"
       line = reader.readLine
     }
 
-    if (line.contains("*!?flush error reader!?*"))
+    if (line.contains("*!?flush error reader!?*")) {
       throw new RuntimeException("python bridge error: " + output)
+    }
 
     output
   }

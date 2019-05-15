@@ -20,17 +20,21 @@ package datafu.spark
 
 import java.io.File
 
-import com.holdenkarau.spark.testing.Utils
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
-import org.junit._
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.junit.runner.RunWith
-
 import scala.util.Try
 
+import com.holdenkarau.spark.testing.Utils
+import org.junit._
+import org.junit.runner.RunWith
+import org.scalatest.FunSuite
+import org.scalatest.junit.JUnitRunner
+import org.slf4j.LoggerFactory
+
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+
 object TestScalaPythonBridge {
+
+  val logger = LoggerFactory.getLogger(this.getClass)
 
   def getNewRunner(): ScalaPythonBridgeRunner = {
     val runner = ScalaPythonBridgeRunner()
@@ -43,15 +47,16 @@ object TestScalaPythonBridge {
     val tempDir = Utils.createTempDir()
     val localMetastorePath = new File(tempDir, "metastore").getCanonicalPath
     val localWarehousePath = new File(tempDir, "wharehouse").getCanonicalPath
-    val pythonPath = PythonPathsManager.getAbsolutePaths().mkString(File.pathSeparator)
-    println("Creating SparkConf with PYTHONPATH: " + pythonPath)
+    val pythonPath =
+      PythonPathsManager.getAbsolutePaths().mkString(File.pathSeparator)
+    logger.info("Creating SparkConf with PYTHONPATH: " + pythonPath)
     val sparkConf = new SparkConf()
-    .setMaster("local[1]")
-    .set("spark.sql.warehouse.dir", localWarehousePath)
-    .set("javax.jdo.option.ConnectionURL", s"jdbc:derby:;databaseName=$localMetastorePath;create=true")
-    //.set("datanucleus.rdbms.datastoreAdapterClassName", "org.datanucleus.store.rdbms.adapter.DerbyAdapter")
-    .setExecutorEnv(Seq(("PYTHONPATH", pythonPath)))
-    .setAppName("Spark Unit Test")
+      .setMaster("local[1]")
+      .set("spark.sql.warehouse.dir", localWarehousePath)
+      .set("javax.jdo.option.ConnectionURL",
+           s"jdbc:derby:;databaseName=$localMetastorePath;create=true")
+      .setExecutorEnv(Seq(("PYTHONPATH", pythonPath)))
+      .setAppName("Spark Unit Test")
 
     val builder = SparkSession.builder().config(sparkConf).enableHiveSupport()
     val spark = builder.getOrCreate()
@@ -67,8 +72,9 @@ class TestScalaPythonBridge extends FunSuite {
   private lazy val runner = TestScalaPythonBridge.getNewRunner()
 
   def assertTable(tableName: String, expected: String): Unit =
-    Assert.assertEquals(expected, spark.table(tableName).collect().sortBy(_.toString).mkString(", "))
-
+    Assert.assertEquals(
+      expected,
+      spark.table(tableName).collect().sortBy(_.toString).mkString(", "))
 
   test("pyfromscala.py") {
 
@@ -80,11 +86,16 @@ class TestScalaPythonBridge extends FunSuite {
     runner.runPythonFile("example_tests/pyfromscala.py")
 
     // try to invoke python udf from scala code
-    assert(spark.sql("select magic('python_udf')").collect().mkString(",") == "[python_udf magic]")
+    assert(
+      spark
+        .sql("select magic('python_udf')")
+        .collect()
+        .mkString(",") == "[python_udf magic]")
 
-    //spark.sql("select * from dfout").registerTempTable("output")
-    assertTable("dfout", "[10], [12], [14], [16], [18], [20], [2], [4], [6], [8]")
-    assertTable("dfout2", "[16], [24], [32], [40], [48], [56], [64], [72], [80], [8]")
+    assertTable("dfout",
+                "[10], [12], [14], [16], [18], [20], [2], [4], [6], [8]")
+    assertTable("dfout2",
+                "[16], [24], [32], [40], [48], [56], [64], [72], [80], [8]")
     assertTable("stats", "[a,0.1], [b,2.0]")
   }
 
@@ -93,17 +104,24 @@ class TestScalaPythonBridge extends FunSuite {
     assert(t.isFailure)
     assert(t.failed.get.isInstanceOf[RuntimeException])
   }
-  
+
   test("SparkDFUtilsBridge") {
     runner.runPythonFile("example_tests/df_utils_tests.py")
     assertTable("dedup", "[a,Alice,34], [b,Bob,36], [c,Zoey,36]")
-    assertTable("dedupTopN", "[a,Alice,34], [a,Sara,33], [b,Bob,36], [b,Charlie,30], [c,Fanny,36], [c,Zoey,36]")
+    assertTable(
+      "dedupTopN",
+      "[a,Alice,34], [a,Sara,33], [b,Bob,36], [b,Charlie,30], [c,Fanny,36], [c,Zoey,36]")
     assertTable("dedup2", "[a,34], [b,36], [c,36]")
-    assertTable("changeSchema", "[a,Alice,34], [a,Sara,33], [b,Bob,36], [b,Charlie,30], [c,David,29], [c,Esther,32], [c,Fanny,36], [c,Zoey,36]")
+    assertTable(
+      "changeSchema",
+      "[a,Alice,34], [a,Sara,33], [b,Bob,36], [b,Charlie,30], [c,David,29], [c,Esther,32], " +
+        "[c,Fanny,36], [c,Zoey,36]")
     assertTable("joinSkewed", "[a,Laura,34,a,1], [a,Stephani,33,a,1]")
     assertTable("broadcastJoinSkewed", "[a,Laura,34,1], [a,Stephani,33,1]")
-    assertTable("joinWithRange", "[a,Laura,34,a,34,36], [b,Margaret,36,a,34,36]")
-    assertTable("joinWithRangeAndDedup", "[a,Laura,34,a,34,36], [b,Margaret,36,a,34,36]")
+    assertTable("joinWithRange",
+                "[a,Laura,34,a,34,36], [b,Margaret,36,a,34,36]")
+    assertTable("joinWithRangeAndDedup",
+                "[a,Laura,34,a,34,36], [b,Margaret,36,a,34,36]")
   }
 
 }

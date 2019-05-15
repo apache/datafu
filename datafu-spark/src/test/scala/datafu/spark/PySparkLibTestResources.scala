@@ -44,6 +44,10 @@ object PathsResolver {
   
   val py4jVersion = py4js.getOrElse(sparkVersion, "0.10.6") // our default
   
-  val pyspark = ResourceCloning.cloneResource(getClass.getResource("/built_in_pyspark_lib/pyspark-" + sparkVersion + ".zip"), "pyspark_cloned.zip").getPath
-  val py4j = ResourceCloning.cloneResource(getClass.getResource("/built_in_pyspark_lib/py4j-" + py4jVersion + "-src.zip"), "py4j_cloned.zip").getPath
+  val pyspark = ResourceCloning.cloneResource(
+    getClass.getResource("/built_in_pyspark_lib/pyspark-" + sparkVersion + ".zip"),
+    "pyspark_cloned.zip").getPath
+  val py4j = ResourceCloning.cloneResource(
+    getClass.getResource("/built_in_pyspark_lib/py4j-" + py4jVersion + "-src.zip"),
+    "py4j_cloned.zip").getPath
 }

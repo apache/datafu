@@ -23,22 +23,27 @@ import java.net.URL
 import java.nio.file.Files
 import java.util.UUID
 
+import org.slf4j.LoggerFactory
+
 import org.apache.spark.SparkConf
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.deploy.SparkPythonRunner
 import org.apache.spark.sql.SparkSession
-import org.slf4j.LoggerFactory
-
 
 case class ScalaPythonBridgeRunner(extraPath: String = "") {
 
   val logger = LoggerFactory.getLogger(this.getClass)
-  //for the bridge we take the full resolved location, since this runs on the driver where the files are local:
+  // for the bridge we take the full resolved location,
+  // since this runs on the driver where the files are local:
   logger.info("constructing PYTHONPATH")
-  
+
   // we include multiple options for py4j because on any given cluster only one should be found
   val pythonPath = (PythonPathsManager.getAbsolutePaths() ++
-    Array("pyspark.zip", "py4j-0.10.4-src.zip", "py4j-0.10.6-src.zip", "py4j-0.10.7-src.zip", "py4j-0.10.8.1-src.zip") ++
+    Array("pyspark.zip",
+          "py4j-0.10.4-src.zip",
+          "py4j-0.10.6-src.zip",
+          "py4j-0.10.7-src.zip",
+          "py4j-0.10.8.1-src.zip") ++
     Option(extraPath).getOrElse("").split(",")).distinct
 
   logger.info("Bridge PYTHONPATH: " + pythonPath.mkString(":"))
@@ -47,28 +52,29 @@ case class ScalaPythonBridgeRunner(extraPath: String = "") {
 
   def runPythonFile(filename: String): String = {
     val pyScript = resolveRunnableScript(filename)
-    //    this.getClass.getClassLoader.asInstanceOf[URLClassLoader].getURLs.foreach(s => logger.info("class: " + s))
     logger.info(s"Running python file $pyScript")
     runner.runPyFile(pyScript)
   }
 
   def runPythonString(str: String): String = {
     val tmpFile = writeToTempFile(str, "pyspark-tmp-file-", ".py")
-    logger.info("Running tmp PySpark file: " + tmpFile.getAbsolutePath + " with content:\n" + str)
+    logger.info(
+      "Running tmp PySpark file: " + tmpFile.getAbsolutePath + " with content:\n" + str)
     runner.runPyFile(tmpFile.getAbsolutePath)
   }
 
   private def resolveRunnableScript(path: String): String = {
     logger.info("Resolving python script location for: " + path)
 
-    val res: String = Option(this.getClass.getClassLoader.getResource(path)) match {
+    val res
+      : String = Option(this.getClass.getClassLoader.getResource(path)) match {
       case None =>
         logger.info("Didn't find script via classLoader, using as is: " + path)
         path
       case Some(resource) =>
         resource.toURI.getScheme match {
           case "jar" =>
-            //if inside jar, extract it and return cloned file:
+            // if inside jar, extract it and return cloned file:
             logger.info("Script found inside jar, extracting...")
             val outputFile = ResourceCloning.cloneResource(resource, path)
             logger.info("Extracted file path: " + outputFile.getPath)
@@ -81,7 +87,9 @@ case class ScalaPythonBridgeRunner(extraPath: String = "") {
     res
   }
 
-  private def writeToTempFile(contents: String, prefix: String, suffix: String): File = {
+  private def writeToTempFile(contents: String,
+                              prefix: String,
+                              suffix: String): File = {
     val tempFi = File.createTempFile(prefix, suffix)
     tempFi.deleteOnExit()
     val bw = new BufferedWriter(new FileWriter(tempFi))
@@ -93,12 +101,13 @@ case class ScalaPythonBridgeRunner(extraPath: String = "") {
 }
 
 /**
-  * Do not instantiate this class! Use the companion object instead.
-  * This class should only be used by python
-  */
-object ScalaPythonBridge { //need empty ctor for py4j gateway
+ * Do not instantiate this class! Use the companion object instead.
+ * This class should only be used by python
+ */
+object ScalaPythonBridge { // need empty ctor for py4j gateway
 
-  /** members used to allow python script share context with main Scala program calling it.
+  /**
+    * members used to allow python script share context with main Scala program calling it.
     * Python script calls :
     * sc, sqlContext, spark = utils.get_contexts()
     * our Python util function get_contexts
@@ -106,20 +115,22 @@ object ScalaPythonBridge { //need empty ctor for py4j gateway
     */
   // Called by python util get_contexts()
   def pyGetSparkSession(): SparkSession = SparkSession.builder().getOrCreate()
-  def pyGetJSparkContext(sparkSession: SparkSession): JavaSparkContext = new JavaSparkContext(sparkSession.sparkContext)
+  def pyGetJSparkContext(sparkSession: SparkSession): JavaSparkContext =
+    new JavaSparkContext(sparkSession.sparkContext)
   def pyGetSparkConf(jsc: JavaSparkContext): SparkConf = jsc.getConf
 
 }
 
 /**
-  * Utility for extracting resource from a jar and copy it to a temporary location
-  */
+ * Utility for extracting resource from a jar and copy it to a temporary location
+ */
 object ResourceCloning {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   val uuid = UUID.randomUUID().toString.substring(6)
-  val outputTempDir = new File(System.getProperty("java.io.tmpdir"), s"risk_tmp/$uuid/cloned_resources/")
+  val outputTempDir = new File(System.getProperty("java.io.tmpdir"),
+                               s"risk_tmp/$uuid/cloned_resources/")
   forceMkdirs(outputTempDir)
 
   def cloneResource(resource: URL, outputFileName: String): File = {
@@ -129,7 +140,8 @@ object ResourceCloning {
       outputTmpFile
     } else {
       logger.info("cloning resource: " + resource)
-      if (!outputTmpFile.exists()) { //it is possible that the file was already extracted in the session
+      if (!outputTmpFile.exists()) {
+        // it is possible that the file was already extracted in the session
         forceMkdirs(outputTmpFile.getParentFile)
         val inputStream = resource.openStream()
         streamToFile(outputTmpFile, inputStream)
@@ -139,14 +151,14 @@ object ResourceCloning {
   }
 
   private def forceMkdirs(dir: File) =
-    if (!dir.exists() && !dir.mkdirs())
+    if (!dir.exists() && !dir.mkdirs()) {
       throw new IOException("Failed to create " + dir.getPath)
+    }
 
   private def streamToFile(outputFile: File, inputStream: InputStream) = {
     try {
       Files.copy(inputStream, outputFile.toPath)
-    }
-    finally {
+    } finally {
       inputStream.close()
       assert(outputFile.exists())
     }

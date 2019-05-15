@@ -14,7 +14,9 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
- 
+
+# Some usage exmaples of python-Scala functionality
+
 # print the PYTHONPATH
 import sys
 from pprint import pprint as p

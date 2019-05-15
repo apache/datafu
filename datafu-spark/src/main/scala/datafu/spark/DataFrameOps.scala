@@ -30,26 +30,63 @@ object DataFrameOps {
     def dedupTopN(n: Int, groupCol: Column, orderCols: Column*): DataFrame =
       SparkDFUtils.dedupTopN(df, n, groupCol, orderCols: _*)
 
-    def dedup2(groupCol: Column, orderByCol: Column, desc: Boolean = true, moreAggFunctions: Seq[Column] = Nil, columnsFilter: Seq[String] = Nil, columnsFilterKeep: Boolean = true): DataFrame =
-      SparkDFUtils.dedup2(df, groupCol, orderByCol, desc, moreAggFunctions, columnsFilter, columnsFilterKeep)
+    def dedup2(groupCol: Column,
+               orderByCol: Column,
+               desc: Boolean = true,
+               moreAggFunctions: Seq[Column] = Nil,
+               columnsFilter: Seq[String] = Nil,
+               columnsFilterKeep: Boolean = true): DataFrame =
+      SparkDFUtils.dedup2(df,
+                          groupCol,
+                          orderByCol,
+                          desc,
+                          moreAggFunctions,
+                          columnsFilter,
+                          columnsFilterKeep)
 
     def flatten(colName: String): DataFrame = SparkDFUtils.flatten(df, colName)
 
-    def changeSchema(newScheme: String*): DataFrame = SparkDFUtils.changeSchema(df, newScheme: _*)
+    def changeSchema(newScheme: String*): DataFrame =
+      SparkDFUtils.changeSchema(df, newScheme: _*)
 
-    def joinWithRange(colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long = 2^8) =
-      SparkDFUtils.joinWithRange(df, colSingle, dfRange, colRangeStart, colRangeEnd, DECREASE_FACTOR)
+    def joinWithRange(colSingle: String,
+                      dfRange: DataFrame,
+                      colRangeStart: String,
+                      colRangeEnd: String,
+                      DECREASE_FACTOR: Long = 2 ^ 8): DataFrame =
+      SparkDFUtils.joinWithRange(df,
+                                 colSingle,
+                                 dfRange,
+                                 colRangeStart,
+                                 colRangeEnd,
+                                 DECREASE_FACTOR)
 
-    def joinWithRangeAndDedup(colSingle: String, dfRange: DataFrame, colRangeStart: String, colRangeEnd: String, DECREASE_FACTOR: Long = 2^8, dedupSmallRange: Boolean = true): DataFrame = {
-      SparkDFUtils.joinWithRangeAndDedup(df, colSingle, dfRange, colRangeStart, colRangeEnd, DECREASE_FACTOR, dedupSmallRange)
-    }
+    def joinWithRangeAndDedup(colSingle: String,
+                              dfRange: DataFrame,
+                              colRangeStart: String,
+                              colRangeEnd: String,
+                              DECREASE_FACTOR: Long = 2 ^ 8,
+                              dedupSmallRange: Boolean = true): DataFrame =
+      SparkDFUtils.joinWithRangeAndDedup(df,
+                                         colSingle,
+                                         dfRange,
+                                         colRangeStart,
+                                         colRangeEnd,
+                                         DECREASE_FACTOR,
+                                         dedupSmallRange)
 
-    def broadcastJoinSkewed(skewed: DataFrame, joinCol: String, numberCustsToBroadcast: Int): DataFrame = {
-      SparkDFUtils.broadcastJoinSkewed(df, skewed, joinCol, numberCustsToBroadcast)
-    }
+    def broadcastJoinSkewed(skewed: DataFrame,
+                            joinCol: String,
+                            numberCustsToBroadcast: Int): DataFrame =
+      SparkDFUtils.broadcastJoinSkewed(df,
+                                       skewed,
+                                       joinCol,
+                                       numberCustsToBroadcast)
 
-    def joinSkewed(notSkewed: DataFrame, joinExprs: Column, numShards: Int = 1000, joinType: String = "inner") : DataFrame = {
+    def joinSkewed(notSkewed: DataFrame,
+                   joinExprs: Column,
+                   numShards: Int = 1000,
+                   joinType: String = "inner"): DataFrame =
       SparkDFUtils.joinSkewed(df, notSkewed, joinExprs, numShards, joinType)
-    }
   }
 }
