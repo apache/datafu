@@ -17,14 +17,13 @@
  * under the License.
  */
 
-/*
- * Macro for sampling a table by a list of keys.
+/**
+ *  Samples a table by a list of keys.
  *
- * Params:
- *   - table_name               - table name to sample
- *   - sample_set               - a set of keys
- *   - join_key_table           - join column name in the table
- *   - join_key_sample          - join column name in the sample
+ *  table_name - table name to sample
+ *  sample_set - a set of keys
+ *  join_key_table - join column name in the table
+ *  join_key_sample - join column name in the sample
  */
 DEFINE sample_by_keys(table, sample_set, join_key_table, join_key_sample) RETURNS out {
     t = FOREACH $table GENERATE

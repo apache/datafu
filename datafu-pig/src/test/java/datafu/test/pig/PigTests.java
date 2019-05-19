@@ -235,7 +235,7 @@ public abstract class PigTests
   protected void assertOutput(PigTest test, String alias, String... expected) throws IOException, ParseException
   {
     List<Tuple> tuples = getLinesForAlias(test, alias);
-    assertEquals(expected.length, tuples.size(), "Mismatch in number of tuples");
+    assertEquals(tuples.size(), expected.length, "Mismatch in number of tuples");
     int i=0;
     for (String e : expected)
     {

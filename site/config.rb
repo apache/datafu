@@ -85,8 +85,6 @@ helpers do
      apache-datafu-incubating-sources-#{version}.tgz</a>
      [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.asc\">
      PGP</a> ]
-     [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.md5\">
-     MD5</a> ]
      [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.sha512\">
      SHA512</a> ]"
   end

@@ -18,23 +18,20 @@
  */
 
 /**
- *  Counts all the rows in a relation
+ *  Used to take the most recent row of a table for a given key.
  *
- *  relation - the relation to count
+ *	relation - relation to dedup
+ *	row_key - field(s) for group by
+ *	order_field - the field for ordering (to find the most recent record)
+ *
  */
-DEFINE count_all_non_distinct(alias) returns res {
-  grp_all = GROUP $alias ALL;
-  $res = FOREACH grp_all GENERATE COUNT($alias);
-};
+DEFINE dedup(relation, row_key, order_field) returns out {
 
-/**
- *  Counts all the distinct keys in a relation
- *
- *  relation - the relation to count
- *  key - the field to check distinctness
- */
-DEFINE count_distinct_keys(alias, key) returns res {
-  just_key = FOREACH $alias GENERATE $key;
-  dist_data = DISTINCT just_key;
-  $res = count_all_non_distinct(dist_data);
+	DEFINE argmax datafu.org.apache.pig.piggybank.evaluation.ExtremalTupleByNthField('1', 'max');
+
+	with_max_field = FOREACH $relation GENERATE $order_field AS field_for_max, *;
+	grouped  = GROUP with_max_field BY $row_key;
+	max_only = FOREACH grouped  GENERATE argmax(with_max_field);
+	flattened = FOREACH max_only GENERATE FLATTEN($0);
+	$out = FOREACH flattened GENERATE $1 .. ;
 };

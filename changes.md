@@ -1,3 +1,19 @@
+# 1.5.0
+
+Additions:
+
+* dedup macro (DATAFU-129)
+* sample_by_keys macro (DATAFU-127)
+
+Improvements:
+
+* Update Ruby gem for site generation (DATAFU-147)
+* Make DataFu compile with Java 8 (DATAFU-132)
+
+Changes:
+
+* Upgrade to Gradle v4.8.1 (DATAFU-146)
+
 # 1.4.0
 
 Changes:
