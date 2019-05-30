@@ -17,11 +17,11 @@
 
 #!/bin/bash
 
-export SPARKS_210="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2"
-export SPARKS_211="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2 2.3.0 2.3.1 2.3.2 2.4.0"
+export SPARK_VERSIONS_FOR_SCALA_210="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2"
+export SPARK_VERSIONS_FOR_SCALA_211="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2 2.3.0 2.3.1 2.3.2 2.4.0"
 
-export LATEST_SPARKS_210="2.1.3 2.2.2"
-export LATEST_SPARKS_211="2.1.3 2.2.2 2.3.2 2.4.0"
+export LATEST_SPARK_VERSIONS_FOR_SCALA_210="2.1.3 2.2.2"
+export LATEST_SPARK_VERSIONS_FOR_SCALA_211="2.1.3 2.2.2 2.3.2 2.4.0"
 
 # No Spark support for Scala 2.12 before 2.4.0, and no spark-testing-base yet
 export SPARKS_212="2.4.0" 
@@ -74,8 +74,8 @@ while getopts "l:j:t:hq" arg; do
                         TEST_PARAMS=$OPTARG
                         ;;
                 q)
-                        SPARKS_210=$LATEST_SPARKS_210
-                        SPARKS_211=$LATEST_SPARKS_211
+                        SPARK_VERSIONS_FOR_SCALA_210=$LATEST_SPARK_VERSIONS_FOR_SCALA_210
+                        SPARK_VERSIONS_FOR_SCALA_211=$LATEST_SPARK_VERSIONS_FOR_SCALA_211
                         ;;
                 h)
                         echo "Builds and tests datafu-spark in multiple Scala/Spark combinations"
@@ -100,12 +100,12 @@ if [[ $JARS_DIR != "NONE" ]]; then
 fi
 
 export scala=2.10
-for spark in $SPARKS_210; do
+for spark in $SPARK_VERSIONS_FOR_SCALA_210; do
 	build
 done
 
 export scala=2.11
-for spark in $SPARKS_211; do
+for spark in $SPARK_VERSIONS_FOR_SCALA_211; do
 	build
 done
 

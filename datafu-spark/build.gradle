@@ -39,8 +39,6 @@ allprojects {
 
 archivesBaseName = 'datafu-spark_' + scalaVersion + '_' + sparkVersion
 
-import groovy.xml.MarkupBuilder
-
 cleanEclipse {
   doLast {
     delete ".apt_generated"

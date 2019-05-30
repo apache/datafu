@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# This file is used by the datafu-spark unit tests
+
 import os
 import sys
 from pprint import pprint as p

@@ -15,7 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Some usage examples of python-Scala functionality
+# Some examples of cross python-Scala functionality
+# This file is used by the datafu-spark unit tests
+
 
 # print the PYTHONPATH
 import sys
