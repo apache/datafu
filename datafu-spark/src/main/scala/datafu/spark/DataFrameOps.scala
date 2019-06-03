@@ -20,6 +20,16 @@ package datafu.spark
 
 import org.apache.spark.sql.{Column, DataFrame}
 
+/**
+ * implicit class to enable easier usage e.g:
+ *
+ * df.dedup(..)
+ *
+ * instead of:
+ *
+ * SparkDFUtils.dedup(...)
+ *
+ */
 object DataFrameOps {
 
   implicit class someDataFrameUtils(df: DataFrame) {

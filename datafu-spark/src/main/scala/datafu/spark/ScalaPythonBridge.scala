@@ -30,6 +30,15 @@ import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.deploy.SparkPythonRunner
 import org.apache.spark.sql.SparkSession
 
+
+/**
+ * this class let's the user invoke PySpark code from scala
+ * example usage:
+ *
+ * val runner = ScalaPythonBridgeRunner()
+ * runner.runPythonFile("my_package/my_pyspark_logic.py")
+ *
+ */
 case class ScalaPythonBridgeRunner(extraPath: String = "") {
 
   val logger = LoggerFactory.getLogger(this.getClass)

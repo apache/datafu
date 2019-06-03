@@ -34,6 +34,10 @@ class PySparkDFUtils(object):
         jvm_utils = _getjvm_class(self._gateway, "datafu.spark.SparkDFUtilsBridge")
         return jvm_utils
 
+    def _get_utils(self, df):
+        self._initSparkContext(df._sc, df.sql_ctx)
+        return self._get_jvm_spark_utils()
+
     # public:
 
     def dedup(self, dataFrame, groupCol, orderCols = []):
@@ -44,9 +48,8 @@ class PySparkDFUtils(object):
         :param orderCols: columns to order the records according to.
         :return: DataFrame representing the data after the operation
         """
-        self._initSparkContext(dataFrame._sc, dataFrame.sql_ctx)
         java_cols = self._cols_to_java_cols(orderCols)
-        jdf = self._get_jvm_spark_utils().dedup(dataFrame._jdf, groupCol._jc, java_cols)
+        jdf = self._get_utils(dataFrame).dedup(dataFrame._jdf, groupCol._jc, java_cols)
         return DataFrame(jdf, self._sqlContext)
 
     def dedupTopN(self, dataFrame, n, groupCol, orderCols = []):
@@ -58,9 +61,8 @@ class PySparkDFUtils(object):
         :param orderCols: columns to order the records according to
         :return: DataFrame representing the data after the operation
         """
-        self._initSparkContext(dataFrame._sc, dataFrame.sql_ctx)
         java_cols = self._cols_to_java_cols(orderCols)
-        jdf = self._get_jvm_spark_utils().dedupTopN(dataFrame._jdf, n, groupCol._jc, java_cols)
+        jdf = self._get_utils(dataFrame).dedupTopN(dataFrame._jdf, n, groupCol._jc, java_cols)
         return DataFrame(jdf, self._sqlContext)
 
     def dedup2(self, dataFrame, groupCol, orderByCol, desc = True, columnsFilter = [], columnsFilterKeep = True):
@@ -75,8 +77,7 @@ class PySparkDFUtils(object):
     *                          those columns in the result
         :return: DataFrame representing the data after the operation
         """
-        self._initSparkContext(dataFrame._sc, dataFrame.sql_ctx)
-        jdf = self._get_jvm_spark_utils().dedup2(dataFrame._jdf, groupCol._jc, orderByCol._jc, desc, columnsFilter, columnsFilterKeep)
+        jdf = self._get_utils(dataFrame).dedup2(dataFrame._jdf, groupCol._jc, orderByCol._jc, desc, columnsFilter, columnsFilterKeep)
         return DataFrame(jdf, self._sqlContext)
 
     def changeSchema(self, dataFrame, newScheme = []):
@@ -86,8 +87,7 @@ class PySparkDFUtils(object):
         :param newScheme: new column names
         :return: DataFrame representing the data after the operation
         """
-        self._initSparkContext(dataFrame._sc, dataFrame.sql_ctx)
-        jdf = self._get_jvm_spark_utils().changeSchema(dataFrame._jdf, newScheme)
+        jdf = self._get_utils(dataFrame).changeSchema(dataFrame._jdf, newScheme)
         return DataFrame(jdf, self._sqlContext)
 
     def joinSkewed(self, dfLeft, dfRight, joinExprs, numShards = 30, joinType= "inner"):
@@ -103,9 +103,7 @@ class PySparkDFUtils(object):
         :param joinType: join type
         :return: DataFrame representing the data after the operation
         """
-        self._initSparkContext(dfLeft._sc, dfLeft.sql_ctx)
-        utils = self._get_jvm_spark_utils()
-        jdf = utils.joinSkewed(dfLeft._jdf, dfRight._jdf, joinExprs._jc, numShards, joinType)
+        jdf = self._get_utils(dfLeft).joinSkewed(dfLeft._jdf, dfRight._jdf, joinExprs._jc, numShards, joinType)
         return DataFrame(jdf, self._sqlContext)
 
     def broadcastJoinSkewed(self, notSkewed, skewed, joinCol, numberCustsToBroadcast):
@@ -120,8 +118,7 @@ class PySparkDFUtils(object):
         :param numberCustsToBroadcast: number of custs to broadcast
         :return: DataFrame representing the data after the operation
         """
-        self._initSparkContext(skewed._sc, skewed.sql_ctx)
-        jdf = self._get_jvm_spark_utils().broadcastJoinSkewed(notSkewed._jdf, skewed._jdf, joinCol, numberCustsToBroadcast)
+        jdf = self._get_utils(skewed).broadcastJoinSkewed(notSkewed._jdf, skewed._jdf, joinCol, numberCustsToBroadcast)
         return DataFrame(jdf, self._sqlContext)
 
     def joinWithRange(self, dfSingle, colSingle, dfRange, colRangeStart, colRangeEnd, decreaseFactor):
@@ -133,8 +130,7 @@ class PySparkDFUtils(object):
         1. single table needs to be distinct on the join column, because there could be a few corresponding ranges so we dedup at the end - we choose the minimal range.
         2. the range and single columns to be numeric.
         """
-        self._initSparkContext(dfSingle._sc, dfSingle.sql_ctx)
-        jdf = self._get_jvm_spark_utils().joinWithRange(dfSingle._jdf, colSingle, dfRange._jdf, colRangeStart, colRangeEnd, decreaseFactor)
+        jdf = self._get_utils(dfSingle).joinWithRange(dfSingle._jdf, colSingle, dfRange._jdf, colRangeStart, colRangeEnd, decreaseFactor)
         return DataFrame(jdf, self._sqlContext)
 
     def joinWithRangeAndDedup(self, dfSingle, colSingle, dfRange, colRangeStart, colRangeEnd, decreaseFactor, dedupSmallRange):
@@ -146,8 +142,7 @@ class PySparkDFUtils(object):
         1. single table needs to be distinct on the join column, because there could be a few corresponding ranges so we dedup at the end - we choose the minimal range.
         2. the range and single columns to be numeric.
         """
-        self._initSparkContext(dfSingle._sc, dfSingle.sql_ctx)
-        jdf = self._get_jvm_spark_utils().joinWithRangeAndDedup(dfSingle._jdf, colSingle, dfRange._jdf, colRangeStart, colRangeEnd, decreaseFactor, dedupSmallRange)
+        jdf = self._get_utils(dfSingle).joinWithRangeAndDedup(dfSingle._jdf, colSingle, dfRange._jdf, colRangeStart, colRangeEnd, decreaseFactor, dedupSmallRange)
         return DataFrame(jdf, self._sqlContext)
 
     def _cols_to_java_cols(self, cols):

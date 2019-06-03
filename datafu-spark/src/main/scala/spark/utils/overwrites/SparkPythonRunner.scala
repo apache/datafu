@@ -28,8 +28,11 @@ import org.apache.spark.api.python.PythonUtils
 import org.apache.spark.util.Utils
 
 /**
- * We wrap Spark's PythonRunner because we failed on premature python process closing.
- * in PythonRunner the python process exits immediately when finished to read the filename,
+ * Internal class - should not be used by user
+ *
+ * background:
+ * We had to "override" Spark's PythonRunner because we failed on premature python process closing.
+ * In PythonRunner the python process exits immediately when finished to read the file,
  * this caused us to Accumulators Exceptions when the driver tries to get accumulation data
  * from the python gateway.
  * Instead, like in Zeppelin, we create an "interactive" python process, feed it the python
