@@ -48,15 +48,6 @@ cleanEclipse {
   }
 }
 
-// Force scala joint compilation
-sourceSets.main.scala.srcDir "src/main/java"
-sourceSets.test.scala.srcDir "src/test/java"
-
-// Disable the Javac compiler by forcing joint compilation by scalac. This is equivalent to setting
-// tasks.compileTestJava.enabled = false
-sourceSets.main.java.srcDirs = []
-sourceSets.test.java.srcDirs = []
-
 dependencies {
     compile "org.scala-lang:scala-library:$scalaLibVersion"
 
