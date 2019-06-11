@@ -19,12 +19,11 @@
 
 export SPARK_VERSIONS_FOR_SCALA_210="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2"
 export SPARK_VERSIONS_FOR_SCALA_211="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2 2.3.0 2.3.1 2.3.2 2.4.0"
+export SPARK_VERSIONS_FOR_SCALA_212="2.4.0"
 
 export LATEST_SPARK_VERSIONS_FOR_SCALA_210="2.1.3 2.2.2"
 export LATEST_SPARK_VERSIONS_FOR_SCALA_211="2.1.3 2.2.2 2.3.2 2.4.0"
-
-# No Spark support for Scala 2.12 before 2.4.0, and no spark-testing-base yet
-export SPARKS_212="2.4.0" 
+export LATEST_SPARK_VERSIONS_FOR_SCALA_212="2.4.0"
 
 STARTTIME=$(date +%s)
 
@@ -76,6 +75,7 @@ while getopts "l:j:t:hq" arg; do
                 q)
                         SPARK_VERSIONS_FOR_SCALA_210=$LATEST_SPARK_VERSIONS_FOR_SCALA_210
                         SPARK_VERSIONS_FOR_SCALA_211=$LATEST_SPARK_VERSIONS_FOR_SCALA_211
+                        SPARK_VERSIONS_FOR_SCALA_212=$LATEST_SPARK_VERSIONS_FOR_SCALA_212
                         ;;
                 h)
                         echo "Builds and tests datafu-spark in multiple Scala/Spark combinations"
@@ -106,6 +106,11 @@ done
 
 export scala=2.11
 for spark in $SPARK_VERSIONS_FOR_SCALA_211; do
+	build
+done
+
+export scala=2.12
+for spark in $SPARK_VERSIONS_FOR_SCALA_212; do
 	build
 done
 

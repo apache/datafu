@@ -18,6 +18,8 @@
  */
 package datafu.spark
 
+import java.io.File
+
 class PysparkResource extends PythonResource(PathsResolver.pyspark, true)
 
 class Py4JResource extends PythonResource(PathsResolver.py4j, true)
@@ -37,17 +39,18 @@ object PathsResolver {
       "2.3.0" -> "0.10.6",
       "2.3.1" -> "0.10.7",
       "2.3.2" -> "0.10.7",
-      "2.4.0" -> "0.10.8.1"
+      "2.4.0" -> "0.10.8.1",
+      "2.4.1" -> "0.10.8.1",
+      "2.4.2" -> "0.10.8.1",
+      "2.4.3" -> "0.10.8.1"
   )
 
 	val sparkVersion = if (sparkSystemVersion == null) "2.3.0" else sparkSystemVersion
   
   val py4jVersion = py4js.getOrElse(sparkVersion, "0.10.6") // our default
   
-  val pyspark = ResourceCloning.cloneResource(
-    getClass.getResource("/built_in_pyspark_lib/pyspark-" + sparkVersion + ".zip"),
+  val pyspark = ResourceCloning.cloneResource(new File("data/pysparks/pyspark-" + sparkVersion + ".zip").toURI().toURL(),
     "pyspark_cloned.zip").getPath
-  val py4j = ResourceCloning.cloneResource(
-    getClass.getResource("/built_in_pyspark_lib/py4j-" + py4jVersion + "-src.zip"),
+  val py4j = ResourceCloning.cloneResource(new File("data/py4js/py4j-" + py4jVersion + "-src.zip").toURI().toURL(),
     "py4j_cloned.zip").getPath
 }

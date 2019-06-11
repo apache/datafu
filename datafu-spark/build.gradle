@@ -25,16 +25,20 @@ buildscript {
   }
 }
 
+plugins {
+  id "de.undercouch.download" version "3.4.3"
+}
+
 apply from: file("gradle/dependency-versions-scala-" + scalaVersion + ".gradle")
 
 apply plugin: 'scala'
 
 allprojects {
-	// For all scala compilation, add extra compiler options, taken from version-specific
+  // For all scala compilation, add extra compiler options, taken from version-specific
   // dependency-versions-scala file applied above.
   tasks.withType(ScalaCompile) {
     scalaCompileOptions.additionalParameters = [ scalaOptions ]
-	}
+  }
 }
 
 archivesBaseName = 'datafu-spark_' + scalaVersion + '_' + sparkVersion
@@ -52,7 +56,7 @@ dependencies {
     compile "org.scala-lang:scala-library:$scalaLibVersion"
 
     testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
-	  testCompile "org.scalatest:scalatest_" + scalaVersion + ":" + sparkVersion
+    testCompile "org.scalatest:scalatest_" + scalaVersion + ":" + sparkVersion
 }
 
 // we need to set up the build for hadoop 3
@@ -69,6 +73,71 @@ if (hadoopVersion.startsWith("2.")) {
     compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
   }
 }
+
+project.ext.sparkFile = file("build/spark-zips/spark-" + sparkVersion + ".zip")
+project.ext.sparkUnzipped = "build/spark-unzipped/spark-" + sparkVersion
+
+// download pyspark for testing. This is not shipped with datafu-spark.
+task downloadPySpark (type: Download) {
+  src 'https://github.com/apache/spark/archive/v' + sparkVersion + '.zip'
+  dest project.sparkFile
+  onlyIfNewer true
+}
+
+downloadPySpark.onlyIf {
+  ! project.sparkFile.exists()
+}
+
+task unzipPySpark(dependsOn: downloadPySpark, type: Copy) {
+  from zipTree(downloadPySpark.dest)
+  into file("build/spark-unzipped/")
+}
+
+unzipPySpark.onlyIf {
+  ! file(project.sparkUnzipped).exists()
+}
+
+task zipPySpark(dependsOn: unzipPySpark, type: Zip) {
+  archiveName = "pyspark-" + sparkVersion + ".zip"
+  include "pyspark/**/*"
+  destinationDir = file("data/pysparks/")
+  from file(project.sparkUnzipped + "/python/")
+}
+
+zipPySpark.onlyIf {
+  ! file("data/pysparks/pyspark-" + sparkVersion + ".zip").exists()
+}
+
+// download py4j for testing. This is not shipped with datafu-spark.
+project.ext.py4js = [
+  "py4j-0.10.4-src.zip" : "https://files.pythonhosted.org/packages/93/a7/0e1719e8ad34d194aae72dc07a37e65fd3895db7c797a67a828333cd6067/py4j-0.10.4-py2.py3-none-any.whl",
+  "py4j-0.10.6-src.zip" : "https://files.pythonhosted.org/packages/4a/08/162710786239aa72bd72bb46c64f2b02f54250412ba928cb373b30699139/py4j-0.10.6-py2.py3-none-any.whl",
+  "py4j-0.10.7-src.zip" : "https://files.pythonhosted.org/packages/e3/53/c737818eb9a7dc32a7cd4f1396e787bd94200c3997c72c1dbe028587bd76/py4j-0.10.7-py2.py3-none-any.whl",
+  "py4j-0.10.8.1-src.zip" : "https://files.pythonhosted.org/packages/04/de/2d314a921ef4c20b283e1de94e0780273678caac901564df06b948e4ba9b/py4j-0.10.8.1-py2.py3-none-any.whl"
+]
+
+task downloadPy4js {
+  doLast {
+    for (s in py4js) {
+      download {
+        src s.value
+        dest file("data/py4js/" + s.key)
+      }
+    }
+  }
+}
+
+downloadPy4js.onlyIf {
+  ! file("data/py4js").exists()
+}
+
+
+// The downloads of pyspark and py4j must succeed in order to test the Scala Python bridge in Eclipse or Gradle
+tasks.eclipse.dependsOn('zipPySpark')
+tasks.compileTestScala.dependsOn('zipPySpark')
+tasks.eclipse.dependsOn('downloadPy4js')
+tasks.compileTestScala.dependsOn('downloadPy4js')
+
 
 test {
   systemProperty 'datafu.jar.dir', file('build/libs')
