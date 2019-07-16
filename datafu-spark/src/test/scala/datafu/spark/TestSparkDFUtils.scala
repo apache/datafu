@@ -63,7 +63,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
     assertDataFrameEquals(expected,
                           inputDataFrame
-                            .dedup($"col_grp", $"col_ord".desc)
+                            .dedupWithOrder($"col_grp", $"col_ord".desc)
                             .select($"col_grp", $"col_ord"))
   }
 
@@ -78,7 +78,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       List(dedupExp("asd4", "b", Option(1), "asd4"),
         dedupExp("asd1", "a", Option(3), "asd3")))
 
-    val actual = inputDataFrame.dedup2($"col_grp",
+    val actual = inputDataFrame.dedupWithCombiner($"col_grp",
                                        $"col_ord",
                                        moreAggFunctions = Seq(min($"col_str")))
 
@@ -89,7 +89,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
   test("dedup2_by_string_asc") {
 
-    val actual = inputDataFrame.dedup2($"col_grp", $"col_str", desc = false)
+    val actual = inputDataFrame.dedupWithCombiner($"col_grp", $"col_str", desc = false)
 
     val expectedByStringDf: DataFrame = sqlContext.createDataFrame(
       List(dedupExp2("b", Option(1), "asd4"),
@@ -100,7 +100,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
   test("test_dedup2_by_complex_column") {
 
-    val actual = inputDataFrame.dedup2($"col_grp",
+    val actual = inputDataFrame.dedupWithCombiner($"col_grp",
                                        expr("cast(concat('-',col_ord) as int)"),
                                        desc = false)
 
@@ -129,7 +129,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       .withColumn("struct_col", expr("struct(col_grp, col_ord)"))
       .withColumn("map_col", expr("map(col_grp, col_ord)"))
       .withColumn("map_col_blah", expr("map(col_grp, col_ord)"))
-      .dedup2($"col_grp", expr("cast(concat('-',col_ord) as int)"))
+      .dedupWithCombiner($"col_grp", expr("cast(concat('-',col_ord) as int)"))
       .drop("map_col_blah")
 
     val expected: DataFrame = sqlContext.createDataFrame(

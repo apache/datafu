@@ -28,7 +28,7 @@ def _get_utils(df):
 # public:
 
 
-def dedup(df, group_col, order_cols = []):
+def dedup_with_order(df, group_col, order_cols = []):
     """
     Used get the 'latest' record (after ordering according to the provided order columns) in each group.
     :param df: DataFrame to operate on
@@ -37,7 +37,7 @@ def dedup(df, group_col, order_cols = []):
     :return: DataFrame representing the data after the operation
     """
     java_cols = _cols_to_java_cols(order_cols)
-    jdf = _get_utils(df).dedup(df._jdf, group_col._jc, java_cols)
+    jdf = _get_utils(df).dedupWithOrder(df._jdf, group_col._jc, java_cols)
     return DataFrame(jdf, df.sql_ctx)
 
 
@@ -55,7 +55,7 @@ def dedup_top_n(df, n, group_col, order_cols = []):
     return DataFrame(jdf, df.sql_ctx)
 
 
-def dedup2(df, group_col, order_by_col, desc = True, columns_filter = [], columns_filter_keep = True):
+def dedup_with_combiner(df, group_col, order_by_col, desc = True, columns_filter = [], columns_filter_keep = True):
     """
     Used get the 'latest' record (after ordering according to the provided order columns) in each group.
     :param df: DataFrame to operate on
@@ -67,7 +67,7 @@ def dedup2(df, group_col, order_by_col, desc = True, columns_filter = [], column
 *                          those columns in the result
     :return: DataFrame representing the data after the operation
     """
-    jdf = _get_utils(df).dedup2(df._jdf, group_col._jc, order_by_col._jc, desc, columns_filter, columns_filter_keep)
+    jdf = _get_utils(df).dedupWithCombiner(df._jdf, group_col._jc, order_by_col._jc, desc, columns_filter, columns_filter_keep)
     return DataFrame(jdf, df.sql_ctx)
 
 
@@ -160,9 +160,9 @@ def activate():
     This technique taken from pymongo_spark
     https://github.com/mongodb/mongo-hadoop/blob/master/spark/src/main/python/pymongo_spark.py
     """
-    pyspark.sql.DataFrame.dedup = dedup
+    pyspark.sql.DataFrame.dedup_with_order = dedup_with_order
     pyspark.sql.DataFrame.dedup_top_n = dedup_top_n
-    pyspark.sql.DataFrame.dedup2 = dedup2
+    pyspark.sql.DataFrame.dedup_with_combiner = dedup_with_combiner
     pyspark.sql.DataFrame.change_schema = change_schema
     pyspark.sql.DataFrame.join_skewed = join_skewed
     pyspark.sql.DataFrame.broadcast_join_skewed = broadcast_join_skewed

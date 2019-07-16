@@ -34,19 +34,19 @@ object DataFrameOps {
 
   implicit class someDataFrameUtils(df: DataFrame) {
 
-    def dedup(groupCol: Column, orderCols: Column*): DataFrame =
-      SparkDFUtils.dedup(df, groupCol, orderCols: _*)
+    def dedupWithOrder(groupCol: Column, orderCols: Column*): DataFrame =
+      SparkDFUtils.dedupWithOrder(df, groupCol, orderCols: _*)
 
     def dedupTopN(n: Int, groupCol: Column, orderCols: Column*): DataFrame =
       SparkDFUtils.dedupTopN(df, n, groupCol, orderCols: _*)
 
-    def dedup2(groupCol: Column,
-               orderByCol: Column,
-               desc: Boolean = true,
-               moreAggFunctions: Seq[Column] = Nil,
-               columnsFilter: Seq[String] = Nil,
-               columnsFilterKeep: Boolean = true): DataFrame =
-      SparkDFUtils.dedup2(df,
+    def dedupWithCombiner(groupCol: Column,
+                          orderByCol: Column,
+                          desc: Boolean = true,
+                          moreAggFunctions: Seq[Column] = Nil,
+                          columnsFilter: Seq[String] = Nil,
+                          columnsFilterKeep: Boolean = true): DataFrame =
+      SparkDFUtils.dedupWithCombiner(df,
                           groupCol,
                           orderByCol,
                           desc,

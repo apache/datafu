@@ -41,17 +41,17 @@ df_people = sqlContext.createDataFrame([
     ("c", "Zoey", 36)],
     ["id", "name", "age"])
 
-func_dedup_res = df_people.dedup(group_col=df_people.id,
+func_dedup_res = df_people.dedup_with_order(group_col=df_people.id,
                              order_cols=[df_people.age.desc(), df_people.name.desc()])
-func_dedup_res.registerTempTable("dedup")
+func_dedup_res.registerTempTable("dedup_with_order")
 
 func_dedupTopN_res = df_people.dedup_top_n(n=2, group_col=df_people.id,
                                      order_cols=[df_people.age.desc(), df_people.name.desc()])
 func_dedupTopN_res.registerTempTable("dedupTopN")
 
-func_dedup2_res = df_people.dedup2(group_col=df_people.id, order_by_col=df_people.age, desc=True,
+func_dedup2_res = df_people.dedup_with_combiner(group_col=df_people.id, order_by_col=df_people.age, desc=True,
                                columns_filter=["name"], columns_filter_keep=False)
-func_dedup2_res.registerTempTable("dedup2")
+func_dedup2_res.registerTempTable("dedup_with_combiner")
 
 func_changeSchema_res = df_people.change_schema(new_scheme=["id1", "name1", "age1"])
 func_changeSchema_res.registerTempTable("changeSchema")

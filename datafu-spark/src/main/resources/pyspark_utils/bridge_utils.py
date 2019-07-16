@@ -34,7 +34,7 @@ class Context(object):
         """When running a Python script from Scala - this function is called
         by the script to initialize the connection to the Java Gateway and get the spark context.
         code is basically copied from: 
-         https://github.com/apache/zeppelin/blob/master/spark/interpreter/src/main/resources/python/zeppelin_pyspark.py#L30
+        https://github.com/apache/zeppelin/blob/master/spark/interpreter/src/main/resources/python/zeppelin_pyspark.py#L30
         """
 
         if os.environ.get("SPARK_EXECUTOR_URI"):

@@ -31,11 +31,11 @@ import org.apache.spark.storage.StorageLevel
  */
 class SparkDFUtilsBridge {
 
-  def dedup(df: DataFrame,
+  def dedupWithOrder(df: DataFrame,
             groupCol: Column,
             orderCols: JavaList[Column]): DataFrame = {
     val converted = convertJavaListToSeq(orderCols)
-    SparkDFUtils.dedup(df = df, groupCol = groupCol, orderCols = converted: _*)
+    SparkDFUtils.dedupWithOrder(df = df, groupCol = groupCol, orderCols = converted: _*)
   }
 
   def dedupTopN(df: DataFrame,
@@ -49,14 +49,14 @@ class SparkDFUtilsBridge {
                            orderCols = converted: _*)
   }
 
-  def dedup2(df: DataFrame,
+  def dedupWithCombiner(df: DataFrame,
              groupCol: Column,
              orderByCol: Column,
              desc: Boolean,
              columnsFilter: JavaList[String],
              columnsFilterKeep: Boolean): DataFrame = {
     val columnsFilter_converted = convertJavaListToSeq(columnsFilter)
-    SparkDFUtils.dedup2(
+    SparkDFUtils.dedupWithCombiner(
       df = df,
       groupCol = groupCol,
       orderByCol = orderByCol,
@@ -146,8 +146,7 @@ object SparkDFUtils {
     * @param orderCols columns to order the records according to
     * @return DataFrame representing the data after the operation
     */
-  def dedup(df: DataFrame, groupCol: Column, orderCols: Column*): DataFrame = {
-    df.dropDuplicates()
+  def dedupWithOrder(df: DataFrame, groupCol: Column, orderCols: Column*): DataFrame = {
     dedupTopN(df, 1, groupCol, orderCols: _*)
   }
 
@@ -174,6 +173,8 @@ object SparkDFUtils {
     * in each group.
     * the same functionality as {@link #dedup} but implemented using UDAF to utilize
     * map side aggregation.
+    * this function should be used in cases when you expect a large number of rows to get combined,
+    * as they share the same group column.
     *
     * @param df DataFrame to operate on
     * @param groupCol column to group by the records
@@ -185,13 +186,13 @@ object SparkDFUtils {
     *                          or alternatively have only those columns in the result
     * @return DataFrame representing the data after the operation
     */
-  def dedup2(df: DataFrame,
-             groupCol: Column,
-             orderByCol: Column,
-             desc: Boolean = true,
-             moreAggFunctions: Seq[Column] = Nil,
-             columnsFilter: Seq[String] = Nil,
-             columnsFilterKeep: Boolean = true): DataFrame = {
+  def dedupWithCombiner(df: DataFrame,
+                        groupCol: Column,
+                        orderByCol: Column,
+                        desc: Boolean = true,
+                        moreAggFunctions: Seq[Column] = Nil,
+                        columnsFilter: Seq[String] = Nil,
+                        columnsFilterKeep: Boolean = true): DataFrame = {
     val newDF =
       if (columnsFilter == Nil) {
         df.withColumn("sort_by_column", orderByCol)
@@ -488,12 +489,12 @@ object SparkDFUtils {
 
     // "range_start" is here for consistency
     val dfDeduped = if (dedupSmallRange) {
-      dedup2(dfJoined,
+      dedupWithCombiner(dfJoined,
              col(colSingle),
              struct("range_size", "range_start"),
              desc = false)
     } else {
-      dedup2(dfJoined,
+      dedupWithCombiner(dfJoined,
              col(colSingle),
              struct(expr("-range_size"), col("range_start")),
              desc = true)

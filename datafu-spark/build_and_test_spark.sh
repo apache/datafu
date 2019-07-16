@@ -28,32 +28,32 @@ export LATEST_SPARK_VERSIONS_FOR_SCALA_212="2.4.3"
 STARTTIME=$(date +%s)
 
 function log {
-	echo $1
-	if [[ $LOG_FILE != "NONE" ]]; then
-		echo $1 >> $LOG_FILE
-	fi
+  echo $1
+  if [[ $LOG_FILE != "NONE" ]]; then
+    echo $1 >> $LOG_FILE
+  fi
 }
 
 function build {
-	echo "----- Building versions for Scala $scala, Spark $spark ----"
-	if ./gradlew :datafu-spark:clean; then
-		echo "----- Clean for Scala $scala, spark $spark succeeded"
-		if ./gradlew :datafu-spark:assemble -PscalaVersion=$scala -PsparkVersion=$spark; then
-			echo "----- Build for Scala $scala, spark $spark succeeded"
-			if ./gradlew :datafu-spark:test -PscalaVersion=$scala -PsparkVersion=$spark $TEST_PARAMS; then
-				log "Testing for Scala $scala, spark $spark succeeded"
-				if [[ $JARS_DIR != "NONE" ]]; then
-					cp datafu-spark/build/libs/*.jar $JARS_DIR/
-				fi
-			else
-				log "Testing for Scala $scala, spark $spark failed (build succeeded)"
-			fi
-		else
-			log "Build for Scala $scala, spark $spark failed"
-		fi
-	else
-		log "Clean for Scala $scala, Spark $spark failed"
-	fi
+  echo "----- Building versions for Scala $scala, Spark $spark ----"
+  if ./gradlew :datafu-spark:clean; then
+    echo "----- Clean for Scala $scala, spark $spark succeeded"
+    if ./gradlew :datafu-spark:assemble -PscalaVersion=$scala -PsparkVersion=$spark; then
+      echo "----- Build for Scala $scala, spark $spark succeeded"
+      if ./gradlew :datafu-spark:test -PscalaVersion=$scala -PsparkVersion=$spark $TEST_PARAMS; then
+        log "Testing for Scala $scala, spark $spark succeeded"
+        if [[ $JARS_DIR != "NONE" ]]; then
+          cp datafu-spark/build/libs/*.jar $JARS_DIR/
+        fi
+      else
+        log "Testing for Scala $scala, spark $spark failed (build succeeded)"
+      fi
+    else
+      log "Build for Scala $scala, spark $spark failed"
+    fi
+  else
+    log "Clean for Scala $scala, Spark $spark failed"
+  fi
 }
 
 # -------------------------------------
@@ -91,27 +91,27 @@ while getopts "l:j:t:hq" arg; do
 done
 
 if [[ $LOG_FILE != "NONE" ]]; then
-	echo "Building datafu-spark: $TEST_PARAMS" > $LOG_FILE
+  echo "Building datafu-spark: $TEST_PARAMS" > $LOG_FILE
 fi
 
 if [[ $JARS_DIR != "NONE" ]]; then
-	echo "Copying successfully built and tested jars to $JARS_DIR" > $LOG_FILE
+  echo "Copying successfully built and tested jars to $JARS_DIR" > $LOG_FILE
   mkdir $JARS_DIR
 fi
 
 export scala=2.10
 for spark in $SPARK_VERSIONS_FOR_SCALA_210; do
-	build
+  build
 done
 
 export scala=2.11
 for spark in $SPARK_VERSIONS_FOR_SCALA_211; do
-	build
+  build
 done
 
 export scala=2.12
 for spark in $SPARK_VERSIONS_FOR_SCALA_212; do
-	build
+  build
 done
 
 export ENDTIME=$(date +%s)

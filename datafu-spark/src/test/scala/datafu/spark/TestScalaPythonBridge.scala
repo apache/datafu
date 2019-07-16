@@ -107,11 +107,11 @@ class TestScalaPythonBridge extends FunSuite {
 
   test("SparkDFUtilsBridge") {
     runner.runPythonFile("python_tests/df_utils_tests.py")
-    assertTable("dedup", "[a,Alice,34], [b,Bob,36], [c,Zoey,36]")
+    assertTable("dedup_with_order", "[a,Alice,34], [b,Bob,36], [c,Zoey,36]")
     assertTable(
       "dedupTopN",
       "[a,Alice,34], [a,Sara,33], [b,Bob,36], [b,Charlie,30], [c,Fanny,36], [c,Zoey,36]")
-    assertTable("dedup2", "[a,34], [b,36], [c,36]")
+    assertTable("dedup_with_combiner", "[a,34], [b,36], [c,36]")
     assertTable(
       "changeSchema",
       "[a,Alice,34], [a,Sara,33], [b,Bob,36], [b,Charlie,30], [c,David,29], [c,Esther,32], " +
