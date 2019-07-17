@@ -15,10 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-group=org.apache.datafu
-version=1.5.0
-gradleVersion=4.8.1
-org.gradle.jvmargs="-XX:MaxPermSize=512m"
-scalaVersion=2.11
-sparkVersion=2.3.0
-release=false
+from pyspark_utils.bridge_utils import get_contexts
+sc, sqlContext, spark = get_contexts()
+
+print("initiated contexts")

@@ -15,10 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-group=org.apache.datafu
-version=1.5.0
-gradleVersion=4.8.1
-org.gradle.jvmargs="-XX:MaxPermSize=512m"
-scalaVersion=2.11
-sparkVersion=2.3.0
-release=false
+# This file is used by the datafu-spark unit tests
+
+sqlContext.sql("select * from edw.table_not_exists")
