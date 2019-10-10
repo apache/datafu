@@ -1,0 +1,131 @@
+---
+title: Macros - Guide - Apache DataFu Pig
+version: 1.5.0
+section_name: Apache DataFu Pig - Guide
+license: >
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+---
+
+## Macros
+
+### Finding the most recent update of a given record — the _dedup_ (de-duplication) macro
+
+A common scenario in data sent to the HDFS — the Hadoop Distributed File System — is multiple rows representing updates for the same logical data. For example, in a table representing accounts, a record might be written every time customer data is updated, with each update receiving a newer timestamp. Let’s consider the following simplified example.
+
+<br>
+<script src="https://gist.github.com/eyala/65b6750b2539db5895738a49be3d8c98.js"></script>
+<center>Raw customers’ data, with more than one row per customer</center>
+<br>
+
+We can see that though most of the customers only appear once, _julia_ and _quentin_ have 2 and 3 rows, respectively. How can we get just the most recent record for each customer? For this we can use the _dedup_ macro, as below:
+
+```pig
+REGISTER datafu-pig-<%= current_page.data.version %>.jar;
+
+IMPORT 'datafu/dedup.pig';
+
+data = LOAD 'customers.csv' AS (id: int, name: chararray, purchases: int, date_updated: chararray);
+
+dedup_data = dedup(data, 'id', 'date_updated');
+
+STORE dedup_data INTO 'dedup_out';
+```
+
+Our result will be as expected — each customer only appears once, as you can see below:
+
+<br>
+<script src="https://gist.github.com/eyala/1dddebc39e9a3fe4501638a95f577752.js"></script>
+<center>“Deduplicated” data, with only the most recent record for each customer</center>
+<br>
+
+One nice thing about this macro is that you can use more than one field to dedup the data. For example, if we wanted to use both the _id_ and _name_ fields, we would change this line:
+
+```pig
+dedup_data = dedup(data, 'id', 'date_updated');
+```
+
+to this:
+
+```pig
+dedup_data = dedup(data, '(id, name)', 'date_updated');
+```
+
+---
+<br>
+
+### Comparing expected and actual results for regression tests — the _diff\_macro_
+
+After making changes in an application’s logic, we are often interested in the effect they have on our output. One common use case is when we refactor — we don’t expect our output to change. Another is a surgical change which should only affect a very small subset of records. For easily performing such regression tests on actual data, we use the _diff\_macro_, which is based on DataFu’s _TupleDiff_ UDF.
+
+Let’s look at a table which is exactly like _dedup\_out_, but with four changes.
+
+1.  We will remove record 1, _quentin_
+2.  We will change _date\_updated_ for record 2, _julia_
+3.  We will change _purchases_ and _date\_updated_ for record 4, _alice_
+4.  We will add a new row, record 8, _amanda_
+
+<br>
+<script src="https://gist.github.com/eyala/699942d65471f3c305b0dcda09944a95.js"></script>
+<br>
+
+We’ll run the following Pig script, using DataFu’s _diff\_macro_:
+
+```pig
+REGISTER datafu-pig-<%= current_page.data.version %>.jar;
+
+IMPORT 'datafu/diff_macros.pig';
+
+data = LOAD 'dedup_out.csv' USING PigStorage(',') AS (id: int, name: chararray, purchases: int, date_updated: chararray);
+
+changed = LOAD 'dedup_out_changed.csv' USING PigStorage(',') AS (id: int, name: chararray, purchases: int, date_updated: chararray);
+
+diffs = diff_macro(data,changed,id,'');
+
+DUMP diffs;
+```
+
+The results look like this:
+
+<br>
+<script src="https://gist.github.com/eyala/3d36775faf081daad37a102f25add2a4.js"></script>
+<br>
+
+Let’s take a moment to look at these results. They have the same general structure. Rows that start with _missing_ indicate records that were in the first relation, but aren’t in the new one. Conversely, rows that start with _added_ indicate records that are in the new relation, but not in the old one. Each of these rows is followed by the relevant tuple from the relations.
+
+The rows that start with _changed_ are more interesting. The word _changed_ is followed by a list of the fields which have changed values in the new table. For the row with _id_ 2, this is the _date\_updated_ field. For the row with _id_ 4, this is the _purchases_ and _date\_updated_ fields.
+
+Obviously, one thing we might want to ignore is the _date\_updated_ field. If the only difference in the fields is when it was last updated, we might just want to skip these records for a more concise diff. For this, we need to change the following row in our original Pig script, from this:
+
+```pig
+diffs = diff_macro(data,changed,id,'');
+```
+
+to become this:
+
+```pig
+diffs = diff_macro(data,changed,id,'date_updated');
+```
+
+If we run our changed Pig script, we’ll get the following result.
+
+<br>
+<script src="https://gist.github.com/eyala/d9b0d5c60ad4d8bbccc79c3527f99aca.js"></script>
+<br>
+
+The row for _julia_ is missing from our diff, because only _date\_updated_ has changed, but the row for _alice_ still appears, because the _purchases_ field has also changed.
+
+There’s one implementation detail that’s important to know — the macro uses a replicated join in order to be able to run quickly on very large tables, so the sample table needs to be able to fit in memory.
+

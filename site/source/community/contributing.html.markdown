@@ -54,12 +54,11 @@ All the JARs for the project can be built with the following command:
 
     ./gradlew assemble
 
-This builds SNAPSHOT versions of the JARs for both DataFu Pig and Hourglass.  The built JARs can be found under `datafu-pig/build/libs` and `datafu-hourglass/build/libs`, respectively.
+This builds SNAPSHOT versions of the JARs for DataFu Pig, Spark and Hourglass.  The built JARs can be found under `datafu-pig/build/libs`, `datafu-spark/build/libs` and `datafu-hourglass/build/libs`, respectively.
 
-The Apache DataFu Pig library can be built by running the command below.
+A single project - for example, DataFu Pig - may be built by running the command below.
 
     ./gradlew :datafu-pig:assemble
-    ./gradlew :datafu-hourglass:assemble
 
 ### Running Tests
 
@@ -69,10 +68,9 @@ Tests can be run with the following command:
 
 All the tests can also be run from within eclipse.
 
-To run the DataFu Pig or Hourglass tests specifically:
+To run a single project's test - for example, for DataFu Pig only:
 
     ./gradlew :datafu-pig:test
-    ./gradlew :datafu-hourglass:test
 
 To run a specific set of tests from the command line, you can define the `test.single` system property with a value matching the test class you want to run.  For example, to run all tests defined in the `QuantileTests` test class for DataFu Pig:
 

@@ -44,7 +44,7 @@ df_people = sqlContext.createDataFrame([
      ("c", "Zoey", 36)],
      ["id", "name", "age"])
 
-func_dedup_res = df_utils.dedup(dataFrame=df_people, groupCol=df_people.id,
+func_dedup_res = df_utils.dedup_with_order(dataFrame=df_people, groupCol=df_people.id,
                                 orderCols=[df_people.age.desc(), df_people.name.desc()])
 
 func_dedup_res.registerTempTable("dedup")

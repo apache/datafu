@@ -253,3 +253,27 @@ joined_sample = FOREACH (COGROUP impressions BY (user_id,item_id),
 ```
 
 Since we have sampled before joining the data, this should be much more efficient.
+
+### Manually Sampling By Key
+
+All the previous methods are based on random selection. If you wish to create a sample of a given table based on a (manually created) table of ids, you can use the _sample\_by\_keys_ macro.
+
+For example, lets assume we have a list of customers are stored on the HDFS as _customers.csv_, and our list for the sample are in _sample.csv_, which only contains customers 2, 4 and 6 from the original _customers.csv_.
+
+We can use the following Pig script:
+
+```pig
+REGISTER datafu-pig-<%= current_page.data.version %>.jar;
+
+IMPORT 'datafu/sample_by_keys.pig';
+
+data = LOAD 'customers.csv' USING PigStorage(',') AS (id: int, name: chararray, purchases: int, updated: chararray);
+
+customers = LOAD 'sample.csv' AS (cust_id: int);
+
+sampled = sample_by_keys(data, customers, id, cust_id);
+
+STORE sampled INTO 'sample_out';
+```
+
+The result will be all the records from our original table for customers 2, 4 and 6.

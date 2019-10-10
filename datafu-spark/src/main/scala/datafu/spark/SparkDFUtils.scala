@@ -366,8 +366,7 @@ object SparkDFUtils {
     * The main problem this function addresses is that doing naive explode on the ranges can result
     * in a huge table.
     * requires:
-    * 1. point table needs to be distinct on the point column. there could be a few corresponding
-    *    ranges to each point, so we choose the minimal range.
+    * 1. point table needs to be distinct on the point column.
     * 2. the range and point columns need to be numeric.
     *
     * TIMES:

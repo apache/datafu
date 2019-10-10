@@ -104,7 +104,7 @@ The result will be all the records from our original table for customers 2, 4 an
 ---
 <br>
 
-**3\. Comparing expected and actual results for regression tests — the diff\_macro**
+**3\. Comparing expected and actual results for regression tests — the _diff\_macro_**
 
 After making changes in an application’s logic, we are often interested in the effect they have on our output. One common use case is when we refactor — we don’t expect our output to change. Another is a surgical change which should only affect a very small subset of records. For easily performing such regression tests on actual data, we use the _diff\_macro_, which is based on DataFu’s _TupleDiff_ UDF.
 

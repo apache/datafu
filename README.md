@@ -3,8 +3,9 @@
 [Apache DataFu](http://datafu.apache.org) is a collection of libraries for working with large-scale data in Hadoop.
 The project was inspired by the need for stable, well-tested libraries for data mining and statistics.
 
-It consists of two libraries:
+It consists of three libraries:
 
+* **Apache DataFu Spark**: a collection of utils and user-defined functions for [Apache Spark](http://spark.apache.org/)
 * **Apache DataFu Pig**: a collection of user-defined functions for [Apache Pig](http://pig.apache.org/)
 * **Apache DataFu Hourglass**: an incremental processing framework for [Apache Hadoop](http://hadoop.apache.org/) in MapReduce
 
@@ -14,6 +15,7 @@ For more information please visit the website:
 
 If you'd like to jump in and get started, check out the corresponding guides for each library:
 
+* [Apache DataFu Spark - Getting Started](http://datafu.apache.org/docs/spark/getting-started.html)
 * [Apache DataFu Pig - Getting Started](http://datafu.apache.org/docs/datafu/getting-started.html)
 * [Apache DataFu Hourglass - Getting Started](http://datafu.apache.org/docs/hourglass/getting-started.html)
 
@@ -23,6 +25,7 @@ If you'd like to jump in and get started, check out the corresponding guides for
 * [DataFu: The WD-40 of Big Data](http://datafu.apache.org/blog/2013/01/24/datafu-the-wd-40-of-big-data.html)
 * [DataFu 1.0](http://datafu.apache.org/blog/2013/09/04/datafu-1-0.html)
 * [DataFu's Hourglass: Incremental Data Processing in Hadoop](http://datafu.apache.org/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html)
+* [A Look at PayPal's Contributions to DataFu](http://datafu.apache.org/blog/2019/01/29/a-look-at-paypals-contributions-to-datafu.html)
 
 ## Presentations
 
@@ -69,9 +72,7 @@ To build DataFu from a git checkout or binary release, run:
 
     ./gradlew clean assemble
 
-The datafu-pig JAR can be found under `datafu-pig/build/libs`.  The artifact name will be of the form `datafu-pig-incubating-x.y.z.jar` if this is a source release and `datafu-pig-incubating-x.y.z-SNAPSHOT.jar` if this is being built from the code repository.
-
-The datafu-hourglass can be found in the `datafu-hourglass/build/libs` directory.
+Each project's jars can be found under the corresponding sub directory. For example, the datafu-pig JAR can be found under `datafu-pig/build/libs`.  The artifact name will be of the form `datafu-pig-x.y.z.jar` if this is a source release and `datafu-pig-x.y.z-SNAPSHOT.jar` if this is being built from the code repository.
 
 ### Generating Eclipse Files
 
@@ -96,19 +97,15 @@ To run all the tests:
 
     ./gradlew test
 
-To run only the DataFu Pig tests:
+To run only one module's tests - for example, only the DataFu Pig tests:
 
     ./gradlew :datafu-pig:test
-
-To run only the DataFu Hourglass tests:
-
-    ./gradlew :datafu-hourglass:test
 
 To run tests for a single class, use the `test.single` property.  For example, to run only the QuantileTests:
 
     ./gradlew :datafu-pig:test -Dtest.single=QuantileTests
 
-The tests can also be run from within eclipse.  You'll need to install the TestNG plugin for Eclipse.  See: http://testng.org/doc/download.html.
+The tests can also be run from within Eclipse.  You'll need to install the TestNG plugin for Eclipse for DataFu Pig and Hourglass.  See: http://testng.org/doc/download.html.
 
 Potential issues and workaround:
 * You may run out of heap when executing tests in Eclipse. To fix this adjust your heap settings for the TestNG plugin. Go to Eclipse->Preferences. Select TestNG->Run/Debug. Add "-Xmx1G" to the JVM args.
