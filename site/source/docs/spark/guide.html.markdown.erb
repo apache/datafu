@@ -78,8 +78,6 @@ This should produce the following output
 +---+-----+---+
 </pre>
 
-## Calling Pyspark functions from Scala using DataFu
-
 ## Using DataFu to do Skewed Joins
 
 DataFu-Spark contains two methods for doing skewed joins.
@@ -204,7 +202,7 @@ In order to use _joinWithRange_ on tables, they need to meet two requirements:
 1. the points table (_grades_ in our example) needs to be distinct on the point column
 2. the range and point columns need to be numeric
 
-If there are ranges that overlap, a point that matches will be joined to all the ranges that include it. In order to take only one range per point, you can use the joinWithRangeAndDedup_ method.
+If there are ranges that overlap, a point that matches will be joined to all the ranges that include it. In order to take only one range per point, you can use the _joinWithRangeAndDedup_ method.
 
 It takes the same parameters as _joinWithRange_, with one addition - whether to match the largest or smallest range that contains a point.
 
