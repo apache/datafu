@@ -25,7 +25,6 @@ ext {
   commonsIoVersion="2.4"
   fastutilVersion="6.5.7"
   guavaVersion="20.0"
-  hadoopVersion="2.7.0"
   jodaTimeVersion="1.6"
   log4jVersion="1.2.17"
   mavenVersion="2.1.3"
@@ -39,4 +38,6 @@ ext {
   jsonVersion="1.1.1"
   jsr311Version="1.1.1"
   slf4jVersion="1.6.4"
+  sparkTestingBaseVersion = "0.12.0"
+  scalaTestVersion="2.3.0"
 }

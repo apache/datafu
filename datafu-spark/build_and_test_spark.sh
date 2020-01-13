@@ -17,11 +17,9 @@
 
 #!/bin/bash
 
-export SPARK_VERSIONS_FOR_SCALA_210="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2"
 export SPARK_VERSIONS_FOR_SCALA_211="2.1.0 2.1.1 2.1.2 2.1.3 2.2.0 2.2.1 2.2.2 2.3.0 2.3.1 2.3.2 2.4.0 2.4.1 2.4.2 2.4.3"
 export SPARK_VERSIONS_FOR_SCALA_212="2.4.0 2.4.1 2.4.2 2.4.3"
 
-export LATEST_SPARK_VERSIONS_FOR_SCALA_210="2.1.3 2.2.2"
 export LATEST_SPARK_VERSIONS_FOR_SCALA_211="2.1.3 2.2.2 2.3.2 2.4.3"
 export LATEST_SPARK_VERSIONS_FOR_SCALA_212="2.4.3"
 
@@ -73,7 +71,6 @@ while getopts "l:j:t:hq" arg; do
                         TEST_PARAMS=$OPTARG
                         ;;
                 q)
-                        SPARK_VERSIONS_FOR_SCALA_210=$LATEST_SPARK_VERSIONS_FOR_SCALA_210
                         SPARK_VERSIONS_FOR_SCALA_211=$LATEST_SPARK_VERSIONS_FOR_SCALA_211
                         SPARK_VERSIONS_FOR_SCALA_212=$LATEST_SPARK_VERSIONS_FOR_SCALA_212
                         ;;
@@ -98,11 +95,6 @@ if [[ $JARS_DIR != "NONE" ]]; then
   echo "Copying successfully built and tested jars to $JARS_DIR" > $LOG_FILE
   mkdir $JARS_DIR
 fi
-
-export scala=2.10
-for spark in $SPARK_VERSIONS_FOR_SCALA_210; do
-  build
-done
 
 export scala=2.11
 for spark in $SPARK_VERSIONS_FOR_SCALA_211; do

@@ -29,7 +29,7 @@ plugins {
   id "de.undercouch.download" version "3.4.3"
 }
 
-apply from: file("gradle/dependency-versions-scala-" + scalaVersion + ".gradle")
+apply from: file("gradle/dependency-versions-scala-" + scalaCompatVersion + ".gradle")
 
 apply plugin: 'scala'
 
@@ -41,7 +41,9 @@ allprojects {
   }
 }
 
-archivesBaseName = 'datafu-spark_' + scalaVersion + '_' + sparkVersion
+// Note: There seem to be no differences between Spark versions 2.3 and 2.4 that require us to build separate
+// versions.  If we do find differences in the future we can append '_' + sparkCompatVersion to the base name here.
+archivesBaseName = 'datafu-spark_' + scalaCompatVersion
 
 cleanEclipse {
   doLast {
@@ -53,24 +55,24 @@ cleanEclipse {
 }
 
 dependencies {
-    compile "org.scala-lang:scala-library:$scalaLibVersion"
+    compile "org.scala-lang:scala-library:$scalaVersion"
+    compile "org.apache.spark:spark-core_" + scalaCompatVersion + ":" + sparkVersion
+    compile "org.apache.spark:spark-hive_" + scalaCompatVersion + ":" + sparkVersion
 
-    testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
-    testCompile "org.scalatest:scalatest_" + scalaVersion + ":" + sparkVersion
+    testCompile "com.holdenkarau:spark-testing-base_" + scalaCompatVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
+    testCompile "org.scalatest:scalatest_" + scalaCompatVersion + ":" + scalaTestVersion
 }
 
 // we need to set up the build for hadoop 3
 if (hadoopVersion.startsWith("2.")) {
   dependencies {
-    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
-    compile "org.apache.spark:spark-core_" + scalaVersion + ":" + sparkVersion
-    compile "org.apache.spark:spark-hive_" + scalaVersion + ":" + sparkVersion
+    testRuntime "org.apache.hadoop:hadoop-common:$hadoopVersion"
+    testRuntime "org.apache.hadoop:hadoop-hdfs:$hadoopVersion"
+    testRuntime "org.apache.hadoop:hadoop-mapreduce-client-jobclient:$hadoopVersion"
   }
 } else {
   dependencies {
-    compile "org.apache.hadoop:hadoop-core:$hadoopVersion"
+    testRuntime "org.apache.hadoop:hadoop-core:$hadoopVersion"
   }
 }
 

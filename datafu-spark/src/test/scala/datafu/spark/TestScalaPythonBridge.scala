@@ -43,7 +43,6 @@ object TestScalaPythonBridge {
   }
 
   def getNewSparkSession(): SparkSession = {
-
     val tempDir = Utils.createTempDir()
     val localMetastorePath = new File(tempDir, "metastore").getCanonicalPath
     val localWarehousePath = new File(tempDir, "wharehouse").getCanonicalPath
@@ -53,6 +52,7 @@ object TestScalaPythonBridge {
     val sparkConf = new SparkConf()
       .setMaster("local[1]")
       .set("spark.sql.warehouse.dir", localWarehousePath)
+      .set("spark.driver.host","127.0.0.1")
       .set("javax.jdo.option.ConnectionURL",
            s"jdbc:derby:;databaseName=$localMetastorePath;create=true")
       .setExecutorEnv(Seq(("PYTHONPATH", pythonPath)))
@@ -60,7 +60,6 @@ object TestScalaPythonBridge {
 
     val builder = SparkSession.builder().config(sparkConf).enableHiveSupport()
     val spark = builder.getOrCreate()
-
     spark
   }
 }

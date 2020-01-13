@@ -24,10 +24,9 @@ import java.nio.file.Files
 import java.util.UUID
 
 import org.slf4j.LoggerFactory
-
 import org.apache.spark.SparkConf
 import org.apache.spark.api.java.JavaSparkContext
-import org.apache.spark.deploy.SparkPythonRunner
+import org.apache.spark.datafu.deploy.SparkPythonRunner
 import org.apache.spark.sql.SparkSession
 
 

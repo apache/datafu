@@ -14,17 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.deploy
+package org.apache.spark.datafu.deploy
 
 import java.io._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-
 import datafu.spark.ScalaPythonBridge
 import org.apache.log4j.Logger
-
 import org.apache.spark.api.python.PythonUtils
+import org.apache.spark.deploy.PythonRunner
 import org.apache.spark.util.Utils
 
 /**

@@ -20,10 +20,11 @@ package datafu.spark
 
 import java.util.{List => JavaList}
 
+import org.apache.spark.sql.datafu.types.SparkOverwriteUDAFs
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{LongType, SparkOverwriteUDAFs, StructType}
+import org.apache.spark.sql.types.{LongType, StructType}
 import org.apache.spark.storage.StorageLevel
 
 /**

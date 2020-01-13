@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.spark.sql.types
+package org.apache.spark.sql.datafu.types
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate.DeclarativeAggregate
 import org.apache.spark.sql.catalyst.util.TypeUtils
+import org.apache.spark.sql.types.{AbstractDataType, AnyDataType, DataType}
 
 object SparkOverwriteUDAFs {
   def minValueByKey(key: Column, value: Column): Column =
