@@ -23,11 +23,11 @@ import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import java.lang.reflect.Constructor;
 
 @SupportedAnnotationTypes({"org.adrianwalker.multilinestring.Multiline"})
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public final class EcjMultilineProcessor extends AbstractProcessor {
 
   private Elements elementUtils;
-  
+
   @Override
   public void init(final ProcessingEnvironment procEnv) {
     super.init(procEnv);

@@ -16,12 +16,10 @@ import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({"org.adrianwalker.multilinestring.Multiline"})
 
-// This generates a warning with Java 8 - however, if we switch to Java 8 and use SourceVersion.RELEASE_8, it
-// prevents compilation with Java 7. So we'll keep it and ignore the warning
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public final class MultilineProcessor extends AbstractProcessor {
   private Processor delegator = null;
-  
+
   @Override
   public void init(final ProcessingEnvironment procEnv) {
     super.init(procEnv);

@@ -234,6 +234,10 @@ test {
   // enable TestNG support (default is JUnit)
   useTestNG()
 
+  testLogging {
+    showStandardStreams true
+  }
+
   systemProperty 'datafu.jar.dir', file('build/libs')
   systemProperty 'datafu.data.dir', file('data')
 

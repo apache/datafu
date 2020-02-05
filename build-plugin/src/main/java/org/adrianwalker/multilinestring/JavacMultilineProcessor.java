@@ -20,12 +20,12 @@ import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.TreeMaker;
 
 @SupportedAnnotationTypes({"org.adrianwalker.multilinestring.Multiline"})
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public final class JavacMultilineProcessor extends AbstractProcessor {
 
   private JavacElements elementUtils;
   private TreeMaker maker;
-  
+
   @Override
   public void init(final ProcessingEnvironment procEnv) {
     super.init(procEnv);

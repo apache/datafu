@@ -53,26 +53,20 @@ import datafu.test.pig.PigTests;
 
 public class LSHPigTest extends PigTests
 {
-  
-  private static void setDebuggingLogging()
-  {
-    Logger.getRootLogger().setLevel(Level.INFO);
-    Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
-  }
-  
+
   private static void setMemorySettings()
   {
     System.getProperties().setProperty("mapred.map.child.java.opts", "-Xmx1G");
     System.getProperties().setProperty("mapred.reduce.child.java.opts","-Xmx1G");
     System.getProperties().setProperty("io.sort.mb","10");
   }
-  
+
   /**
    * PTS = LOAD 'input' AS (b:bag{t:tuple(idx:int, val:double)});
    * STORE PTS INTO 'output';
    */
   @Multiline private String sparseVectorTest;
-  
+
   @Test
   public void testSparseVectors() throws IOException, ParseException
   {
@@ -100,21 +94,21 @@ public class LSHPigTest extends PigTests
         double interpretedField = interpreted.getEntry(i);
         Assert.assertTrue(Math.abs(originalField - interpretedField) < 1e-5);
       }
-      
+
       idx++;
     }
   }
-  
+
 /**
-  
+
   define LSH datafu.pig.hash.lsh.L1PStableHash('3', '150', '1', '5');
   define METRIC datafu.pig.hash.lsh.metric.L1('3');
-  
+
   PTS = LOAD 'input' AS (dim1:double, dim2:double, dim3:double);
   PTS_HASHED = foreach PTS generate TOTUPLE(dim1, dim2, dim3) as pt
                                   , FLATTEN(LSH(TOTUPLE(dim1, dim2, dim3)));
-  
-  store PTS_HASHED INTO 'lsh_pts'; 
+
+  store PTS_HASHED INTO 'lsh_pts';
   */
   @Multiline private String randomSeedTest;
   @Test
@@ -163,17 +157,17 @@ public class LSHPigTest extends PigTests
     System.out.println(1.0*numDiff / numHashes);
     Assert.assertTrue(1.0*numDiff/numHashes > .8);
   }
-  
+
    /**
-  
+
   define LSH datafu.pig.hash.lsh.L1PStableHash('3', '150', '1', '5', '0');
   define METRIC datafu.pig.hash.lsh.metric.L1('3');
-  
+
   PTS = LOAD 'input' AS (pt:bag{t:tuple(idx:int, val:double)});
   PTS_HASHED = foreach PTS generate pt as pt
                                   , FLATTEN(LSH(pt));
   PARTITIONS = group PTS_HASHED by (lsh_id, hash);
-  
+
   QUERIES = LOAD 'queries' as (pt:bag{t:tuple(idx:int, val:double)});
   QUERIES_HASHED = foreach QUERIES generate pt as query_pt
                       , FLATTEN(LSH(pt))
@@ -182,32 +176,32 @@ public class LSHPigTest extends PigTests
   NEAR_NEIGHBORS = foreach QUERIES_W_PARTS generate query_pt as query_pt
                               , METRIC(query_pt, 1000, PTS_HASHED) as neighbor
                               ;
- 
+
  describe NEAR_NEIGHBORS;
   NEIGHBORS_PROJ = foreach NEAR_NEIGHBORS {
-   
+
    generate TOTUPLE(query_pt) as query_pt, neighbor.pt as matching_pts;
   };
   describe NEIGHBORS_PROJ;
   NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) > 0;
   NEIGHBORS_GRP = group NOT_NULL by query_pt;
   describe NEIGHBORS_GRP;
-  
+
   NEIGHBOR_CNT = foreach NEIGHBORS_GRP{
    MATCHING_PTS = foreach NOT_NULL generate matching_pts;
    DIST_MATCHING_PTS = DISTINCT MATCHING_PTS;
    generate group as query_pt, COUNT(NOT_NULL), DIST_MATCHING_PTS;
   };
   STORE NEIGHBOR_CNT INTO 'neighbors';
-  
-  
+
+
   */
  @Multiline private String l1SparseTest;
- 
+
  @Test
  public void testL1UDFSparse() throws Exception
  {
-   
+
    setMemorySettings();
    RandomGenerator rg = new JDKRandomGenerator();
    rg.setSeed(0);
@@ -232,21 +226,21 @@ public class LSHPigTest extends PigTests
      public double distance(RealVector v1, RealVector v2) {
        return L1.distance(v1, v2);
      }
-     
+
    };
    verifyPoints(neighbors, d, 1000);
  }
-  
+
   /**
-   
+
    define LSH datafu.pig.hash.lsh.L1PStableHash('3', '150', '1', '5', '0');
    define METRIC datafu.pig.hash.lsh.metric.L1('3');
-   
+
    PTS = LOAD 'input' AS (dim1:double, dim2:double, dim3:double);
    PTS_HASHED = foreach PTS generate TOTUPLE(dim1, dim2, dim3) as pt
                                    , FLATTEN(LSH(TOTUPLE(dim1, dim2, dim3)));
    PARTITIONS = group PTS_HASHED by (lsh_id, hash);
-   
+
    QUERIES = LOAD 'queries' as (dim1:double, dim2:double, dim3:double);
    QUERIES_HASHED = foreach QUERIES generate TOTUPLE(dim1, dim2, dim3) as query_pt
                        , FLATTEN(LSH(TOTUPLE(dim1, dim2, dim3)))
@@ -255,28 +249,28 @@ public class LSHPigTest extends PigTests
    NEAR_NEIGHBORS = foreach QUERIES_W_PARTS generate query_pt as query_pt
                                , METRIC(query_pt, 1000, PTS_HASHED) as neighbor
                                ;
-  
+
   describe NEAR_NEIGHBORS;
    NEIGHBORS_PROJ = foreach NEAR_NEIGHBORS {
-    
+
     generate query_pt as query_pt, neighbor.pt as matching_pts;
    };
    describe NEIGHBORS_PROJ;
    NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) > 0;
    NEIGHBORS_GRP = group NOT_NULL by query_pt;
    describe NEIGHBORS_GRP;
-   
+
    NEIGHBOR_CNT = foreach NEIGHBORS_GRP{
     MATCHING_PTS = foreach NOT_NULL generate FLATTEN(matching_pts);
     DIST_MATCHING_PTS = DISTINCT MATCHING_PTS;
     generate group as query_pt, COUNT(NOT_NULL), DIST_MATCHING_PTS;
    };
    STORE NEIGHBOR_CNT INTO 'neighbors';
-   
-   
+
+
    */
   @Multiline private String l1Test;
-  
+
   @Test
   public void testL1UDF() throws Exception
   {
@@ -304,21 +298,21 @@ public class LSHPigTest extends PigTests
       public double distance(RealVector v1, RealVector v2) {
         return L1.distance(v1, v2);
       }
-      
+
     };
     verifyPoints(neighbors, d, 1000);
   }
-  
+
   /**
-   
+
    define LSH datafu.pig.hash.lsh.L2PStableHash('3', '200', '1', '5', '0');
    define METRIC datafu.pig.hash.lsh.metric.L2('3');
-   
+
    PTS = LOAD 'input' AS (dim1:double, dim2:double, dim3:double);
    PTS_HASHED = foreach PTS generate TOTUPLE(dim1, dim2, dim3) as pt
                    , FLATTEN(LSH(TOTUPLE(dim1, dim2, dim3)));
    PARTITIONS = group PTS_HASHED by (lsh_id, hash);
-   
+
    QUERIES = LOAD 'queries' as (dim1:double, dim2:double, dim3:double);
    QUERIES_HASHED = foreach QUERIES generate TOTUPLE(dim1, dim2, dim3) as query_pt
                        , FLATTEN(LSH(TOTUPLE(dim1, dim2, dim3)))
@@ -329,25 +323,25 @@ public class LSHPigTest extends PigTests
                                ;
    describe NEAR_NEIGHBORS;
    NEIGHBORS_PROJ = foreach NEAR_NEIGHBORS {
-    
+
     generate query_pt as query_pt, neighbor.pt as matching_pts;
    };
    describe NEIGHBORS_PROJ;
    NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) > 0;
    NEIGHBORS_GRP = group NOT_NULL by query_pt;
    describe NEIGHBORS_GRP;
-   
+
    NEIGHBOR_CNT = foreach NEIGHBORS_GRP{
     MATCHING_PTS = foreach NOT_NULL generate FLATTEN(matching_pts);
     DIST_MATCHING_PTS = DISTINCT MATCHING_PTS;
     generate group as query_pt, COUNT(NOT_NULL), DIST_MATCHING_PTS;
    };
    STORE NEIGHBOR_CNT INTO 'neighbors';
-   
-   
+
+
    */
   @Multiline private String l2Test;
-  
+
   @Test
   public void testL2UDF() throws Exception
   {
@@ -375,21 +369,21 @@ public class LSHPigTest extends PigTests
       public double distance(RealVector v1, RealVector v2) {
         return L2.distance(v1, v2);
       }
-      
+
     };
     verifyPoints(neighbors, d, 1000);
   }
-  
+
   /**
-   
+
    define LSH datafu.pig.hash.lsh.CosineDistanceHash('3', '1500', '5', '0');
    define METRIC datafu.pig.hash.lsh.metric.Cosine('3');
-   
+
    PTS = LOAD 'input' AS (dim1:double, dim2:double, dim3:double);
    PTS_HASHED = foreach PTS generate TOTUPLE(dim1, dim2, dim3) as pt
                    , FLATTEN(LSH(TOTUPLE(dim1, dim2, dim3)));
    PARTITIONS = group PTS_HASHED by (lsh_id, hash);
-   
+
    QUERIES = LOAD 'queries' as (dim1:double, dim2:double, dim3:double);
    QUERIES_HASHED = foreach QUERIES generate TOTUPLE(dim1, dim2, dim3) as query_pt
                        , FLATTEN(LSH(TOTUPLE(dim1, dim2, dim3)))
@@ -401,14 +395,14 @@ public class LSHPigTest extends PigTests
                                ;
    describe NEAR_NEIGHBORS;
    NEIGHBORS_PROJ = foreach NEAR_NEIGHBORS {
-    
+
     generate query_pt as query_pt, neighbor.pt as matching_pts;
    };
    describe NEIGHBORS_PROJ;
    NOT_NULL = filter NEIGHBORS_PROJ by SIZE(matching_pts) > 0;
    NEIGHBORS_GRP = group NOT_NULL by query_pt;
    describe NEIGHBORS_GRP;
-   
+
    NEIGHBOR_CNT = foreach NEIGHBORS_GRP{
     MATCHING_PTS = foreach NOT_NULL generate FLATTEN(matching_pts);
     DIST_MATCHING_PTS = DISTINCT MATCHING_PTS;
@@ -416,11 +410,11 @@ public class LSHPigTest extends PigTests
    };
    describe NEIGHBOR_CNT;
    STORE NEIGHBOR_CNT INTO 'neighbors';
-   
-   
+
+
    */
   @Multiline private String cosTest;
-  
+
   @Test
   public void testCosineUDF() throws Exception
   {
@@ -448,7 +442,7 @@ public class LSHPigTest extends PigTests
       public double distance(RealVector v1, RealVector v2) {
         return Cosine.distance(v1, v2);
       }
-      
+
     };
     verifyPoints(neighbors, d, .001);
   }
@@ -456,7 +450,7 @@ public class LSHPigTest extends PigTests
   {
     public double distance(RealVector v1, RealVector v2);
   }
-  
+
   private void verifyPoints(List<Tuple> neighbors, Distance d, double threshold) throws PigException
   {
     for(Tuple t : neighbors)
@@ -471,7 +465,7 @@ public class LSHPigTest extends PigTests
       }
     }
   }
-  
+
   private Iterable<Long> getCounts(List<Tuple> neighbors)
   {
     return Iterables.transform(neighbors, new Function<Tuple, Long>()
@@ -496,7 +490,7 @@ public class LSHPigTest extends PigTests
     }
     return input;
   }
-  
+
   private String[] getLines(List<RealVector> vectors)
   {
     String[] input = new String[vectors.size()];

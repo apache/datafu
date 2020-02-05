@@ -37,47 +37,50 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.metrics.jvm.JvmMetrics;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.pigunit.PigTest;
 import org.apache.pig.tools.parameters.ParseException;
 
 public abstract class PigTests
-{    
+{
+
   private String testFileDir;
   private String savedUserDir;
-  
+
+  private static final Logger logger = Logger.getLogger(PigTests.class);
+
   @org.testng.annotations.BeforeClass
   public void beforeClass()
   {
-    // TODO make it configurable whether this happens, for travis-ci we can't spam the logs so much,
-    // however otherwise it is useful to see the errors
     Logger.getRootLogger().removeAllAppenders();
+    Logger.getRootLogger().addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
+    Logger.getRootLogger().setLevel(Level.INFO);
     Logger.getLogger(JvmMetrics.class).setLevel(Level.OFF);
-    
+
     System.setProperty("pig.import.search.path", System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources");
 
     // Test files will be created in the following sub-directory
-    new File(System.getProperty("user.dir") + File.separator + "build", "test-files").mkdir();		
+    new File(System.getProperty("user.dir") + File.separator + "build", "test-files").mkdir();
   }
-	  
+
   @org.testng.annotations.BeforeMethod
   public void beforeMethod(Method method)
-  {	
+  {
     // working directory needs to be changed to the location of the test files for the PigTests to work properly
     this.savedUserDir = System.getProperty("user.dir");
     this.testFileDir = System.getProperty("user.dir") + File.separator + "build" + File.separator + "test-files";
     System.setProperty("user.dir", this.testFileDir);
-    
-    System.out.println("\n*** Running " + method.getName() + " ***");
   }
 
-  @org.testng.annotations.AfterMethod 	
+  @org.testng.annotations.AfterMethod
   public void afterMethod(Method method)
   {
-    // restore the change made in the location of the working directory in beforeMethod 
+    // restore the change made in the location of the working directory in beforeMethod
     System.setProperty("user.dir", this.savedUserDir);
   }
-  
+
   protected String[] getDefaultArgs()
   {
     String[] args = {
@@ -85,7 +88,7 @@ public abstract class PigTests
       };
     return args;
   }
-  
+
   protected List<String> getDefaultArgsAsList()
   {
     String[] args = getDefaultArgs();
@@ -96,12 +99,12 @@ public abstract class PigTests
     }
     return argsList;
   }
-  
+
   protected PigTest createPigTestFromString(String str, String... args) throws IOException
   {
     return createPigTest(str.split("\n"),args);
   }
-  
+
   protected PigTest createPigTest(String[] lines, String... args) throws IOException
   {
     // append args to list of default args
@@ -110,7 +113,7 @@ public abstract class PigTests
     {
       theArgs.add(arg);
     }
-    
+
     for (String arg : theArgs)
     {
       String[] parts = arg.split("=",2);
@@ -122,20 +125,20 @@ public abstract class PigTests
         }
       }
     }
-    
+
     return new PigTest(lines);
   }
-  
+
   protected PigTest createPigTest(String scriptPath, String... args) throws IOException
   {
     return createPigTest(getLinesFromFile(scriptPath), args);
   }
-  
+
   protected String getDataDirParam()
   {
     return "DATA_DIR=" + getDataPath();
   }
-  
+
   protected String getDataPath()
   {
     if (System.getProperty("datafu.data.dir") != null)
@@ -145,13 +148,13 @@ public abstract class PigTests
     else
     {
       return new File(System.getProperty("user.dir"), "data").getAbsolutePath();
-    }  
+    }
   }
-  
+
   protected String getJarPath()
-  {    
+  {
     String jarDir = null;
-    
+
     if (System.getProperty("datafu.jar.dir") != null)
     {
       jarDir = System.getProperty("datafu.jar.dir");
@@ -159,10 +162,10 @@ public abstract class PigTests
     else
     {
       jarDir = new File(System.getProperty("user.dir"), "build/libs").getAbsolutePath();
-    }  
-    
+    }
+
     File userDir = new File(jarDir);
-    
+
     String[] files = userDir.list(new FilenameFilter() {
 
       @Override
@@ -170,9 +173,9 @@ public abstract class PigTests
       {
         return name.endsWith(".jar") && !name.contains("sources") && !name.contains("javadoc");
       }
-      
+
     });
-    
+
     if (files == null || files.length == 0)
     {
       throw new RuntimeException("Could not find JAR file");
@@ -187,41 +190,41 @@ public abstract class PigTests
       }
       throw new RuntimeException("Found more JAR files than expected: " + sb.substring(0, sb.length()-1));
     }
-    
+
     return  userDir.getAbsolutePath() + "/" + files[0];
   }
-  
+
   protected List<Tuple> getLinesForAlias(PigTest test, String alias) throws IOException, ParseException
   {
     return getLinesForAlias(test,alias,true);
   }
-  
+
   protected List<Tuple> getLinesForAlias(PigTest test, String alias, boolean logValues) throws IOException, ParseException
   {
     Iterator<Tuple> tuplesIterator = test.getAlias(alias);
     List<Tuple> tuples = new ArrayList<Tuple>();
     if (logValues)
     {
-      System.out.println(String.format("Values for %s: ", alias));
+      logger.info(String.format("Values for %s: ", alias));
     }
     while (tuplesIterator.hasNext())
     {
       Tuple tuple = tuplesIterator.next();
       if (logValues)
       {
-        System.out.println(tuple.toString());
+        logger.info(tuple.toString());
       }
       tuples.add(tuple);
     }
     return tuples;
   }
-    
+
   protected void writeLinesToFile(String fileName, String... lines) throws IOException
   {
     File inputFile = deleteIfExists(getFile(fileName));
     writeLinesToFile(inputFile, lines);
   }
-  
+
   protected void writeLinesToFile(File file, String[] lines) throws IOException
   {
     FileWriter writer = new FileWriter(file);
@@ -252,15 +255,15 @@ public abstract class PigTests
     }
     return file;
   }
-  
+
   protected File getFile(String fileName)
   {
     return new File(System.getProperty("user.dir"), fileName).getAbsoluteFile();
   }
-  
+
   /**
    * Gets the lines from a given file.
-   * 
+   *
    * @param relativeFilePath The path relative to the datafu-tests project.
    * @return The lines from the file
    * @throws IOException
