@@ -1,3 +1,17 @@
+# 1.6.0
+
+Additions:
+
+* datafu-spark library (DATAFU-148)
+
+Improvements:
+
+* Remove log suppression in unit tests (DATAFU-82)
+
+Fixes:
+
+* Failure to assemble due to jcenter HTTP usage (DATAFU-152)
+
 # 1.5.0
 
 Additions:
