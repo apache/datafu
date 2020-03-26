@@ -47,16 +47,16 @@ Bugs and feature requests can be filed [here](https://issues.apache.org/jira/bro
 
 If you are starting from a source release, then you'll want to verify the release is valid and bootstrap the build environment.
 
-To verify that the archive has the correct MD5 checksum, the following two commands can be run.  These should produce the same output.
+To verify that the archive has the correct SHA512 checksum, the following two commands can be run.  These should produce the same output.
 
-  openssl md5 < apache-datafu-sources-x.y.z-incubating.tgz
-  cat apache-datafu-sources-x.y.z-incubating.tgz.MD5
+  openssl sha512 < apache-datafu-sources-x.y.z.tgz
+  cat apache-datafu-sources-x.y.z.tgz.sha512
 
 To verify the archive against its signature, you can run:
 
-  gpg2 --verify apache-datafu-sources-x.y.z-incubating.tgz.asc
+  gpg2 --verify apache-datafu-sources-x.y.z.tgz.asc
 
-The command above will assume you are verifying `apache-datafu-sources-x.y.z-incubating.tgz` and produce "Good signature" if the archive is valid.
+The command above will assume you are verifying `apache-datafu-sources-x.y.z.tgz` and produce "Good signature" if the archive is valid.
 
 To build DataFu from a source release, it is first necessary to download a gradle wrapper script.  This bootstrapping process requires Gradle to be installed on the source machine.  Gradle is available through most package managers or directly from [its website](http://www.gradle.org/).  Once you have installed Gradle and have ensured that the `gradle` is available in your path, you can bootstrap the wrapper with:
 

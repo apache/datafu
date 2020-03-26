@@ -21,9 +21,17 @@ If you are using gpg2 then you'll need to tell git to use it.
 
     git config --global gpg.program gpg2
 
-Tip: You may get an error about a passphrase not being provided when signing with git.  If this happens try running the command below, which should case the passphrase prompt to show in the terminal.
+When signing with git or gpg later in this guide you may get an error about a passphrase not being provided or gpg
+being unable to sign the tag.  If this happens try running the command below, which should case the passphrase prompt
+to show in the terminal.
 
     export GPG_TTY=`tty`
+
+Bootstrap Gradle with the command below.  This creates the `gradlew` file referenced in these instructions.
+
+    gradle -b bootstrap.gradle
+
+Make sure `changes.md` has been updated with all changes since the last release.
 
 ## Code Validation
 
@@ -39,6 +47,16 @@ Assuming you have are preparing to release version `x.y.z` from the current comm
 
         git checkout -b x.y.z
         git push origin x.y.z
+
+Source releases are created from a release candidate branch.  To create an rc0 release candidate branch, checkout your
+`x.y.z` branch and then checkout a `x.y.z-rc0` like so:
+
+        git checkout -b x.y.z-rc0
+
+In the `x.y.z-rc0` branch edit `gradle.properties`, set `release=true`, and commit the change.
+The `release=true` setting prevents `-SNAPSHOT` from being appended to the version, which is the default behavior.
+It also prevents any builds from the extracted source tarball from including `-SNAPSHOT` in the version.
+
 
 ## Create a Source Release
 
@@ -63,10 +81,9 @@ The GPG key ID can be found by running `gpg --list-keys`.
 
 To generate the source release, run:
 
-    ./gradlew clean release -Prelease=true
+    ./gradlew clean release
 
-This generates a source tarball.  The `-Prelease=true` setting prevents `-SNAPSHOT` from being appended to the version,
-which is the default behavior.  It also prevents any builds from the extracted source tarball from including `-SNAPSHOT` in the version.  It achieves this by modifying `gradle.properties` within the generated archive.
+This generates a source tarball.
 
 If you have configured your key information in your `gradle.properties` then you the archive should automatically be signed.  There should now be a corresponding ASC file alongside the tarball and MD5 file.  Otherwise you'll need to sign it manually by running:
 
@@ -100,11 +117,13 @@ Then push the tag:
 
 ## Staging artifacts in Maven
 
-General information on publishing to Maven can be found [here](http://www.apache.org/dev/publishing-maven-artifacts.html).  To upload the archive to the Apache Nexus staging repository, run:
+First, refer to general information on publishing to Maven, which can be found [here](http://www.apache.org/dev/publishing-maven-artifacts.html).
 
-    ./gradlew uploadArchives -Prelease=true -PnexusUsername=yourNexusUsername -PnexusPassword=yourNexusPassword
+To upload the archive to the Apache Nexus staging repository, from the release candidate branch run:
 
-Note that if you are running the above command from a source release you don't need `-Prelease=true`.  The above command assumes you have configured `$HOME/.gradle/gradle.properties` with your GPG key information.
+    ./gradlew uploadArchives -PnexusUsername=yourNexusUsername -PnexusPassword=yourNexusPassword
+
+The above command assumes you have configured `$HOME/.gradle/gradle.properties` with your GPG key information.
 
 If you now visit the [Apache Nexus Repository](https://repository.apache.org) and click on Staging Repositories, you should see a repository named orgapachedatafu-xxxx, where xxxx is some number.  Select the repository and browse the content to make sure the set of files looks right.  If it looks correct then Close the repository.  The repository is now ready for testing.  If you look at the summary there is a URL for the repository that may be used to fetch the archives.
 
