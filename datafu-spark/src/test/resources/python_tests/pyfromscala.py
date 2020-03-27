@@ -28,7 +28,7 @@ from pyspark.sql import functions as F
 
 
 import os
-print os.getcwd()
+print(os.getcwd())
 
 
 ###############################################################
@@ -70,9 +70,9 @@ schema = StructType([
 
 txt_df = sqlContext.read.csv('src/test/resources/text.csv', sep=DEL, schema=schema)
 
-print type(txt_df)
-print dir(txt_df)
-print txt_df.count()
+print(type(txt_df))
+print(dir(txt_df))
+print(txt_df.count())
 
 txt_df.show()
 
