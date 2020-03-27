@@ -110,13 +110,16 @@ case class SparkPythonRunner(pyPaths: String,
                        writer: BufferedWriter,
                        reader: BufferedReader): String = {
     writer.write("import traceback\n")
+    writer.write("import sys\n")
     writer.write("try:\n")
-    writer.write("    execfile('" + filename + "')\n")
+    writer.write("    if sys.version_info < (3, 0):\n")
+    writer.write(s"      execfile('$filename')\n")
+    writer.write("    else:\n")
+    writer.write(s"      exec(open('$filename').read())\n")
     writer.write("    print (\"*!?flush reader!?*\")\n")
     writer.write("except Exception as e:\n")
     writer.write("    traceback.print_exc()\n")
     writer.write("    print (\"*!?flush error reader!?*\")\n\n")
-//    writer.write("    exit(1)\n\n")
     writer.flush()
     var output = ""
     var line: String = reader.readLine
