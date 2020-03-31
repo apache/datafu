@@ -41,7 +41,22 @@ The static website content is located in another repo:
 
     svn co https://svn.apache.org/repos/asf/datafu apache-datafu-website
 
-## Commit the changes
+## Build and commit docs
+
+To generate the docs, run the commands below.  If you are in a release branch or building from a source release then the version should not include SNAPSHOT in the name.  Confirm this is the case by opening the docs after they are built.
+
+    ./gradlew clean
+    ./gradlew :datafu-spark:scaladoc :datafu-pig:javadoc :datafu-hourglass:javadoc
+
+Assuming current version is `x.y.z`, copy the docs to the site repo into new version directories:
+
+    cp -r ~/Projects/datafu/datafu-pig/build/docs/javadoc ~/Projects/apache-datafu-website/site/docs/datafu/x.y.z
+    cp -r ~/Projects/datafu/datafu-hourglass/build/docs/javadoc ~/Projects/apache-datafu-website/site/docs/hourglass/x.y.z
+    cp -r ~/Projects/datafu/datafu-spark/build/docs/scaladoc ~/Projects/apache-datafu-website/site/docs/spark/x.y.z
+
+Add and commit the changes.
+
+## Commit the website changes
 
 In the `apache-datafu-website` folder, delete the old content, which we will be replacing
 with new content:
@@ -55,17 +70,8 @@ Now copy the built content to the `apache-datafu-website` folder, replacing the 
 
 This procedure unfortunately removes the javadocs too, which we want to keep and are not stored in the git repo.  We should add a script to make this easier.  In the meantime you can revert the deleted javadoc files with something resembling the commands below.  Check the `revert_list.txt` file before proceeding.
 
-    svn status | grep "\!" | cut -c 9- | grep -E "(datafu|hourglass)/\d\.\d\.\d/" > revert_list.txt
+    svn status | grep "\!" | cut -c 9- | grep -E "(datafu|hourglass|spark)/\d\.\d\.\d/" > revert_list.txt
     svn revert --targets revert_list.txt
-
-If this is a new release, make sure you have built the javadocs first.  If you are in the release branch for the repo, you can run `gradle assemble -Prelease=true` to generate the javadocs.  The `release=true` flag ensure SNAPSHOT does not appear in the name.  If you are building from the source release this isn't necessary and `gradle assemble` is fine.  Copy the new javadocs from the release into the site.
-
-    cp -r ~/Projects/datafu/datafu-pig/build/docs/javadoc site/docs/datafu/x.y.z
-    cp -r ~/Projects/datafu/datafu-hourglass/build/docs/javadoc site/docs/hourglass/x.y.z
-    svn add site/docs/datafu/x.y.z
-    svn add site/docs/hourglass/x.y.z
-
-Open the new javadocs and confirm they are correct before checking them in.  For example, make sure that the version is correct and the version does not have SNAPSHOT in the name.
 
 Check what has changed:
 

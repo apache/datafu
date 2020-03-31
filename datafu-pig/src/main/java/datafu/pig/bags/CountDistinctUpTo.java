@@ -39,9 +39,9 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
 
 /**
  * Generates a count of the number of distinct tuples in a bag, up to a preset limit.
- * 
+ *
  * If the number of distinct tuples is small, performance is comparable to using Pig's DISTINCT and COUNT in a nested foreach.
- * 
+ *
  * Use this UDF when your threshold is low, and some records have a distinct count that is much higher. In such cases this UDF will prevent memory problems
  * and perform an order of magnitude faster than using pure Pig.
  *
@@ -50,19 +50,19 @@ import org.apache.pig.impl.logicalLayer.schema.Schema.FieldSchema;
  * {@code
  * DEFINE CountDistinctUpTo10 datafu.pig.bags.CountDistinctUpTo('10');
  * DEFINE CountDistinctUpTo3 datafu.pig.bags.CountDistinctUpTo('3');
- * 
- * -- input: 
+ *
+ * -- input:
  * -- {(A),(B),(D),(A),(C),(E),(A),(B),(A),(B)}
  * input = LOAD 'input' AS (B: bag {T: tuple(alpha:CHARARRAY)});
- * 
- * -- output: 
- * -- (5)
- * output = FOREACH input GENERATE CountDistinctUpTo10(B); 
  *
- * -- output2: 
+ * -- output:
+ * -- (5)
+ * output = FOREACH input GENERATE CountDistinctUpTo10(B);
+ *
+ * -- output2:
  * -- (3)
- * output2 = FOREACH input GENERATE CountDistinctUpTo3(B); 
- * } 
+ * output2 = FOREACH input GENERATE CountDistinctUpTo3(B);
+ * }
  * </pre>
  */
 public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements Algebraic{
@@ -73,12 +73,12 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 	// for accumulator implementation
 	private Set<Tuple> set;
 	private final int max;
-	
+
 	public CountDistinctUpTo(String maxAmount) {
 		max = Integer.valueOf(maxAmount);
 		set = new HashSet<Tuple>(max);
 	}
-	
+
 	@Override
 	public void accumulate(Tuple tuple) throws IOException {
 		count(set, tuple, max, log);
@@ -86,7 +86,7 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 
 	/**
 	 * Counts tuples with a single level of embedding (input contains a bag containing tuples with the original schema)
-	 * 
+	 *
 	 * Used by both accumulator and algebraic implementations
 	 */
 	private static void count(Set<Tuple> set, Tuple input, int max, Log log) throws ExecException {
@@ -113,23 +113,23 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 
 	/**
 	 * Counts tuples with two levels of embedding (input contains a bag containing bags of tuples with the original schema)
-	 * 
+	 *
 	 * Used by the algebraic implementation. Returns null if the maximum was reached
 	 */
 	private static Set<Tuple> makeDistinctSet(Tuple input, int max, Log log) throws ExecException {
 		Set<Tuple> set = new HashSet<Tuple>(max);
 
 		DataBag bag = (DataBag) input.get(0);
-		
+
 		for (Tuple t : bag) {
-			
+
 			// we've encountered a null value from the combiner, therefore the max has already been reached (obviously, not used in the combiner itself)
 			if (t.get(0) == null) {
 				return null;
 			}
-			
+
 			count(set, t, max, log);
-			
+
 			// we've just now reached the maximum
 			if (set.size() == max) {
 				return null;
@@ -138,7 +138,7 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 
 		return set;
 	}
-	
+
 	@Override
 	public void cleanup() {
 		set.clear();
@@ -166,14 +166,18 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 
 	/**
 	 * Outputs a tuple containing a DataBag containing a single tuple T (the original schema) or an empty bag
-	 * 
+	 *
+	 * <pre>
+     * {@code
 	 *  T -> ({T})
+	 * }
+	 * </pre>
 	 */
 	public static class Initial extends EvalFunc<Tuple> {
 
 		public Initial() {}
 		public Initial(String maxAmount) {}
-			
+
 		@Override
 		public Tuple exec(Tuple input) throws IOException {
 			DataBag inputBag = (DataBag) input.get(0);
@@ -186,17 +190,29 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 					outputBag.add(t);
 				}
 			}
-			
+
 			return tupleFactory.newTuple(outputBag);
 		}
 	}
 
 	/**
 	 * Receives a bag of bags, each containing a single tuple with the original input schema T
-	 * 
-	 * Outputs a bag of distinct tuples each with the original schema T: {({T}),({T}),({T})} -> ({T, T, T}) 
-	 * 
-	 * or if the maximum is reached, null: {({T}),({T}),({T}) ..} -> (null) 
+	 *
+	 * Outputs a bag of distinct tuples each with the original schema T:
+
+	 * <pre>
+     * {@code
+	 * {({T}),({T}),({T})} -> ({T, T, T})
+	 * }
+	 * </pre>
+	 *
+	 * or if the maximum is reached, null:
+	 *
+	 * <pre>
+     * {@code
+	 * {({T}),({T}),({T}) ..} -> (null)
+	 * }
+	 * </pre>
 	 */
 	public static class Intermediate extends EvalFunc<Tuple> {
 
@@ -205,7 +221,7 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 		public Intermediate() {
 			this("0");
 		}
-		
+
 		public Intermediate(String maxAmount) {
 			max = Integer.valueOf(maxAmount);
 		}
@@ -219,10 +235,10 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 				Tuple result = tupleFactory.newTuple(1);
 				result.set(0, null);
 				return result;
-			} 
-			
+			}
+
 			DataBag outputBag = bagFactory.newDefaultBag();
-	
+
 			for (Tuple t : set) {
 				outputBag.add(t);
 			}
@@ -233,14 +249,18 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 
 	/**
 	 * Receives output either from initial results or intermediate
-	 * 
-	 * Outputs an integer with the number of distinct tuples, up to the maximum desired. 
-	 * 
+	 *
+	 * Outputs an integer with the number of distinct tuples, up to the maximum desired.
+	 *
+	 * <pre>
+     * {@code
 	 * {({T}),({T,T,T})} -> (3)
-	 * 
+	 *
 	 * or
-	 * 
+	 *
 	 * {({T}),({T,T,T}),(null)} -> (MAX)
+	 * }
+	 * </pre>
 	 */
 	public static class Final extends EvalFunc<Integer> {
 
@@ -249,7 +269,7 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 		public Final() {
 			this("0");
 		}
-		
+
 		public Final(String maxAmount) {
 			max = Integer.valueOf(maxAmount);
 		}
@@ -257,11 +277,11 @@ public class CountDistinctUpTo extends AccumulatorEvalFunc<Integer> implements A
 		@Override
 		public Integer exec(Tuple input) throws IOException {
 			Set<Tuple> set = makeDistinctSet(input, max, log);
-			
+
 			if (set == null) {
 				return max;
 			}
-			
+
 			return set.size();
 		}
 	}

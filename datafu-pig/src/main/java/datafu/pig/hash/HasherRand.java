@@ -50,26 +50,28 @@ public class HasherRand extends Hasher
   * Generates hash values according to murmur3-32, a non-cryptographic-strength
   * hash function with good mixing.
   *
-  * @throws IllegalArgumentException, RuntimeException
-  * @see    #HasherRand(String alg)
+  * @see #HasherRand(String alg)
   */
- public HasherRand() throws IllegalArgumentException, RuntimeException
+ public HasherRand()
  {
    this("murmur3-32");
  }
 
   /**
-   * @param  alg
-   * @throws IllegalArgumentException, RuntimeException
-   * @see    #HasherRand()
+   * Generates hash values according to the given hash algorithm.
+   *
+   * @param alg the hash algorithm to use
+   * @see #HasherRand()
    */
-  public HasherRand(String alg) throws IllegalArgumentException, RuntimeException
+  public HasherRand(String alg)
   {
     algorithm = alg;
   }
 
   /**
-   * @param  val the single string to hash
+   * Generates the hash for a string value.
+   *
+   * @param val the single string to hash
    * @return val, hashed according to the algorithm specified at instantiation
    */
   @Override

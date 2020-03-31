@@ -35,101 +35,89 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 
 /**
  * This class is a copy of org.apache.pig.piggybank.evaluation.ExtremalTupleByNthField
- * 
+ *
  * https://github.com/apache/pig/blob/trunk/contrib/piggybank/java/src/main/java/org/apache/pig/piggybank/evaluation/ExtremalTupleByNthField.java
  */
 public class ExtremalTupleByNthField extends EvalFunc<Tuple> implements Algebraic, Accumulator<Tuple> {
-	
+
 	/**
 	 * Indicates once for how many items progress heart beat should be sent.
 	 * This number has been increased from 10 to reduce verbosity.
 	 */
 	private static final int PROGRESS_FREQUENCY = 10000;
-	
+
 	int fieldIndex;
 	int sign;
-	
-	/**
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * Constructors
-	 * 
-	 * @throws ExecException
-	 * 
-	 */
-	
+
 	// defaults to max by first field
 	public ExtremalTupleByNthField() throws ExecException {
 		this("1", "max");
 	}
-	
+
 	// defaults to max
 	public ExtremalTupleByNthField(String fieldIndexString)
 			throws ExecException {
 		this(fieldIndexString, "max");
 	}
-	
+
 	public ExtremalTupleByNthField(String fieldIndexString, String order)
 			throws ExecException {
 		super();
 		this.fieldIndex = parseFieldIndex(fieldIndexString);
 		this.sign = parseOrdering(order);
 	}
-	
+
 	/**
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 *
+	 *
 	 * The EvalFunc interface
 	 */
 	@Override
 	public Tuple exec(Tuple input) throws IOException {
 		return extreme(fieldIndex, sign, input, reporter);
 	}
-	
+
 	@Override
 	public Type getReturnType() {
 		return Tuple.class;
 	}
-	
+
 	public Schema outputSchema(Schema input) {
 		return input;
 	}
-	
+
 	/**
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 *
+	 *
 	 * Algebraic interface
 	 */
 	@Override
 	public String getInitial() {
 		return HelperClass.class.getName();
 	}
-	
+
 	@Override
 	public String getIntermed() {
 		return HelperClass.class.getName();
 	}
-	
+
 	@Override
 	public String getFinal() {
 		return HelperClass.class.getName();
 	}
-	
+
 	/**
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 *
+	 *
 	 * The Accumulator interface
 	 */
 	Tuple intermediate = null;
@@ -178,12 +166,12 @@ public class ExtremalTupleByNthField extends EvalFunc<Tuple> implements Algebrai
 	}
 
 	/**
-	 * 
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
+	 *
 	 * Utility classes and methods
-	 * 
+	 *
 	 */
 	public static final class HelperClass extends EvalFunc<Tuple> {
 		int fieldIndex, sign;
@@ -250,10 +238,10 @@ public class ExtremalTupleByNthField extends EvalFunc<Tuple> implements Algebrai
 					 * <pre>
 					 * c > 0 iff ((sign==1 && d>curMax) || (sign==-1 && d<curMax))
 					 * </pre>
-					 * 
+					 *
 					 * In both case we want to replace curMax/curMaxTuple by the
 					 * new values
-					 * 
+					 *
 					 **/
 					int c = psign * d.compareTo(curMax);
 					if (c > 0) {

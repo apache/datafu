@@ -83,7 +83,8 @@ public class Hasher extends SimpleEvalFunc<String>
    * Generates hash values according to murmur3-32, a non-cryptographic-strength
    * hash function with good mixing.
    *
-   * @throws IllegalArgumentException, RuntimeException
+   * @throws IllegalArgumentException for an internal error
+   * @throws RuntimeException for an internal error
    */
   public Hasher() throws IllegalArgumentException, RuntimeException
   {
@@ -95,8 +96,9 @@ public class Hasher extends SimpleEvalFunc<String>
    *
    * See the Hasher class docs for a list of algorithms and guidance on selection.
    *
-   * @param algorithm
-   * @throws IllegalArgumentException, RuntimeException
+   * @param algorithm the hash algorithm to use
+   * @throws IllegalArgumentException for an invalid algorithm
+   * @throws RuntimeException for an internal error
    * @see    Hasher#makeHashFunc(String algorithm)
    *
    */
@@ -111,9 +113,10 @@ public class Hasher extends SimpleEvalFunc<String>
    *
    * See the Hasher class docs for a list of algorithms and guidance on selection.
    *
-   * @param  algorithm
-   * @param  seed
-   * @throws IllegalArgumentException, RuntimeException
+   * @param  algorithm the hash algorithm to use
+   * @param  seed the initial seed to use
+   * @throws IllegalArgumentException for an invalid algorithm or seed
+   * @throws RuntimeException when the seed cannot be parsed or other internal error
    * @see    Hasher#makeHashFunc(String algorithm, String seed)
    *
    */
@@ -127,14 +130,15 @@ public class Hasher extends SimpleEvalFunc<String>
    *
    * See the Hasher class docs for a list of algorithms and guidance on selection.
    *
-   * @param algorithm
-   * @throws IllegalArgumentException, RuntimeException
+   * @param algorithm the hash algorithm to use
+   * @throws IllegalArgumentException for an invalid seed given the algorithm
+   * @throws RuntimeException when the seed cannot be parsed
    */
   private void makeHashFunc(String algorithm) throws IllegalArgumentException, RuntimeException
   {
     if (hash_func != null) { throw new RuntimeException("The hash function should only be set once per instance"); }
 
-    if      (algorithm.startsWith("good-")) {
+    if (algorithm.startsWith("good-")) {
       int bits = Integer.parseInt(algorithm.substring(5));
       hash_func = Hashing.goodFastHash(bits);
     }
@@ -165,9 +169,10 @@ public class Hasher extends SimpleEvalFunc<String>
    *   32 hexadecimal digits.</li>
    * </ul>
    *
-   * @param algorithm
-   * @param seed
-   * @throws IllegalArgumentException, RuntimeException
+   * @param algorithm the hash algorithm to use
+   * @param seed the initial seed to use
+   * @throws IllegalArgumentException for an invalid seed given the algorithm
+   * @throws RuntimeException when the seed cannot be parsed
    */
   protected void makeHashFunc(String algorithm, String seed) throws IllegalArgumentException, RuntimeException
   {
