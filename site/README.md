@@ -2,11 +2,16 @@
 
 We use [Middleman](http://middlemanapp.com/) to generate the website content. This requires Ruby.  It's highly recommended that you use something like [rbenv](https://github.com/sstephenson/rbenv) to manage your Ruby versions.  The website content has been successfully generated using Ruby version `2.2.2`.
 
+```
+rbenv install 2.2.2
+rbenv local 2.2.2
+```
+
 ## Setup
 
 Install bundler if you don't already have it:
 
-    gem install bundler
+    gem install bundler -v 1.16.2
 
 Install gems required by website (includes middleman):
 

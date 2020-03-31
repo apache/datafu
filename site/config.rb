@@ -79,16 +79,6 @@ helpers do
      SHA512</a> ]"
   end
 
-  # Use this for old incubator releases > 1.3.2 and <= 1.3.3
-  def archived_incubator_source_release_link(version)
-    "<a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz\">
-     apache-datafu-incubating-sources-#{version}.tgz</a>
-     [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.asc\">
-     PGP</a> ]
-     [ <a href=\"https://archive.apache.org/dist/incubator/datafu/apache-datafu-incubating-#{version}/apache-datafu-incubating-sources-#{version}.tgz.sha512\">
-     SHA512</a> ]"
-  end
-
   def inner_text(html)
     Nokogiri.HTML(html).text.gsub(/\s+/, " ")
   end
