@@ -98,5 +98,9 @@ object DataFrameOps {
                    numShards: Int = 1000,
                    joinType: String = "inner"): DataFrame =
       SparkDFUtils.joinSkewed(df, notSkewed, joinExprs, numShards, joinType)
+  
+    def explodeArray(arrayCol: Column,
+                     alias: String) =
+      SparkDFUtils.explodeArray(df, arrayCol, alias)  
   }
 }

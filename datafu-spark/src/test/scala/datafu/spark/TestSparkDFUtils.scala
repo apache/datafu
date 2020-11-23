@@ -375,4 +375,27 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
     assertDataFrameEquals(expected, actual)
   }
+  
+  test("test_explode_array") {
+ 
+    val input = spark.createDataFrame(Seq(
+      (0.0, Seq("Hi", "I heard", "about", "Spark")),
+      (0.0, Seq("I wish", "Java", "could use", "case", "classes")),
+      (1.0, Seq("Logistic", "regression", "models", "are neat")),
+      (0.0, Seq()),
+      (1.0, null)
+    )).toDF("label", "sentence_arr")
+    
+    val actual = input.explodeArray($"sentence_arr", "token")
+    
+    val expected = spark.createDataFrame(Seq(
+      (0.0, Seq("Hi", "I heard", "about", "Spark"),"Hi", "I heard", "about", "Spark",null),
+      (0.0, Seq("I wish", "Java", "could use", "case", "classes"),"I wish", "Java", "could use", "case", "classes"),
+      (1.0, Seq("Logistic", "regression", "models", "are neat"),"Logistic", "regression", "models", "are neat",null),
+      (0.0, Seq(),null,null,null,null,null),
+      (1.0, null,null,null,null,null,null)
+    )).toDF("label", "sentence_arr","token0","token1","token2","token3","token4")
+    
+    assertDataFrameEquals(expected, actual)
+  }
 }

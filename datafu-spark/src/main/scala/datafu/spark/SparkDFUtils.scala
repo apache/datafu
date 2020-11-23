@@ -507,4 +507,36 @@ object SparkDFUtils {
                    "decreased_single",
                    "range_size")
   }
+
+/** given an array column that you need to explode into different columns, use this method.
+   *
+   * @param df
+   * @param arrayCol
+   * @param alias
+   * @return
+   *
+   * input
+   * +-----+----------------------------------------+
+   * |label|sentence_arr                            |
+   * +-----+----------------------------------------+
+   * |0.0  |[Hi, I heard, about, Spark]             |
+   * |0.0  |[I wish, Java, could use, case classes] |
+   * |1.0  |[Logistic, regression, models, are neat]|
+   * +-----+----------------------------------------+
+   *
+   * output
+   * +-----+----------------------------------------+--------+----------+---------+------------+
+   * |label|sentence_arr                            |token0  |token1    |token2   |token3      |
+   * +-----+----------------------------------------+--------+----------+---------+------------+
+   * |0.0  |[Hi, I heard, about, Spark]             |Hi      |I heard   |about    |Spark       |
+   * |0.0  |[I wish, Java, could use, case classes] |I wish  |Java      |could use|case classes|
+   * |1.0  |[Logistic, regression, models, are neat]|Logistic|regression|models   |are neat    |
+   * +-----+----------------------------------------+--------+----------+---------+------------+
+   */
+  def explodeArray(df: DataFrame, arrayCol: Column, alias: String) = {
+    val arrSize = df.agg(max(size(arrayCol))).collect()(0).getInt(0)
+
+    val exprs = (0 until arrSize).map(i => arrayCol.getItem(i).alias(s"$alias$i"))
+    df.select((col("*") +: exprs):_*)
+  }
 }
