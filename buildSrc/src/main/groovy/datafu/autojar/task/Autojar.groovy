@@ -23,6 +23,7 @@ import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.java.archives.Manifest
 import org.gradle.api.java.archives.internal.DefaultManifest
 import org.gradle.api.logging.Logger
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskDependency
@@ -41,7 +42,7 @@ class Autojar extends JavaExec implements PublishArtifact {
 
     Configuration targetConfiguration
 
-    String mainClass
+    Property<String> mainClass
     List<String> autojarClasses    // convert these to raw files
     List<String> autojarFiles      // all the class files, etc.
 

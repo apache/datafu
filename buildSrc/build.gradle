@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.github.rholder:gradle-autojar:1.0.1'
+  implementation 'com.github.rholder:gradle-autojar:1.0.1'
 }
 
 test.enabled=false
