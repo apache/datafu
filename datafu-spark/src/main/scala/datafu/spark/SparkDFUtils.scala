@@ -508,7 +508,10 @@ object SparkDFUtils {
                    "range_size")
   }
 
-/** given an array column that you need to explode into different columns, use this method.
+/**
+   * Given an array column that you need to explode into different columns, use this method.
+   * This function counts the number of output columns by executing the Spark job internally on the input array column.
+   * Consider caching the input dataframe if this is an expensive operation.
    *
    * @param df
    * @param arrayCol
