@@ -1,3 +1,18 @@
+# 1.6.1
+
+Additions
+
+* Explode Array method (DATAFU-154)
+
+Improvements
+
+* Add support for newer versions of Gradle (DATAFU-157)
+* Document Explode Array usage recommendation (DATAFU-158)
+
+Fixes
+
+* Gradle build fails (DATAFU-156)
+
 # 1.6.0
 
 Additions:
