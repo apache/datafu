@@ -258,6 +258,20 @@ public class PathUtils
     }    
     return totalForPath;
   }
+
+
+
+  private static Date getDate(Path path, Matcher matcher, SimpleDateFormat datedPathFormat, int i) throws RuntimeException {
+    if (!matcher.matches()) {
+      throw new RuntimeException("Unexpected input filename: " + path);
+    }
+
+    try {
+      return datedPathFormat.parse(matcher.group(i));
+    } catch (ParseException e) {
+      throw new RuntimeException("Unexpected input filename: " + path);
+    }
+  }
   
   /**
    * Gets the date for a path in the "yyyyMMdd" format.
@@ -268,22 +282,12 @@ public class PathUtils
   public static Date getDateForDatedPath(Path path)
   {
     Matcher matcher = timestampPathPattern.matcher(path.toString());
-    
-    if (!matcher.matches())
-    {
-      throw new RuntimeException("Unexpected input filename: " + path);
-    }
-         
-    try
-    {
-      return PathUtils.datedPathFormat.parse(matcher.group(1));
-    }
-    catch (ParseException e)
-    {
-      throw new RuntimeException("Unexpected input filename: " + path);
-    }
+
+    return getDate(path, matcher, PathUtils.datedPathFormat, 1);
   }
-  
+
+
+
   /**
    * Gets the date for a path in the "yyyy/MM/dd" format.
    * 
@@ -293,20 +297,8 @@ public class PathUtils
   public static Date getDateForNestedDatedPath(Path path)
   {
     Matcher matcher = dailyPathPattern.matcher(path.toString());
-    
-    if (!matcher.matches())
-    {
-      throw new RuntimeException("Unexpected input filename: " + path);
-    }
-    
-    try
-    {
-      return PathUtils.nestedDatedPathFormat.parse(matcher.group(2));
-    }
-    catch (ParseException e)
-    {
-      throw new RuntimeException("Unexpected input filename: " + path);
-    }
+
+    return getDate(path, matcher, PathUtils.nestedDatedPathFormat, 2);
   }
   
   /**
