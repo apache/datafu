@@ -164,9 +164,14 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
       Tuple key = extractKey(tuple);
       addGroup(groups, key, tuple);
     }
+    for (Map.Entry<Tuple, Tuple> entry : groups.entrySet()) {
+      Tuple key = entry.getKey();
+      Tuple groupedTuple = entry.getValue;
 
     DataBag outputBag = bagFactory.newDefaultBag();
-    for (Tuple key : groups.keySet()) {
+    for (Map.Entry<Tuple, List<Tuple>> entry : groups.entrySet()) {
+      Tuple key = entry.getKey();
+      List<Tuple>> value = entry.getValue();
       Tuple outputTuple = tupleFactory.newTuple();
       if (fieldNames.size() > 1) {
         outputTuple.append(key);
@@ -174,7 +179,7 @@ public class BagGroup extends AliasableEvalFunc<DataBag>
         outputTuple.append(key.get(0));
       }
       DataBag groupBag = bagFactory.newDefaultBag();
-      for (Tuple groupedTuple : groups.get(key)) {
+      for (Tuple groupedTuple : value) {
         groupBag.add(groupedTuple);
       }
       outputTuple.append(groupBag);
