@@ -77,7 +77,7 @@ public class PartitionCollapsingSchemas implements Serializable
     {
       throw new NullArgumentException("outputSchemaName");
     }
-    if (outputSchemaName == outputSchemaNamespace)
+    if (outputSchemaName.equals(outputSchemaNamespace))
     {
       throw new NullArgumentException("outputSchemaNamespace");
     }
