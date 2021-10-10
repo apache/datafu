@@ -31,6 +31,8 @@ import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Partitioner;
 
+import lombok.NonNull;
+
 /**
  * A partitioner used by {@link AbstractPartitionPreservingIncrementalJob} to limit the number of named outputs
  * used by each reducer.
@@ -102,13 +104,13 @@ public class TimePartitioner extends Partitioner<AvroKey<GenericRecord>,AvroValu
   }
   
   @Override
-  public int getPartition(AvroKey<GenericRecord> key, AvroValue<GenericRecord> value, int numReduceTasks)
+  public int getPartition(@NonNull AvroKey<GenericRecord> key, @NonNull AvroValue<GenericRecord> value, @NonNull int numReduceTasks)
   {
     if (numReduceTasks != this.numReducers)
     {
       throw new RuntimeException("numReduceTasks " + numReduceTasks + " does not match expected " + this.numReducers);
     }
-    
+
     Long time = (Long)key.datum().get("time");
     if (time == null)
     {
