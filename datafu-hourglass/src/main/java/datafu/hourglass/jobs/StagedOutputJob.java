@@ -232,7 +232,7 @@ public class StagedOutputJob extends Job implements Callable<Boolean>
   public boolean waitForCompletion(boolean verbose) throws IOException, InterruptedException, ClassNotFoundException
   {
     final Path actualOutputPath = FileOutputFormat.getOutputPath(this);
-    final Path stagedPath = new Path(String.format("%s/%s/staged", _stagingPrefix, System.currentTimeMillis()));
+    final Path stagedPath = new Path(String.format("%s/%dd/staged", _stagingPrefix, System.currentTimeMillis()));
 
     FileOutputFormat.setOutputPath(
       this,
@@ -601,8 +601,12 @@ public class StagedOutputJob extends Job implements Callable<Boolean>
     }
     
     int index = 0;
+    int iteration = 0;
     while(true)
     {
+      if (iteration > 100000) {
+        break;
+      }
       TaskCompletionEvent[] currentEvents;
       if (getTaskCompletionEventsMethod != null)
       {
