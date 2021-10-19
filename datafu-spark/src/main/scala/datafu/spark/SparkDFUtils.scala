@@ -172,7 +172,7 @@ object SparkDFUtils {
   /**
     * Used to get the 'latest' record (after ordering according to the provided order columns)
     * in each group.
-    * the same functionality as {@link #dedup} but implemented using UDAF to utilize
+    * the same functionality as {@link #dedupWithOrder} but implemented using UDAF to utilize
     * map side aggregation.
     * this function should be used in cases when you expect a large number of rows to get combined,
     * as they share the same group column.

@@ -61,7 +61,7 @@ Dir['./lib/*'].each { |f| require f }
 helpers do
   # Use this for the current release.
   def current_source_release_link(version)
-    "<a href=\"http://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-#{version}/\">
+    "<a href=\"http://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-#{version}/apache-datafu-sources-#{version}.tgz\">
      apache-datafu-#{version}</a>
      [ <a href=\"https://www.apache.org/dist/datafu/apache-datafu-#{version}/apache-datafu-sources-#{version}.tgz.asc\">
      PGP</a> ]

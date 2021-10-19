@@ -44,18 +44,11 @@ gpg --import KEYS
 gpg --verify apache-datafu-sources-<%= current_page.data.version %>.tgz.asc apache-datafu-sources-<%= current_page.data.version %>.tgz
 ```
 
-The `md5sum` tool can be used to compute an MD5 hash that can be compared against the `.md5` file:
-
-```
-md5sum apache-datafu-sources-<%= current_page.data.version %>.tgz
-cat apache-datafu-sources-<%= current_page.data.version %>.tgz.md5
-```
-
 The `sha512sum` tool can be used to compute a SHA-512 hash that can be compared against the `.sha512` file:
 
 ```
 sha512sum apache-datafu-sources-<%= current_page.data.version %>.tgz
-cat apache-datafu-sources-<%= current_page.data.version %>.tgz.md5
+cat apache-datafu-sources-<%= current_page.data.version %>.tgz.sha512
 ```
 
 Note that the hashes are only intended to check that the file has been downloaded correctly.  They do not provide guarantees on the authenticity of the file.  The signature should instead be used for this purpose.  For more information see [here](https://www.apache.org/info/verification.html).
