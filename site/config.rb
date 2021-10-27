@@ -43,7 +43,7 @@ Dir['./lib/*'].each { |f| require f }
 #   page "/admin/*"
 # end
 
-# Proxy pages (http://middlemanapp.com/dynamic-pages/)
+# Proxy pages (https://middlemanapp.com/dynamic-pages/)
 # proxy "/this-page-has-no-template.html", "/template-file.html", :locals => {
 #  :which_fake_page => "Rendering a fake page with a local variable" }
 
@@ -61,7 +61,7 @@ Dir['./lib/*'].each { |f| require f }
 helpers do
   # Use this for the current release.
   def current_source_release_link(version)
-    "<a href=\"http://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-#{version}/apache-datafu-sources-#{version}.tgz\">
+    "<a href=\"https://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-#{version}/apache-datafu-sources-#{version}.tgz\">
      apache-datafu-#{version}</a>
      [ <a href=\"https://www.apache.org/dist/datafu/apache-datafu-#{version}/apache-datafu-sources-#{version}.tgz.asc\">
      PGP</a> ]

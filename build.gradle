@@ -96,7 +96,8 @@ rat {
     'datafu-spark/metastore_db/**',
     'datafu-spark/spark-warehouse/**',
     'datafu-spark/derby.log',
-    'datafu-spark/data/**'
+    'datafu-spark/data/**',
+    '.github/**/*'
   ]
 }
 
