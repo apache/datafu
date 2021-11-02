@@ -43,6 +43,11 @@ If this builds successfully then it means the tests pass and the report was succ
 
 ## Create a branch for release
 
+Before you create a branch for release, make sure that
+
+	Your changes.md and CONTRIBUTORS files are up to date
+	gradle.properties has the desired version number in it
+	
 Assuming you have are preparing to release version `x.y.z` from the current commit, then create a branch with:
 
         git checkout -b x.y.z
@@ -77,6 +82,11 @@ The source tarball needs to be signed.  You can do this either manually or autom
     signing.secretKeyRingFile=/path/to/secring.gpg  # Normally in $HOME/.gnupg/secring.gpg
     signing.password=YourSuperSecretPassphrase      # Plaintext passphrase to decrypt key
 
+Please note the following tweaks for signing the source (and binary) tarballs.
+
+	Gradle expects only 8 digits for your GPG key
+	Newer versions of GPG no longer create the file secring.gpg, but Gradle expects this format. See [this answer on Stack Overflow](https://stackoverflow.com/questions/27936119/gradle-uploadarchives-task-unable-to-read-secret-key/39573795#39573795) for instructions.
+	
 The GPG key ID can be found by running `gpg --list-keys`.
 
 To generate the source release, run:
@@ -198,3 +208,9 @@ To distribute the artifacts, simple select the staged repository for DataFu that
 
 Once a source release has been committed to the release path [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu), the source releases under [https://dist.apache.org/repos/dist/dev/datafu](https://dist.apache.org/repos/dist/dev/datafu) can be removed.  Also the older releases under [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu) can be removed, as old releases are archived automatically through a
 separate process.
+
+## Updating the docs
+
+After you have released source and binary artifacts, you should add an entry to the DataFu website and update the various places that point to the previous release. You can look at [a previous release's commit](https://github.com/apache/datafu/commit/09a68527f5921e026c04e8e9940ef0466b41a7c0) in order to get an idea of which files need to be changed. Keep in mind that there is one place where the previous version is updated (if you're release 1.6.1 instead of 1.6.0, you need to replace *1.5.0*, not 1.6.0)
+
+After you have made these changes, build the site (and regenerate java/scaladocs) by using [the instructions here.](https://github.com/apache/datafu/blob/master/site/README.md)
