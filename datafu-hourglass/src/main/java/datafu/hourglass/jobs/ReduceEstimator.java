@@ -33,6 +33,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
 import datafu.hourglass.fs.PathUtils;
+import lombok.NonNull;
+
 
 /**
  * Estimates the number of reducers needed based on input size.
@@ -74,7 +76,7 @@ public class ReduceEstimator
   private final static String DEFAULT = "default";
   private final static Long DEFAULT_BYTES_PER_REDUCER = 256L*1024L*1024L; // 256 MB
   
-  public ReduceEstimator(FileSystem fs, Properties props)
+  public ReduceEstimator(@NonNull FileSystem fs, Properties props)
   {
     this.fs = fs;
     
@@ -138,9 +140,9 @@ public class ReduceEstimator
     Map<String,Long> bytesPerTag = getTagToInputBytes();
     
     double numReducers = 0.0;
-    for (String tag : bytesPerTag.keySet())
-    {
-      long bytes = bytesPerTag.get(tag);
+    for (Map.Entry<String, Long> entry : bytesPerTag.entrySet()) {
+      long bytes = entry.getValue();
+      String tag = entry.getKey();
       _log.info(String.format("Found %d bytes (%.2f GB) for inputs tagged with '%s'",bytes,toGB(bytes),tag));
       Long bytesPerReducer = tagToBytesPerReducer.get(tag);
       if (bytesPerReducer == null) 

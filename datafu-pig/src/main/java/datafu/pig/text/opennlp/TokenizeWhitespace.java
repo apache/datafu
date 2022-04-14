@@ -60,7 +60,7 @@ public class TokenizeWhitespace extends EvalFunc<DataBag>
         }
 
         String inputString = input.get(0).toString();
-        if(inputString == null || inputString == "") {
+        if(inputString == null || inputString.equals("")) {
             return null;
         }
 
