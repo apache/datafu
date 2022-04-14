@@ -449,7 +449,7 @@ object SparkDFUtils {
             col("decreased_single") === col("decreased_range_single"),
             "left_outer")
       .withColumn("range_size", expr("(range_end - range_start + 1)"))
-      .filter("single>=range_start and single<=range_end")
+      .filter("decreased_range_single is null or (single>=range_start and single<=range_end)")
   }
 
   /**
