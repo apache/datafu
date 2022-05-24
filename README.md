@@ -91,6 +91,10 @@ To clean up the eclipse files:
 
     ./gradlew cleanEclipse
 
+### Using Intellij
+
+If you would like to use Intellij, generate and import the Eclipse files.
+
 ### Running the Tests
 
 To run all the tests:
