@@ -101,6 +101,9 @@ object DataFrameOps {
   
     def explodeArray(arrayCol: Column,
                      alias: String) =
-      SparkDFUtils.explodeArray(df, arrayCol, alias)  
+      SparkDFUtils.explodeArray(df, arrayCol, alias)
+
+    def dedupRandomN(df: DataFrame, groupCol: Column, maxSize: Int): DataFrame =
+      SparkDFUtils.dedupRandomN(df, groupCol, maxSize)
   }
 }
