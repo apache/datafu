@@ -26,6 +26,12 @@ from pyspark.sql import SparkSession
 def _getjvm_class(gateway, fullClassName):
     return gateway.jvm.java.lang.Thread.currentThread().getContextClassLoader().loadClass(fullClassName).newInstance()
 
+def UDFRegister(sqlContext, clazz):
+    # Registers all SQL user-defined functions. Calls Scala for registration.
+    sc = sqlContext._sc
+    gateway = sc._gateway
+    ureg = gateway.jvm.datafu.spark.UDFRegister
+    ureg.registerObject(clazz, sqlContext._jsqlContext)
 
 class Context(object):
 
