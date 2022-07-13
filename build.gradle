@@ -58,6 +58,7 @@ rat {
     '**/*.iml',
     '**/*.iws',
     '**/*.ipr',
+    '**/.idea/**',
     '**/.rubyversion',
     'gradle/wrapper/**',
     '.reviewboardrc',

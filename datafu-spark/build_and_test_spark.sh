@@ -45,12 +45,15 @@ function build {
         fi
       else
         log "Testing for Scala $scala, spark $spark failed (build succeeded)"
+        exit 1
       fi
     else
       log "Build for Scala $scala, spark $spark failed"
+      exit 1
     fi
   else
     log "Clean for Scala $scala, Spark $spark failed"
+    exit 1
   fi
 }
 
