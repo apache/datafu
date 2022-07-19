@@ -87,11 +87,13 @@ object DataFrameOps {
 
     def broadcastJoinSkewed(skewed: DataFrame,
                             joinCol: String,
-                            numberCustsToBroadcast: Int): DataFrame =
+                            numberCustsToBroadcast: Int,
+                            filterCnt: Option[Long] = None): DataFrame =
       SparkDFUtils.broadcastJoinSkewed(df,
                                        skewed,
                                        joinCol,
-                                       numberCustsToBroadcast)
+                                       numberCustsToBroadcast,
+                                       filterCnt)
 
     def joinSkewed(notSkewed: DataFrame,
                    joinExprs: Column,

@@ -88,11 +88,13 @@ class SparkDFUtilsBridge {
   def broadcastJoinSkewed(notSkewed: DataFrame,
                           skewed: DataFrame,
                           joinCol: String,
-                          numRowsToBroadcast: Int): DataFrame = {
+                          numRowsToBroadcast: Int,
+                          filterCnt: Long): DataFrame = {
     SparkDFUtils.broadcastJoinSkewed(notSkewed = notSkewed,
                                      skewed = skewed,
                                      joinCol = joinCol,
-                                     numRowsToBroadcast = numRowsToBroadcast)
+                                     numRowsToBroadcast = numRowsToBroadcast,
+                                     filterCnt = Option(filterCnt))
   }
 
   def joinWithRange(dfSingle: DataFrame,
@@ -318,17 +320,23 @@ object SparkDFUtils {
     * @param skewed skewed DataFrame
     * @param joinCol join column
     * @param numRowsToBroadcast num of rows to broadcast
+    * @param filterCnt filter out unskewed rows from the boardcast to ease limit calculation
     * @return DataFrame representing the data after the operation
     */
   def broadcastJoinSkewed(notSkewed: DataFrame,
                           skewed: DataFrame,
                           joinCol: String,
-                          numRowsToBroadcast: Int): DataFrame = {
+                          numRowsToBroadcast: Int,
+                          filterCnt: Option[Long] = None): DataFrame = {
     val ss = notSkewed.sparkSession
     import ss.implicits._
-    val skewedKeys = skewed
+    val keyCount = skewed
       .groupBy(joinCol)
       .count()
+    val filteredKeyCount = filterCnt.map(cnt => keyCount.filter($"count" >= cnt)).getOrElse(keyCount)
+
+
+    val skewedKeys = filteredKeyCount
       .sort($"count".desc)
       .limit(numRowsToBroadcast)
       .drop("count")

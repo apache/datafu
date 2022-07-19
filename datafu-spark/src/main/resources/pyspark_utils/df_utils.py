@@ -99,7 +99,7 @@ def join_skewed(df_left, df_right, join_exprs, num_shards = 30, join_type="inner
     return DataFrame(jdf, df_left.sql_ctx)
 
 
-def broadcast_join_skewed(not_skewed_df, skewed_df, join_col, number_of_custs_to_broadcast):
+def broadcast_join_skewed(not_skewed_df, skewed_df, join_col, number_of_custs_to_broadcast, filter_cnt):
     """
     Suitable to perform a join in cases when one DF is skewed and the other is not skewed.
     splits both of the DFs to two parts according to the skewed keys.
@@ -109,9 +109,10 @@ def broadcast_join_skewed(not_skewed_df, skewed_df, join_col, number_of_custs_to
     :param skewed_df: skewed DataFrame
     :param join_col: join column
     :param number_of_custs_to_broadcast: number of custs to broadcast
+    :param filter_cnt: ???
     :return: DataFrame representing the data after the operation
     """
-    jdf = _get_utils(skewed_df).broadcastJoinSkewed(not_skewed_df._jdf, skewed_df._jdf, join_col, number_of_custs_to_broadcast)
+    jdf = _get_utils(skewed_df).broadcastJoinSkewed(not_skewed_df._jdf, skewed_df._jdf, join_col, number_of_custs_to_broadcast, filter_cnt)
     return DataFrame(jdf, not_skewed_df.sql_ctx)
 
 
