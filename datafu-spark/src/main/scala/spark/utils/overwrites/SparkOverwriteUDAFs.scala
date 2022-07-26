@@ -98,6 +98,7 @@ abstract class ExtramumValueByKey(
 /** *
  *
  * This code is copied from CollectList, just modified the method it extends
+ * Copied originally from https://github.com/apache/spark/blob/branch-2.3/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/expressions/aggregate/collect.scala
  *
  */
 case class CollectLimitedList(child: Expression,
