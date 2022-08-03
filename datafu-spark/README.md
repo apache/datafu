@@ -12,7 +12,7 @@ Here are some examples of things you can do with it:
 
 * [Count distinct up to](https://github.com/apache/datafu/blob/spark-tmp/datafu-spark/src/main/scala/datafu/spark/SparkUDAFs.scala#L224) - an efficient implementation when you just want to verify that a certain minimum of distinct rows appear in a table
 
-It has been tested on Spark releases from 2.1.0 to 2.4.3, using Scala 2.10, 2.11 and 2.12. You can check if your Spark/Scala version combination has been tested by looking [here.](https://github.com/apache/datafu/blob/spark-tmp/datafu-spark/build_and_test_spark.sh#L20)
+It has been tested on Spark releases from 2.2.0 to 2.4.3, using Scala 2.11 and 2.12. You can check if your Spark/Scala version combination has been tested by looking [here.](https://github.com/apache/datafu/blob/master/datafu-spark/build_and_test_spark.sh#L20)
 
 -----------
 
@@ -21,9 +21,9 @@ In order to call the datafu-spark API's from Pyspark, you can do the following (
 First, call pyspark with the following parameters
 
 ```bash
-export PYTHONPATH=datafu-spark_2.11_2.3.0-1.5.0-SNAPSHOT.jar
+export PYTHONPATH=datafu-spark_2.11_2.3.0-1.6.1.jar
 
-pyspark --jars datafu-spark_2.11_2.3.0-1.5.0-SNAPSHOT.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.11_2.3.0-1.5.0-SNAPSHOT.jar
+pyspark --jars datafu-spark_2.11_2.3.0-1.6.1.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.11_2.3.0-1.6.1.jar
 ```
 
 The following is an example of calling the Spark version of the datafu _dedup_ method
