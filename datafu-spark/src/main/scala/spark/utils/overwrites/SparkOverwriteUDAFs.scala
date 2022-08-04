@@ -19,17 +19,23 @@
 package org.apache.spark.sql.datafu.types
 
 import org.apache.spark.sql.Column
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.aggregate.DeclarativeAggregate
+import org.apache.spark.sql.catalyst.expressions.aggregate.{Collect, DeclarativeAggregate, ImperativeAggregate}
+import org.apache.spark.sql.catalyst.expressions.{AttributeReference, BinaryComparison, ExpectsInputTypes, Expression, GreaterThan, If, IsNull, LessThan, Literal}
 import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types.{AbstractDataType, AnyDataType, DataType}
+
+import scala.collection.generic.Growable
+import scala.collection.mutable
 
 object SparkOverwriteUDAFs {
   def minValueByKey(key: Column, value: Column): Column =
     Column(MinValueByKey(key.expr, value.expr).toAggregateExpression(false))
   def maxValueByKey(key: Column, value: Column): Column =
     Column(MaxValueByKey(key.expr, value.expr).toAggregateExpression(false))
+  def collectLimitedList(e: Column, maxSize: Int): Column =
+    Column(CollectLimitedList(e.expr, howMuchToTake = maxSize).toAggregateExpression(false))
 }
 
 case class MinValueByKey(child1: Expression, child2: Expression)
@@ -87,4 +93,55 @@ abstract class ExtramumValueByKey(
   )
 
   override lazy val evaluateExpression: AttributeReference = data
+}
+
+/** *
+ *
+ * This code is copied from CollectList, just modified the method it extends
+ * Copied originally from https://github.com/apache/spark/blob/branch-2.3/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/expressions/aggregate/collect.scala
+ *
+ */
+case class CollectLimitedList(child: Expression,
+                              mutableAggBufferOffset: Int = 0,
+                              inputAggBufferOffset: Int = 0,
+                              howMuchToTake: Int = 10) extends LimitedCollect[mutable.ArrayBuffer[Any]](howMuchToTake) {
+
+  def this(child: Expression) = this(child, 0, 0)
+
+  override def withNewMutableAggBufferOffset(newMutableAggBufferOffset: Int): ImperativeAggregate =
+    copy(mutableAggBufferOffset = newMutableAggBufferOffset)
+
+  override def withNewInputAggBufferOffset(newInputAggBufferOffset: Int): ImperativeAggregate =
+    copy(inputAggBufferOffset = newInputAggBufferOffset)
+
+  override def createAggregationBuffer(): mutable.ArrayBuffer[Any] = mutable.ArrayBuffer.empty
+
+  override def prettyName: String = "collect_limited_list"
+
+}
+
+/** *
+ *
+ * This modifies the collect list / set to keep only howMuchToTake random elements
+ *
+ */
+abstract class LimitedCollect[T <: Growable[Any] with Iterable[Any]](howMuchToTake: Int) extends Collect[T] with Serializable {
+
+  override def update(buffer: T, input: InternalRow): T = {
+    if (buffer.size < howMuchToTake)
+      super.update(buffer, input)
+    else
+      buffer
+  }
+
+  override def merge(buffer: T, other: T): T = {
+    if (buffer.size == howMuchToTake)
+      buffer
+    else if (other.size == howMuchToTake)
+      other
+    else {
+      val howMuchToTakeFromOtherBuffer = howMuchToTake - buffer.size
+      buffer ++= other.take(howMuchToTakeFromOtherBuffer)
+    }
+  }
 }

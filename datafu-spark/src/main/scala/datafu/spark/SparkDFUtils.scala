@@ -129,6 +129,10 @@ class SparkDFUtilsBridge {
     )
   }
 
+  def dedupRandomN(df: DataFrame, groupCol: Column, maxSize: Int): DataFrame = {
+    SparkDFUtils.dedupRandomN(df, groupCol, maxSize)
+  }
+
   private def convertJavaListToSeq[T](list: JavaList[T]): Seq[T] = {
     scala.collection.JavaConverters
       .asScalaIteratorConverter(list.iterator())
@@ -549,5 +553,19 @@ object SparkDFUtils {
 
     val exprs = (0 until arrSize).map(i => arrayCol.getItem(i).alias(s"$alias$i"))
     df.select((col("*") +: exprs):_*)
+  }
+
+  /**
+    * Used get the random n records in each group. Uses an efficient implementation
+    * that doesn't order the data so it can handle large amounts of data.
+    *
+    * @param df        DataFrame to operate on
+    * @param groupCol  column to group by the records
+    * @param maxSize   The maximal number of rows per group
+    * @return DataFrame representing the data after the operation
+    */
+  def dedupRandomN(df: DataFrame, groupCol: Column, maxSize: Int): DataFrame = {
+    df.groupBy(groupCol).agg(SparkOverwriteUDAFs.collectLimitedList(expr("struct(*)"), maxSize).as("list"))
+      .select(groupCol,expr("explode(list)"))
   }
 }

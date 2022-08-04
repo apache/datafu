@@ -258,4 +258,26 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
                             .agg(countDistinctUpTo6($"col_ord").as("col_ord")))
   }
 
+  test("test_limited_collect_list") {
+
+    val maxSize = 10
+
+    val rows = (1 to 30).flatMap(x => (1 to x).map(n => (x, n, "some-string " + n))).toDF("num1", "num2", "str")
+
+    rows.show(10, false)
+
+    import org.apache.spark.sql.functions._
+
+    val result = rows.groupBy("num1").agg(SparkOverwriteUDAFs.collectLimitedList(expr("struct(*)"), maxSize).as("list"))
+      .withColumn("list_size", expr("size(list)"))
+
+    result.show(10, false)
+
+    SparkDFUtils.dedupRandomN(rows,$"num1",10).show(10,false)
+
+    val rows_different = result.filter(s"case when num1 > $maxSize then $maxSize else num1 end != list_size")
+
+    Assert.assertEquals(0, rows_different.count())
+
+  }
 }
