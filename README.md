@@ -1,4 +1,26 @@
+<!---
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
 # Apache DataFu
+
+[![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/datafu)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Apache Jira](https://img.shields.io/badge/ASF%20Jira-DATAFU-brightgreen)](https://issues.apache.org/jira/projects/DATAFU/)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.datafu/datafu-pig)](http://search.maven.org/#search|gav|1|g:"org.apache.datafu")
+[![GitHub Actions Build](https://github.com/apache/datafu/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/apache/datafu/actions/workflows/tests.yml)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/apache/datafu)
 
 [Apache DataFu](http://datafu.apache.org) is a collection of libraries for working with large-scale data in Hadoop.
 The project was inspired by the need for stable, well-tested libraries for data mining and statistics.

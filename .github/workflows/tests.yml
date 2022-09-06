@@ -1,5 +1,5 @@
-# Build and test datafu-spark code for the latest Scala/Spark combinations for new PRs
-name: "testPRs"
+# Build and test datafu-spark code for the latest Scala/Spark combinations for the master branch and new PRs
+name: "tests"
 
 on:
   push:
