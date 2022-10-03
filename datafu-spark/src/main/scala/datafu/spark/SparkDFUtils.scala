@@ -129,6 +129,10 @@ class SparkDFUtilsBridge {
     )
   }
 
+  def explodeArray(df: DataFrame, arrayCol: Column, alias: String): DataFrame = {
+    SparkDFUtils.explodeArray(df, arrayCol, alias)
+  }
+
   def dedupRandomN(df: DataFrame, groupCol: Column, maxSize: Int): DataFrame = {
     SparkDFUtils.dedupRandomN(df, groupCol, maxSize)
   }

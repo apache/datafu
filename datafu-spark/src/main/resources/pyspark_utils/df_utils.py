@@ -141,6 +141,17 @@ def join_with_range_and_dedup(df_single, col_single, df_range, col_range_start, 
     jdf = _get_utils(df_single).joinWithRangeAndDedup(df_single._jdf, col_single, df_range._jdf, col_range_start, col_range_end, decrease_factor, dedup_small_range)
     return DataFrame(jdf, df_single.sql_ctx)
 
+def explode_array(df, array_col, alias):
+    """
+    Given an array column that you need to explode into different columns, use this method.
+    This function counts the number of output columns by executing the Spark job internally on the input array column.
+    Consider caching the input dataframe if this is an expensive operation.
+    :param df: DataFrame to operate on
+    :param array_col: Array Column
+    :param alias: Alias for new columns after explode
+    """
+    jdf = _get_utils(df).explodeArray(df._jdf, array_col._jc, alias)
+    return DataFrame(jdf, df.sql_ctx)
 
 def _cols_to_java_cols(cols):
     return _map_if_needed(lambda x: x._jc, cols)
@@ -169,4 +180,5 @@ def activate():
     pyspark.sql.DataFrame.broadcast_join_skewed = broadcast_join_skewed
     pyspark.sql.DataFrame.join_with_range = join_with_range
     pyspark.sql.DataFrame.join_with_range_and_dedup = join_with_range_and_dedup
+    pyspark.sql.DataFrame.explode_array = explode_array
 

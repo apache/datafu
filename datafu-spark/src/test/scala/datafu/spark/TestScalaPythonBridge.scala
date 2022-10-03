@@ -121,6 +121,8 @@ class TestScalaPythonBridge extends FunSuite {
                 "[a,Laura,34,a,34,36], [b,Margaret,36,a,34,36]")
     assertTable("joinWithRangeAndDedup",
                 "[a,Laura,34,a,34,36], [b,Margaret,36,a,34,36]")
+    assertTable("explodeArray",
+      "[0.0,WrappedArray(Hi, I heard, about, Spark),Hi,I heard,about,Spark]")
   }
 
 }
