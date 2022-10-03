@@ -88,3 +88,10 @@ func_joinWithRangeAndDedup_res = df_utils.join_with_range_and_dedup(df_single=df
                                                                     col_range_start="start", col_range_end="end",
                                                                     decrease_factor=5, dedup_small_range=True)
 func_joinWithRangeAndDedup_res.registerTempTable("joinWithRangeAndDedup")
+
+dfArray = sqlContext.createDataFrame([
+    (0.0, ["Hi", "I heard", "about", "Spark"])],
+    ["label", "sentence_arr"])
+
+func_explodeArray_res = df_utils.explode_array(df=dfArray, array_col=dfArray.sentence_arr, alias="token")
+func_explodeArray_res.registerTempTable("explodeArray")
