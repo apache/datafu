@@ -23,10 +23,8 @@ import java.net.JarURLConnection
 import java.nio.file.Paths
 import java.util
 import java.util.{MissingResourceException, ServiceLoader}
-
 import scala.collection.JavaConverters._
-
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.{LogManager, Logger}
 
 
 /**
@@ -70,7 +68,7 @@ object PythonPathsManager {
   case class ResolvedResource(resource: PythonResource,
                               resolvedLocation: String)
 
-  private val logger: Logger = Logger.getLogger(getClass)
+  private val logger: Logger = LogManager.getLogger(getClass)
 
   val resources: Seq[ResolvedResource] =
     ServiceLoader

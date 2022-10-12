@@ -19,22 +19,19 @@
 package datafu.spark
 
 import java.io.File
-
 import scala.util.Try
-
 import com.holdenkarau.spark.testing.Utils
+import org.apache.logging.log4j.LogManager
 import org.junit._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.slf4j.LoggerFactory
-
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
 object TestScalaPythonBridge {
 
-  val logger = LoggerFactory.getLogger(this.getClass)
+  val logger = LogManager.getLogger(this.getClass)
 
   def getNewRunner(): ScalaPythonBridgeRunner = {
     val runner = ScalaPythonBridgeRunner()

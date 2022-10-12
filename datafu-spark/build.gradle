@@ -55,10 +55,13 @@ cleanEclipse {
 }
 
 dependencies {
+    compile "org.apache.logging.log4j:log4j-api:$log4j2Version"
     compile "org.scala-lang:scala-library:$scalaVersion"
-    compile "org.apache.spark:spark-core_" + scalaCompatVersion + ":" + sparkVersion
+    compile ("org.apache.spark:spark-core_" + scalaCompatVersion + ":" + sparkVersion)
     compile "org.apache.spark:spark-hive_" + scalaCompatVersion + ":" + sparkVersion
 
+    testCompile "org.apache.logging.log4j:log4j-1.2-api:$log4j2Version"
+    testCompile "org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version"
     testCompile "com.holdenkarau:spark-testing-base_" + scalaCompatVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
     testCompile "org.scalatest:scalatest_" + scalaCompatVersion + ":" + scalaTestVersion
 }
@@ -140,7 +143,6 @@ tasks.compileTestScala.dependsOn('zipPySpark')
 tasks.eclipse.dependsOn('downloadPy4js')
 tasks.compileTestScala.dependsOn('downloadPy4js')
 
-
 test {
   systemProperty 'datafu.jar.dir', file('build/libs')
   systemProperty 'datafu.data.dir', file('data')
@@ -148,4 +150,10 @@ test {
   systemProperty 'datafu.spark.version', sparkVersion
 
   maxHeapSize = "2G"
+}
+
+configurations.all {
+    exclude group: 'log4j', module:'log4j'
+    exclude group: 'log4j', module:'apache-log4j-extras'
+    exclude group: 'org.slf4j', module:'slf4j-log4j12'
 }

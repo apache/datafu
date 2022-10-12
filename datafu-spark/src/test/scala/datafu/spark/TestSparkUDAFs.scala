@@ -19,11 +19,11 @@
 package datafu.spark
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
+import org.apache.logging.log4j.LogManager
 import org.junit.Assert
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.slf4j.LoggerFactory
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
@@ -45,7 +45,7 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   override def conf: SparkConf =
     super.conf.set(CATALOG_IMPLEMENTATION.key, "hive")
 
-  val logger = LoggerFactory.getLogger(this.getClass)
+  val logger = LogManager.getLogger(this.getClass)
 
   val inputSchema = List(
     StructField("col_grp", StringType, true),

@@ -18,12 +18,12 @@
  */
 package datafu.spark
 
+import org.apache.logging.log4j.LogManager
+
 import java.io._
 import java.net.URL
 import java.nio.file.Files
 import java.util.UUID
-
-import org.slf4j.LoggerFactory
 import org.apache.spark.SparkConf
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.datafu.deploy.SparkPythonRunner
@@ -40,7 +40,7 @@ import org.apache.spark.sql.SparkSession
  */
 case class ScalaPythonBridgeRunner(extraPath: String = "") {
 
-  val logger = LoggerFactory.getLogger(this.getClass)
+  val logger = LogManager.getLogger(this.getClass)
   // for the bridge we take the full resolved location,
   // since this runs on the driver where the files are local:
   logger.info("constructing PYTHONPATH")
@@ -134,7 +134,7 @@ object ScalaPythonBridge { // need empty ctor for py4j gateway
  */
 object ResourceCloning {
 
-  private val logger = LoggerFactory.getLogger(this.getClass)
+  private val logger = LogManager.getLogger(this.getClass)
 
   val uuid = UUID.randomUUID().toString.substring(6)
   val outputTempDir = new File(System.getProperty("java.io.tmpdir"),
