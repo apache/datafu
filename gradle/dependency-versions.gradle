@@ -31,7 +31,7 @@ ext {
   mavenVersion="2.1.3"
   jlineVersion="0.9.94"
   pigVersion="0.14.0"
-  testngVersion="6.2"
+  testngVersion="7.5"
   toolsVersion="1.4.2"
   wagonHttpVersion="1.0-beta-2"
   openNlpVersion="1.5.3"
@@ -39,6 +39,5 @@ ext {
   jsonVersion="1.1.1"
   jsr311Version="1.1.1"
   slf4jVersion="1.6.4"
-  sparkTestingBaseVersion = "0.12.0"
-  scalaTestVersion="2.3.0"
+  sparkTestingBaseVersion = "0.14.0"
 }
