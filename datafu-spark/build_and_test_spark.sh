@@ -36,9 +36,9 @@ function build {
   echo "----- Building versions for Scala $scala, Spark $spark ----"
   if ./gradlew :datafu-spark:clean; then
     echo "----- Clean for Scala $scala, spark $spark succeeded"
-    if ./gradlew :datafu-spark:assemble -PscalaVersion=$scala -PsparkVersion=$spark; then
+    if ./gradlew :datafu-spark:assemble -PscalaVersion=$scala -PsparkVersion=$spark -PscalaCompatVersion=$scala; then
       echo "----- Build for Scala $scala, spark $spark succeeded"
-      if ./gradlew :datafu-spark:test -PscalaVersion=$scala -PsparkVersion=$spark $TEST_PARAMS; then
+      if ./gradlew :datafu-spark:test -PscalaVersion=$scala -PsparkVersion=$spark -PscalaCompatVersion=$scala $TEST_PARAMS; then
         log "Testing for Scala $scala, spark $spark succeeded"
         if [[ $JARS_DIR != "NONE" ]]; then
           cp datafu-spark/build/libs/*.jar $JARS_DIR/

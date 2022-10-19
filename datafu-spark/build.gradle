@@ -62,8 +62,13 @@ dependencies {
 
     testCompile "org.apache.logging.log4j:log4j-1.2-api:$log4j2Version"
     testCompile "org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version"
-    testCompile "com.holdenkarau:spark-testing-base_" + scalaCompatVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
-    testCompile "org.scalatest:scalatest_" + scalaCompatVersion + ":" + scalaTestVersion
+
+// there isn't a spark-test-base version for 2.3.4, but 2.3.3 will work instead
+    if (sparkVersion == "2.3.4") {
+    	testCompile "com.holdenkarau:spark-testing-base_" + scalaCompatVersion + ":2.3.3_" + sparkTestingBaseVersion
+    } else {
+	testCompile "com.holdenkarau:spark-testing-base_" + scalaCompatVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
+    }
 }
 
 // we need to set up the build for hadoop 3
@@ -115,7 +120,6 @@ zipPySpark.onlyIf {
 
 // download py4j for testing. This is not shipped with datafu-spark.
 project.ext.py4js = [
-  "py4j-0.10.4-src.zip" : "https://files.pythonhosted.org/packages/93/a7/0e1719e8ad34d194aae72dc07a37e65fd3895db7c797a67a828333cd6067/py4j-0.10.4-py2.py3-none-any.whl",
   "py4j-0.10.6-src.zip" : "https://files.pythonhosted.org/packages/4a/08/162710786239aa72bd72bb46c64f2b02f54250412ba928cb373b30699139/py4j-0.10.6-py2.py3-none-any.whl",
   "py4j-0.10.7-src.zip" : "https://files.pythonhosted.org/packages/e3/53/c737818eb9a7dc32a7cd4f1396e787bd94200c3997c72c1dbe028587bd76/py4j-0.10.7-py2.py3-none-any.whl",
   "py4j-0.10.8.1-src.zip" : "https://files.pythonhosted.org/packages/04/de/2d314a921ef4c20b283e1de94e0780273678caac901564df06b948e4ba9b/py4j-0.10.8.1-py2.py3-none-any.whl"
