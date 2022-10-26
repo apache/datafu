@@ -20,10 +20,15 @@ import java.io._
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import datafu.spark.ScalaPythonBridge
+import org.apache.commons.codec.binary.Base64
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.apache.spark.api.python.PythonUtils
 import org.apache.spark.deploy.PythonRunner
 import org.apache.spark.util.Utils
+import py4j.GatewayServer
+
+import java.security.SecureRandom
+import scala.util.Random
 
 /**
  * Internal class - should not be used by user
@@ -60,7 +65,12 @@ case class SparkPythonRunner(pyPaths: String,
 
     // Launch a Py4J gateway server for the process to connect to; this will let it see our
     // Java system properties and such
-    val gatewayServer = new py4j.GatewayServer(ScalaPythonBridge, 0)
+    val auth_token = createSecret(256)
+    val gatewayServer = new GatewayServer.GatewayServerBuilder()
+      .entryPoint(ScalaPythonBridge)
+      .javaPort(0)
+      .authToken(auth_token)
+      .build()
     val thread = new Thread(new Runnable() {
       override def run(): Unit = Utils.logUncaughtExceptions {
         gatewayServer.start()
@@ -94,7 +104,7 @@ case class SparkPythonRunner(pyPaths: String,
     // This is equivalent to setting the -u flag; we use it because ipython doesn't support -u:
     env.put("PYTHONUNBUFFERED", "YES") // value is needed to be set to a non-empty string
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
-    env.put("PYSPARK_ALLOW_INSECURE_GATEWAY", "1") // needed for Spark 2.4.1 and newer, will stop working in Spark 3.x
+    env.put("PYSPARK_GATEWAY_SECRET", auth_token)
     builder.redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
     val process = builder.start()
     val writer = new BufferedWriter(
@@ -137,6 +147,13 @@ case class SparkPythonRunner(pyPaths: String,
     }
 
     output
+  }
+
+  def createSecret(secretBitLength: Int): String = {
+    val rnd = new SecureRandom
+    val secretBytes = new Array[Byte](secretBitLength / java.lang.Byte.SIZE)
+    rnd.nextBytes(secretBytes)
+    Base64.encodeBase64String(secretBytes)
   }
 
 }
