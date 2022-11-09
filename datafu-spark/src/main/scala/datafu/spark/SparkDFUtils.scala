@@ -89,12 +89,14 @@ class SparkDFUtilsBridge {
                           skewed: DataFrame,
                           joinCol: String,
                           numRowsToBroadcast: Int,
-                          filterCnt: Long): DataFrame = {
+                          filterCnt: Long,
+                          joinType: String): DataFrame = {
     SparkDFUtils.broadcastJoinSkewed(notSkewed = notSkewed,
-                                     skewed = skewed,
-                                     joinCol = joinCol,
-                                     numRowsToBroadcast = numRowsToBroadcast,
-                                     filterCnt = Option(filterCnt))
+      skewed = skewed,
+      joinCol = joinCol,
+      numRowsToBroadcast = numRowsToBroadcast,
+      filterCnt = Option(filterCnt),
+      joinType)
   }
 
   def joinWithRange(dfSingle: DataFrame,
@@ -335,7 +337,8 @@ object SparkDFUtils {
                           skewed: DataFrame,
                           joinCol: String,
                           numRowsToBroadcast: Int,
-                          filterCnt: Option[Long] = None): DataFrame = {
+                          filterCnt: Option[Long] = None,
+                          joinType: String = "inner"): DataFrame = {
     val ss = notSkewed.sparkSession
     import ss.implicits._
     val keyCount = skewed
@@ -355,12 +358,11 @@ object SparkDFUtils {
       .join(broadcast(skewedKeys), $"skew_join_key" === col(joinCol), "left")
       .withColumn("is_skewed_record", col("skew_join_key").isNotNull)
       .drop("skew_join_key")
-      .persist(StorageLevel.DISK_ONLY)
 
     // broadcast map-join, sending the notSkewed data
     val bigRecordsJnd =
       broadcast(notSkewedWithSkewIndicator.filter("is_skewed_record"))
-        .join(skewed, joinCol)
+        .join(skewed.join(broadcast(skewedKeys), $"skew_join_key" === col(joinCol)).drop("skew_join_key"), List(joinCol), joinType)
 
     // regular join for the rest
     val skewedWithoutSkewedKeys = skewed
@@ -369,7 +371,7 @@ object SparkDFUtils {
       .drop("skew_join_key")
     val smallRecordsJnd = notSkewedWithSkewIndicator
       .filter("not is_skewed_record")
-      .join(skewedWithoutSkewedKeys, joinCol)
+      .join(skewedWithoutSkewedKeys, List(joinCol), joinType)
 
     smallRecordsJnd
       .union(bigRecordsJnd)

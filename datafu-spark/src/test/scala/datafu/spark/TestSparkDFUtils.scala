@@ -253,39 +253,28 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
     assertDataFrameEquals(expected, actual)
   }
 
-  test("broadcastJoinSkewed") {
-    val skewedList = List(("1", "a"),
-                          ("1", "b"),
-                          ("1", "c"),
-                          ("1", "d"),
-                          ("1", "e"),
-                          ("2", "k"),
-                          ("0", "k"))
-    val skewed =
-      sqlContext.createDataFrame(skewedList).toDF("key", "val_skewed")
+  test("randomJoinSkewedTests") {
+    def makeSkew(i: Int): Int = {
+      if (i < 200) 10 else 50
+    }
+
+    val skewed = sqlContext.createDataFrame((1 to 500).map(i => ((Math.random * makeSkew(i)).toInt, s"str$i")))
+      .toDF("key", "val_skewed")
     val notSkewed = sqlContext
-      .createDataFrame((1 to 10).map(i => (i.toString, s"str$i")))
+      .createDataFrame((1 to 500).map(i => ((Math.random * 50).toInt, s"str$i")))
       .toDF("key", "val")
 
-    val expected = sqlContext
-      .createDataFrame(
-        List(
-          ("1", "str1", "a"),
-          ("1", "str1", "b"),
-          ("1", "str1", "c"),
-          ("1", "str1", "d"),
-          ("1", "str1", "e"),
-          ("2", "str2", "k")
-        ))
-      .toDF("key", "val", "val_skewed")
+    val expected = notSkewed.join(skewed, Seq("key")).sort($"key", $"val", $"val_skewed")
+    val actual1 = notSkewed.broadcastJoinSkewed(skewed, "key", 1).sort($"key", $"val", $"val_skewed")
+    assertDataFrameEquals(expected, actual1)
 
-    val actual1 = notSkewed.broadcastJoinSkewed(skewed, "key", 1)
+    val leftExpected = notSkewed.join(skewed, Seq("key"), "left").sort($"key", $"val", $"val_skewed")
+    val actual2 = notSkewed.broadcastJoinSkewed(skewed, "key", 1, joinType = "left").sort($"key", $"val", $"val_skewed")
+    assertDataFrameEquals(leftExpected, actual2)
 
-    assertDataFrameEquals(expected, actual1.sort($"val_skewed"))
-
-    val actual2 = notSkewed.broadcastJoinSkewed(skewed, "key", 2)
-
-    assertDataFrameEquals(expected, actual2.sort($"val_skewed"))
+    val rightExpected = notSkewed.join(skewed, Seq("key"), "right").sort($"key", $"val", $"val_skewed")
+    val actual3 = notSkewed.broadcastJoinSkewed(skewed, "key", 2, joinType = "right").sort($"key", $"val", $"val_skewed")
+    assertDataFrameEquals(rightExpected, actual3)
   }
 
   // because of nulls in expected data, an actual schema needs to be used
@@ -375,9 +364,9 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
     assertDataFrameEquals(expected, actual)
   }
-  
+
   test("test_explode_array") {
- 
+
     val input = spark.createDataFrame(Seq(
       (0.0, Seq("Hi", "I heard", "about", "Spark")),
       (0.0, Seq("I wish", "Java", "could use", "case", "classes")),
@@ -385,9 +374,9 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       (0.0, Seq()),
       (1.0, null)
     )).toDF("label", "sentence_arr")
-    
+
     val actual = input.explodeArray($"sentence_arr", "token")
-    
+
     val expected = spark.createDataFrame(Seq(
       (0.0, Seq("Hi", "I heard", "about", "Spark"),"Hi", "I heard", "about", "Spark",null),
       (0.0, Seq("I wish", "Java", "could use", "case", "classes"),"I wish", "Java", "could use", "case", "classes"),
@@ -395,7 +384,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       (0.0, Seq(),null,null,null,null,null),
       (1.0, null,null,null,null,null,null)
     )).toDF("label", "sentence_arr","token0","token1","token2","token3","token4")
-    
+
     assertDataFrameEquals(expected, actual)
   }
 }
