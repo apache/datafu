@@ -73,7 +73,7 @@ func_joinSkewed_res = df_utils.join_skewed(df_left=df_people2.alias("df1"), df_r
 func_joinSkewed_res.registerTempTable("joinSkewed")
 
 func_broadcastJoinSkewed_res = df_utils.broadcast_join_skewed(not_skewed_df=df_people2, skewed_df=simpleDF, join_col="id",
-                                                              number_of_custs_to_broadcast=5, filter_cnt=0)
+                                                              number_of_custs_to_broadcast=5, filter_cnt=0, join_type="inner")
 func_broadcastJoinSkewed_res.registerTempTable("broadcastJoinSkewed")
 
 dfRange = sqlContext.createDataFrame([
