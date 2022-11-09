@@ -1,11 +1,11 @@
-# Build and test datafu-spark code for the latest Scala/Spark combinations for the master branch and new PRs
+# Build and test datafu-spark code for the latest Scala/Spark combinations for the main branch and new PRs
 name: "tests"
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   schedule:
     - cron: '36 3 * * 5'
 

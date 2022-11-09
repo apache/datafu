@@ -213,4 +213,4 @@ separate process.
 
 After you have released source and binary artifacts, you should add an entry to the DataFu website and update the various places that point to the previous release. You can look at [a previous release's commit](https://github.com/apache/datafu/commit/09a68527f5921e026c04e8e9940ef0466b41a7c0) in order to get an idea of which files need to be changed. Keep in mind that there is one place where the previous version is updated (if you're release 1.6.1 instead of 1.6.0, you need to replace *1.5.0*, not 1.6.0)
 
-After you have made these changes, build the site (and regenerate java/scaladocs) by using [the instructions here.](https://github.com/apache/datafu/blob/master/site/README.md)
+After you have made these changes, build the site (and regenerate java/scaladocs) by using [the instructions here.](https://github.com/apache/datafu/blob/main/site/README.md)

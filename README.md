@@ -19,7 +19,7 @@
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/datafu)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Apache Jira](https://img.shields.io/badge/ASF%20Jira-DATAFU-brightgreen)](https://issues.apache.org/jira/projects/DATAFU/)
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.datafu/datafu-pig)](http://search.maven.org/#search|gav|1|g:"org.apache.datafu")
-[![GitHub Actions Build](https://github.com/apache/datafu/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/apache/datafu/actions/workflows/tests.yml)
+[![GitHub Actions Build](https://github.com/apache/datafu/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/apache/datafu/actions/workflows/tests.yml)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/apache/datafu)
 
 [Apache DataFu](http://datafu.apache.org) is a collection of libraries for working with large-scale data in Hadoop.
