@@ -67,7 +67,9 @@ def dedup_with_combiner(df, group_col, order_by_col, desc = True, columns_filter
 *                          those columns in the result
     :return: DataFrame representing the data after the operation
     """
-    jdf = _get_utils(df).dedupWithCombiner(df._jdf, group_col._jc, order_by_col._jc, desc, columns_filter, columns_filter_keep)
+    group_col = group_col if isinstance(group_col, list) else [group_col]
+    order_by_col = order_by_col if isinstance(order_by_col, list) else [order_by_col]
+    jdf = _get_utils(df).dedupWithCombiner(df._jdf, _cols_to_java_cols(group_col), _cols_to_java_cols(order_by_col), desc, columns_filter, columns_filter_keep)
     return DataFrame(jdf, df.sql_ctx)
 
 

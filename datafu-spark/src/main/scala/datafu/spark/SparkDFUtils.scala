@@ -25,6 +25,8 @@ import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{LongType, StructType}
+import scala.language.implicitConversions
+import DataFrameOps.columnToColumns
 import org.apache.spark.storage.StorageLevel
 
 /**
@@ -51,16 +53,18 @@ class SparkDFUtilsBridge {
   }
 
   def dedupWithCombiner(df: DataFrame,
-             groupCol: Column,
-             orderByCol: Column,
+             groupCol: JavaList[Column],
+             orderByCol: JavaList[Column],
              desc: Boolean,
              columnsFilter: JavaList[String],
              columnsFilterKeep: Boolean): DataFrame = {
     val columnsFilter_converted = convertJavaListToSeq(columnsFilter)
+    val groupCol_converted = convertJavaListToSeq(groupCol)
+    val orderByCol_converted = convertJavaListToSeq(orderByCol)
     SparkDFUtils.dedupWithCombiner(
       df = df,
-      groupCol = groupCol,
-      orderByCol = orderByCol,
+      groupCol = groupCol_converted,
+      orderByCol = orderByCol_converted,
       desc = desc,
       moreAggFunctions = Nil,
       columnsFilter = columnsFilter_converted,
@@ -200,25 +204,25 @@ object SparkDFUtils {
     * @return DataFrame representing the data after the operation
     */
   def dedupWithCombiner(df: DataFrame,
-                        groupCol: Column,
-                        orderByCol: Column,
+                        groupCol: Seq[Column],
+                        orderByCol: Seq[Column],
                         desc: Boolean = true,
                         moreAggFunctions: Seq[Column] = Nil,
                         columnsFilter: Seq[String] = Nil,
                         columnsFilterKeep: Boolean = true): DataFrame = {
     val newDF =
       if (columnsFilter == Nil) {
-        df.withColumn("sort_by_column", orderByCol)
+        df.withColumn("sort_by_column", struct(orderByCol: _*))
       } else {
         if (columnsFilterKeep) {
-          df.withColumn("sort_by_column", orderByCol)
+          df.withColumn("sort_by_column", struct(orderByCol: _*))
             .select("sort_by_column", columnsFilter: _*)
         } else {
           df.select(
             df.columns
               .filter(colName => !columnsFilter.contains(colName))
               .map(colName => new Column(colName)): _*)
-            .withColumn("sort_by_column", orderByCol)
+            .withColumn("sort_by_column", struct(orderByCol: _*))
         }
       }
 
@@ -227,15 +231,18 @@ object SparkDFUtils {
       else SparkOverwriteUDAFs.minValueByKey(_: Column, _: Column)
 
     val df2 = newDF
-      .groupBy(groupCol.as("group_by_col"))
+      .groupBy(groupCol:_*)
       .agg(aggFunc(expr("sort_by_column"), expr("struct(sort_by_column, *)"))
-             .as("h1"),
-           struct(lit(1).as("lit_placeholder_col") +: moreAggFunctions: _*)
-             .as("h2"))
-      .selectExpr("h2.*", "h1.*")
+        .as("h1"),
+        struct(lit(1).as("lit_placeholder_col") +: moreAggFunctions: _*)
+          .as("h2"))
+      .selectExpr("h1.*", "h2.*")
       .drop("lit_placeholder_col")
       .drop("sort_by_column")
-    df2
+    val ns = StructType((df.schema++df2.schema.filter(s2 => !df.schema.map(_.name).contains(s2.name)))
+      .filter(s2 => columnsFilter == Nil || (columnsFilterKeep && columnsFilter.contains(s2.name)) || (!columnsFilterKeep && !columnsFilter.contains(s2.name))).toList)
+
+    df2.sparkSession.createDataFrame(df2.rdd,ns)
   }
 
   /**
