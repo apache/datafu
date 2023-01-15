@@ -21,9 +21,9 @@ In order to call the datafu-spark API's from Pyspark, you can do the following (
 First, call pyspark with the following parameters
 
 ```bash
-export PYTHONPATH=datafu-spark_2.11_2.3.0-1.6.1.jar
+export PYTHONPATH=datafu-spark_2.11_2.3.0-1.7.0.jar
 
-pyspark --jars datafu-spark_2.11_2.3.0-1.6.1.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.11_2.3.0-1.6.1.jar
+pyspark --jars datafu-spark_2.11_2.3.0-1.7.0.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.11_2.3.0-1.7.0.jar
 ```
 
 The following is an example of calling the Spark version of the datafu _dedup_ method
@@ -72,10 +72,10 @@ Building and testing datafu-spark can be done as described in the [the main Data
 
 If you wish to build for a specific Scala/Spark version, there are two options. One is to change the *scalaVersion* and *sparkVersion* in [the main gradle.properties file.](https://github.com/apache/datafu/blob/spark-tmp/gradle.properties#L22)
 
-The other is to pass these parameters in the command line. For example, to build and test for Scala 2.12 and Spark 2.4.0, you would use
+The other is to pass these parameters in the command line. For example, to build and test for Scala 2.12 and Spark 2.4.3, you would use
 
 ```bash
-./gradlew :datafu-spark:test -PscalaVersion=2.12 -PsparkVersion=2.4.0
+./gradlew :datafu-spark:test -PscalaVersion=2.12 -PsparkVersion=2.4.3
 ```
 
 There is a [script](https://github.com/apache/datafu/tree/spark-tmp/datafu-spark/build_and_test_spark.sh) for building and testing datafu-spark across the multiple Scala/Spark combinations.
