@@ -17,4 +17,4 @@
  * under the License.
  */
 
-include "build-plugin","datafu-pig","datafu-hourglass","datafu-spark"
+include "datafu-spark"
