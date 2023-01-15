@@ -1,3 +1,24 @@
+# 1.7.0
+
+Additions
+
+* Add collectLimitedList and dedupRandomN methods (DATAFU-165)
+* Improve broadcastJoinSkewed function performance and allow all join types (DATAFU-170)
+
+Improvements
+
+* Upgrade Log4j version (DATAFU-162)
+* Make dedupWithCombiner support multiple columns (DATAFU-171)
+* Added count filtering option to broadcastJoinSkewed
+ 
+Fixes
+
+* explodeArray method not exposed in Python (DATAFU-163)
+
+Breaking changes
+
+* Spark 2.1.x no longer supported
+
 # 1.6.1
 
 Additions

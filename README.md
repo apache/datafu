@@ -43,11 +43,12 @@ If you'd like to jump in and get started, check out the corresponding guides for
 
 ## Blog Posts
 
-* [Introducing DataFu](http://datafu.apache.org/blog/2012/01/10/introducing-datafu.html)
-* [DataFu: The WD-40 of Big Data](http://datafu.apache.org/blog/2013/01/24/datafu-the-wd-40-of-big-data.html)
-* [DataFu 1.0](http://datafu.apache.org/blog/2013/09/04/datafu-1-0.html)
-* [DataFu's Hourglass: Incremental Data Processing in Hadoop](http://datafu.apache.org/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html)
+* [Introducing Datafu Spark](https://datafu.apache.org/blog/2021/11/18/introducing-datafu-spark.html)
 * [A Look at PayPal's Contributions to DataFu](http://datafu.apache.org/blog/2019/01/29/a-look-at-paypals-contributions-to-datafu.html)
+* [DataFu's Hourglass: Incremental Data Processing in Hadoop](http://datafu.apache.org/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html)
+* [DataFu 1.0](http://datafu.apache.org/blog/2013/09/04/datafu-1-0.html)
+* [DataFu: The WD-40 of Big Data](http://datafu.apache.org/blog/2013/01/24/datafu-the-wd-40-of-big-data.html)
+* [Introducing DataFu](http://datafu.apache.org/blog/2012/01/10/introducing-datafu.html)
 
 ## Presentations
 

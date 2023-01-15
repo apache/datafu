@@ -41,5 +41,6 @@ datafu-spark/bin
 datafu-spark/test-output
 datafu-spark/data
 datafu-spark/.apt_generated/
+datafu-spark/venv
 *.ipr
 *.iws

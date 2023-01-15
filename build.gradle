@@ -98,6 +98,7 @@ rat {
     'datafu-spark/spark-warehouse/**',
     'datafu-spark/derby.log',
     'datafu-spark/data/**',
+    'datafu-spark/venv/**',
     '.github/**/*'
   ]
 }
