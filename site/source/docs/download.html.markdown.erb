@@ -1,7 +1,7 @@
 ---
 title: Download - Apache DataFu
 section_name: Getting Started
-version: 1.6.1
+version: 1.7.0
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -21,7 +21,7 @@ license: >
 
 # Download
 
-Apache DataFu is available for download as a source release and as compiled artifacts stored in a Maven repository.
+Apache DataFu is available for download as a source release and as compiled artifacts stored in a Maven repository. Please note that the latest version of datafu-pig and datafu-hourglass is not the same as the latest version of datafu-spark.
 
 ## Source Releases
 
@@ -31,7 +31,7 @@ The latest source release can be found here:
 
 Previous releases:
 
-* <%= archived_source_release_link("1.6.0") %>
+* <%= archived_source_release_link("1.6.1") %>
 
 ### Validation
 
@@ -84,21 +84,22 @@ Assuming your local maven repository is at `~/.m2`, you should see the DataFu ar
 The latest release can be found in [Apache's Maven Repository for DataFu](https://repository.apache.org/content/groups/public/org/apache/datafu):
 
 * [datafu-spark_2.11-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-spark_2.11/<%= current_page.data.version %>/)
-* [datafu-pig-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-pig/<%= current_page.data.version %>/)
-* [datafu-hourglass-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-hourglass/<%= current_page.data.version %>/)
+* [datafu-spark_2.12-<%= current_page.data.version %>](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-spark_2.12/<%= current_page.data.version %>/)
+* [datafu-pig-1.6.1](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-pig/1.6.1/)
+* [datafu-hourglass-1.6.1](https://repository.apache.org/content/groups/public/org/apache/datafu/datafu-hourglass/1.6.1/)
 
 You can also use a dependency management system to download the DataFu artifacts and all their dependencies.  Some examples appear below.
 
 SBT:
 
 ```scala
-libraryDependencies += "org.apache.datafu" %%  "datafu-spark" % "1.6.1" intransitive
+libraryDependencies += "org.apache.datafu" %%  "datafu-spark" % "<%= current_page.data.version %>" intransitive
 ```
 
 Gradle:
 
 ```groovy
-compile "org.apache.datafu:datafu-pig:<%= current_page.data.version %>"
+compile "org.apache.datafu:datafu-spark:<%= current_page.data.version %>"
 ```
 
 Maven:
@@ -106,7 +107,7 @@ Maven:
 ```xml
 <dependency>
   <groupId>org.apache.datafu</groupId>
-  <artifactId>datafu-pig</artifactId>
+  <artifactId>datafu-spark</artifactId>
   <version><%= current_page.data.version %></version>
 </dependency>
 ```

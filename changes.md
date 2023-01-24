@@ -8,7 +8,6 @@ Additions
 Improvements
 
 * Upgrade Log4j version (DATAFU-162)
-* Make dedupWithCombiner support multiple columns (DATAFU-171)
 * Added count filtering option to broadcastJoinSkewed
  
 Fixes
