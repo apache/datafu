@@ -29,7 +29,9 @@ plugins {
   id "de.undercouch.download" version "3.4.3"
 }
 
-apply from: file("gradle/dependency-versions-scala-" + scalaCompatVersion + ".gradle")
+def scalaVersion = project.properties['scalaVersion'] ?: "2.11"
+
+apply from: file("gradle/dependency-versions-scala-" + scalaVersion + ".gradle")
 
 apply plugin: 'scala'
 
@@ -43,7 +45,7 @@ allprojects {
 
 // Note: There seem to be no differences between Spark versions 2.3 and 2.4 that require us to build separate
 // versions.  If we do find differences in the future we can append '_' + sparkCompatVersion to the base name here.
-archivesBaseName = 'datafu-spark_' + scalaCompatVersion
+archivesBaseName = 'datafu-spark_' + scalaVersion
 
 cleanEclipse {
   doLast {
@@ -56,18 +58,18 @@ cleanEclipse {
 
 dependencies {
     compile "org.apache.logging.log4j:log4j-api:$log4j2Version"
-    compile "org.scala-lang:scala-library:$scalaVersion"
-    compile ("org.apache.spark:spark-core_" + scalaCompatVersion + ":" + sparkVersion)
-    compile "org.apache.spark:spark-hive_" + scalaCompatVersion + ":" + sparkVersion
+    compile "org.scala-lang:scala-library:$scalaLibraryVersion"
+    compile ("org.apache.spark:spark-core_" + scalaVersion + ":" + sparkVersion)
+    compile "org.apache.spark:spark-hive_" + scalaVersion + ":" + sparkVersion
 
     testCompile "org.apache.logging.log4j:log4j-1.2-api:$log4j2Version"
     testCompile "org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version"
 
 // there isn't a spark-test-base version for 2.3.4, but 2.3.3 will work instead
     if (sparkVersion == "2.3.4") {
-    	testCompile "com.holdenkarau:spark-testing-base_" + scalaCompatVersion + ":2.3.3_" + sparkTestingBaseVersion
+    	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":2.3.3_" + sparkTestingBaseVersion
     } else {
-	testCompile "com.holdenkarau:spark-testing-base_" + scalaCompatVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
+	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
     }
 }
 

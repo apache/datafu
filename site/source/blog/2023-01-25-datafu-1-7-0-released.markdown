@@ -18,29 +18,35 @@ license: >
    limitations under the License.
 ---
 
-I'd like to announce the release of Apache DataFu-Spark 1.7.0. Many thanks to new contributors Arpit Bhardwaj, Ben Rahamim and Shaked Aharon! 
+I'd like to announce the release of Apache DataFu-Spark 1.7.0.
 
-Additions
+Many thanks to new contributors Arpit Bhardwaj, Ben Rahamim and Shaked Aharon! 
 
-* Add collectLimitedList and dedupRandomN methods (DATAFU-165)
-* Improve broadcastJoinSkewed function performance and allow all join types (DATAFU-170)
+<br>
 
-Improvements
+**Additions**
 
-* Upgrade Log4j version (DATAFU-162)
-* Added count filtering option to broadcastJoinSkewed
+* Add collectLimitedList and dedupRandomN methods ([DATAFU-165](https://issues.apache.org/jira/browse/DATAFU-165))
+* Improve broadcastJoinSkewed function performance and allow all join types ([DATAFU-170](https://issues.apache.org/jira/browse/DATAFU-170))
+
+**Improvements**
+
+* Upgrade Log4j version ([DATAFU-162](https://issues.apache.org/jira/browse/DATAFU-162))
+* Added count filtering option to broadcastJoinSkewed ([PR #27](https://github.com/apache/datafu/pull/27))
  
-Fixes
+**Fixes**
 
-* explodeArray method not exposed in Python (DATAFU-163)
+* explodeArray method not exposed in Python ([DATAFU-163](https://issues.apache.org/jira/browse/DATAFU-163))
 
-Breaking changes
+**Breaking changes**
 
 * Spark 2.1.x no longer supported
 
+<br>
+
 The source release can be obtained from:
 
-http://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-1.7.0/
+http://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-1.7.0/apache-datafu-sources-1.7.0.tgz
 
 Artifacts for DataFu are published in Apache's Maven Repository:
 
