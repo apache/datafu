@@ -17,7 +17,7 @@
 
 import os
 
-from py4j.java_gateway import JavaGateway, GatewayClient
+from py4j.java_gateway import JavaGateway, GatewayParameters
 from pyspark.conf import SparkConf
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession
@@ -40,7 +40,10 @@ class Context(object):
         if os.environ.get("SPARK_EXECUTOR_URI"):
             SparkContext.setSystemProperty("spark.executor.uri", os.environ["SPARK_EXECUTOR_URI"])
 
-        gateway = JavaGateway(GatewayClient(port=int(os.environ.get("PYSPARK_GATEWAY_PORT"))), auto_convert=True)
+        gateway = JavaGateway(gateway_parameters=GatewayParameters(
+            port=int(os.environ.get("PYSPARK_GATEWAY_PORT")),
+            auth_token=os.environ.get("PYSPARK_GATEWAY_SECRET"),
+            auto_convert=True))
         java_import(gateway.jvm, "org.apache.spark.SparkEnv")
         java_import(gateway.jvm, "org.apache.spark.SparkConf")
         java_import(gateway.jvm, "org.apache.spark.api.java.*")

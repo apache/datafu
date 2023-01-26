@@ -48,8 +48,6 @@ case class ScalaPythonBridgeRunner(extraPath: String = "") {
   // we include multiple options for py4j because on any given cluster only one should be found
   val pythonPath = (PythonPathsManager.getAbsolutePaths() ++
     Array("pyspark.zip",
-          "py4j-0.10.4-src.zip",
-          "py4j-0.10.6-src.zip",
           "py4j-0.10.7-src.zip",
           "py4j-0.10.8.1-src.zip") ++
     Option(extraPath).getOrElse("").split(",")).distinct
