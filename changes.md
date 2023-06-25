@@ -1,3 +1,15 @@
+# 1.8.0
+
+Improvements
+
+* dedupWithCombiner method now supports a list of columns in the order / group by params  (DATAFU-171)
+* Scala Python bridge now uses secure gateway (DATAFU-167)
+ 
+Breaking changes
+
+* Spark 2.2.0, 2.2.1, and 2.3.0. no longer supported
+
+
 # 1.7.0
 
 Additions
