@@ -133,7 +133,7 @@ To upload the archive to the Apache Nexus staging repository, from the release c
 
     ./gradlew uploadArchives -PnexusUsername=yourNexusUsername -PnexusPassword=yourNexusPassword
 
-The above command assumes you have configured `$HOME/.gradle/gradle.properties` with your GPG key information.
+The above command assumes you have configured `$HOME/.gradle/gradle.properties` with your GPG key information. If this fails with _Cannot invoke method readPassword() on null object_ or _Cannot invoke method readLine() on null object_, this is because the Gradle daemon is running. Disable it with _--no-daemon_ and try again. Please note that sometimes your JVM settings will prevent Gradle from launching without forking a daemon. Removing them from the gradlew script may help.
 
 If you now visit the [Apache Nexus Repository](https://repository.apache.org) and click on Staging Repositories, you should see a repository named orgapachedatafu-xxxx, where xxxx is some number.  Select the repository and browse the content to make sure the set of files looks right.  If it looks correct then Close the repository.  The repository is now ready for testing.  If you look at the summary there is a URL for the repository that may be used to fetch the archives.
 

@@ -155,6 +155,7 @@ test {
 
   systemProperty 'datafu.spark.version', sparkVersion
 
+// removed so the daemon is cancelled
   maxHeapSize = "2G"
 }
 
