@@ -18,7 +18,7 @@
 
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/datafu)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Apache Jira](https://img.shields.io/badge/ASF%20Jira-DATAFU-brightgreen)](https://issues.apache.org/jira/projects/DATAFU/)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.datafu/datafu-spark)](http://search.maven.org/#search|gav|1|g:"org.apache.datafu")
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datafu/datafu-spark_2.12/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.apache.datafu%22)
 [![GitHub Actions Build](https://github.com/apache/datafu/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/apache/datafu/actions/workflows/tests.yml)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/apache/datafu)
 
