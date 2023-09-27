@@ -67,9 +67,11 @@ dependencies {
 
 // there isn't a spark-test-base version for 2.3.4, but 2.3.3 will work instead
     if (sparkVersion == "2.3.4") {
-    	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":2.3.3_" + sparkTestingBaseVersion
+        testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":2.3.3_" + sparkTestingBaseVersion
+    } else if (sparkVersion > "2.4.5" && sparkVersion < "3" ) {
+        testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":2.4.5_" + sparkTestingBaseVersion
     } else {
-	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
+	    testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
     }
 }
 

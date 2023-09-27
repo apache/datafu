@@ -23,11 +23,12 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions.aggregate.{Collect, DeclarativeAggregate, ImperativeAggregate}
 import org.apache.spark.sql.catalyst.expressions.{AttributeReference, BinaryComparison, ExpectsInputTypes, Expression, GreaterThan, If, IsNull, LessThan, Literal}
-import org.apache.spark.sql.catalyst.util.TypeUtils
+import org.apache.spark.sql.catalyst.util.{GenericArrayData, TypeUtils}
 import org.apache.spark.sql.types.{AbstractDataType, AnyDataType, DataType}
 
 import scala.collection.generic.Growable
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 object SparkOverwriteUDAFs {
   def minValueByKey(key: Column, value: Column): Column =
@@ -108,6 +109,10 @@ case class CollectLimitedList(child: Expression,
 
   def this(child: Expression) = this(child, 0, 0)
 
+  override lazy val bufferElementType = child.dataType
+
+  override protected def convertToBufferElement(value: Any): Any = InternalRow.copyValue(value)
+
   override def withNewMutableAggBufferOffset(newMutableAggBufferOffset: Int): ImperativeAggregate =
     copy(mutableAggBufferOffset = newMutableAggBufferOffset)
 
@@ -118,6 +123,7 @@ case class CollectLimitedList(child: Expression,
 
   override def prettyName: String = "collect_limited_list"
 
+  override def eval(buffer: ArrayBuffer[Any]): Any = new GenericArrayData(buffer.toArray)
 }
 
 /** *
