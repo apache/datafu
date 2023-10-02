@@ -18,7 +18,7 @@
 
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/datafu)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Apache Jira](https://img.shields.io/badge/ASF%20Jira-DATAFU-brightgreen)](https://issues.apache.org/jira/projects/DATAFU/)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datafu/datafu-spark_2.12/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.apache.datafu%22)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.datafu/datafu-spark)](http://search.maven.org/#search|gav|1|g:"org.apache.datafu")
 [![GitHub Actions Build](https://github.com/apache/datafu/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/apache/datafu/actions/workflows/tests.yml)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr/apache/datafu)
 
@@ -128,9 +128,9 @@ To run only one module's tests - for example, only the DataFu Pig tests:
 
     ./gradlew :datafu-pig:test
 
-To run tests for a single class, use the `test.single` property.  For example, to run only the QuantileTests:
+To run tests for a single class, use the `tests` property.  For example, to run only the QuantileTests:
 
-    ./gradlew :datafu-pig:test -Dtest.single=QuantileTests
+    ./gradlew :datafu-pig:test --tests QuantileTests
 
 The tests can also be run from within Eclipse.  You'll need to install the TestNG plugin for Eclipse for DataFu Pig and Hourglass.  See: http://testng.org/doc/download.html.
 

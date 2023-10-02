@@ -29,7 +29,7 @@ plugins {
   id "de.undercouch.download" version "3.4.3"
 }
 
-def scalaVersion = project.properties['scalaVersion'] ?: "2.11"
+def scalaVersion = project.properties['scalaVersion'] ?: "2.12"
 
 apply from: file("gradle/dependency-versions-scala-" + scalaVersion + ".gradle")
 
@@ -64,14 +64,14 @@ dependencies {
 
     testCompile "org.apache.logging.log4j:log4j-1.2-api:$log4j2Version"
     testCompile "org.apache.logging.log4j:log4j-slf4j-impl:$log4j2Version"
-
-// there isn't a spark-test-base version for 2.3.4, but 2.3.3 will work instead
-    if (sparkVersion == "2.3.4") {
-        testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":2.3.3_" + sparkTestingBaseVersion
-    } else if (sparkVersion > "2.4.5" && sparkVersion < "3" ) {
-        testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":2.4.5_" + sparkTestingBaseVersion
+    
+// for versions that don't have a spark-test-base version use one that's older instead
+    if (sparkVersion == "3.1.3") {
+    	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":3.1.2_" + sparkTestingBaseVersion
+    } else if (sparkVersion == "3.2.4") {
+    	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":3.2.1_" + sparkTestingBaseVersion
     } else {
-	    testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
+	testCompile "com.holdenkarau:spark-testing-base_" + scalaVersion + ":" + sparkVersion + "_" + sparkTestingBaseVersion
     }
 }
 
@@ -124,9 +124,9 @@ zipPySpark.onlyIf {
 
 // download py4j for testing. This is not shipped with datafu-spark.
 project.ext.py4js = [
-  "py4j-0.10.6-src.zip" : "https://files.pythonhosted.org/packages/4a/08/162710786239aa72bd72bb46c64f2b02f54250412ba928cb373b30699139/py4j-0.10.6-py2.py3-none-any.whl",
-  "py4j-0.10.7-src.zip" : "https://files.pythonhosted.org/packages/e3/53/c737818eb9a7dc32a7cd4f1396e787bd94200c3997c72c1dbe028587bd76/py4j-0.10.7-py2.py3-none-any.whl",
-  "py4j-0.10.8.1-src.zip" : "https://files.pythonhosted.org/packages/04/de/2d314a921ef4c20b283e1de94e0780273678caac901564df06b948e4ba9b/py4j-0.10.8.1-py2.py3-none-any.whl"
+  "py4j-0.10.8.1-src.zip" : "https://files.pythonhosted.org/packages/04/de/2d314a921ef4c20b283e1de94e0780273678caac901564df06b948e4ba9b/py4j-0.10.8.1-py2.py3-none-any.whl",
+  "py4j-0.10.9-src.zip" : "https://files.pythonhosted.org/packages/9e/b6/6a4fb90cd235dc8e265a6a2067f2a2c99f0d91787f06aca4bcf7c23f3f80/py4j-0.10.9-py2.py3-none-any.whl",
+  "py4j-0.10.9.7-src.zip" : "https://files.pythonhosted.org/packages/10/30/a58b32568f1623aaad7db22aa9eafc4c6c194b429ff35bdc55ca2726da47/py4j-0.10.9.7-py2.py3-none-any.whl"
 ]
 
 task downloadPy4js {

@@ -39,5 +39,5 @@ ext {
   jsonVersion="1.1.1"
   jsr311Version="1.1.1"
   slf4jVersion="1.6.4"
-  sparkTestingBaseVersion = "0.14.0"
+  sparkTestingBaseVersion = "1.1.2"
 }

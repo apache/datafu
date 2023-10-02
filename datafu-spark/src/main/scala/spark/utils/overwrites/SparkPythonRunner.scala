@@ -58,7 +58,7 @@ case class SparkPythonRunner(pyPaths: String,
 
     val pythonExec =
       sys.env.getOrElse("PYSPARK_DRIVER_PYTHON",
-                        sys.env.getOrElse("PYSPARK_PYTHON", "python"))
+                        sys.env.getOrElse("PYSPARK_PYTHON", "python3"))
 
     // Format python filename paths before adding them to the PYTHONPATH
     val formattedPyFiles = PythonRunner.formatPaths(pyPaths)
