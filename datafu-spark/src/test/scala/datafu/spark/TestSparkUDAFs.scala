@@ -31,6 +31,9 @@ import org.apache.spark.sql.datafu.types.SparkOverwriteUDAFs
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.internal.StaticSQLConf.CATALOG_IMPLEMENTATION
 import org.apache.spark.sql.types._
+import java.io.File
+import java.nio.file.{Path, Paths, Files, SimpleFileVisitor, FileVisitResult}
+import java.nio.file.attribute.BasicFileAttributes
 
 @RunWith(classOf[JUnitRunner])
 class UdafTests extends FunSuite with DataFrameSuiteBase {
@@ -65,6 +68,25 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   case class mapExp(map_col: Map[String, Int])
   case class mapArrExp(map_col: Map[String, Array[String]])
 
+  lazy val defaultDbLocation = spark.sql("describe database default").toDF
+	.collect()
+	.filter(_.getString(0) == "Location")(0)(1)
+	.toString.replace("file:", "")
+
+  def deleteLeftoverFiles(table : String) : Unit = {
+   
+	val tablePath = Paths.get(defaultDbLocation + File.separator + table)
+	
+	// sanity check - only delete files if the path seems to be to a Hive warehouse
+	if (defaultDbLocation.endsWith("warehouse") && Files.exists(tablePath)) Files.walkFileTree(tablePath, new SimpleFileVisitor[Path] {
+      		override def visitFile(path: Path, attrs: BasicFileAttributes): FileVisitResult = {
+        		Files.delete(path)
+        		FileVisitResult.CONTINUE
+      		}
+    	}
+  )
+ }
+
   test("test multiset simple") {
     val ms = new SparkUDAFs.MultiSet()
     val expected: DataFrame =
@@ -87,6 +109,8 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   test("test multiarrayset all nulls") {
     // end case
     spark.sql("drop table if exists mas_table")
+    deleteLeftoverFiles("mas_table")
+    	
     spark.sql("create table mas_table (arr array<string>)")
     spark.sql(
       "insert overwrite table mas_table select case when 1=2 then array('asd') end " +
@@ -111,6 +135,8 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   test("test multiarrayset max keys") {
     // max keys case
     spark.sql("drop table if exists mas_table2")
+    deleteLeftoverFiles("mas_table2")
+
     spark.sql("create table mas_table2 (arr array<string>)")
     spark.sql(
       "insert overwrite table mas_table2 select array('asd','dsa') from (select 1)z")
@@ -162,6 +188,8 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
     val mapMerge = new SparkUDAFs.MapSetMerge()
 
     spark.sql("drop table if exists mapmerge_table")
+    deleteLeftoverFiles("mapmerge_table")
+
     spark.sql("create table mapmerge_table (c map<string, array<string>>)")
     spark.sql(
       "insert overwrite table mapmerge_table select map('k1', array('v1')) from (select 1) z")
