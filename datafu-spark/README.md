@@ -2,6 +2,19 @@
 
 datafu-spark contains a number of spark API's and a "Scala-Python bridge" that makes calling Scala code from Python, and vice-versa, easier.
 
+## Compatibility Matrix
+
+This matrix represents versions of Spark that DataFu has been compiled and tested on. Some/many methods work on unsupported versions as well.
+
+| DataFu | Spark|
+|-------|------|
+| 1.7.0 | 2.2.0 to 2.2.2, 2.3.0 to 2.3.2 and 2.4.0 to 2.4.3|
+| 1.8.0 | 2.2.3, 2.3.3, and 2.4.4 to 2.4.5|
+| 2.0.0 (not released yet) | 3.0.x - 3.1.x |
+| 2.1.0 (not released yet) | 3.2.x and up |
+
+# Examples
+
 Here are some examples of things you can do with it:
 
 * ["Dedup" a table](https://github.com/apache/datafu/blob/spark-tmp/datafu-spark/src/main/scala/datafu/spark/SparkDFUtils.scala#L139) - remove duplicates based on a key and ordering (typically a date updated field, to get only the mostly recently updated record).
