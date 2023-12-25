@@ -19,24 +19,24 @@
 package datafu.spark
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
-import org.apache.logging.log4j.LogManager
 import org.junit.Assert
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
+import org.apache.logging.log4j.LogManager
+import org.apache.spark.sql.functions.udaf
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.datafu.types.SparkOverwriteUDAFs
-import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.internal.StaticSQLConf.CATALOG_IMPLEMENTATION
 import org.apache.spark.sql.types._
 import java.io.File
 import java.nio.file.{Path, Paths, Files, SimpleFileVisitor, FileVisitResult}
 import java.nio.file.attribute.BasicFileAttributes
 
+import datafu.spark.Aggregators._
+
 @RunWith(classOf[JUnitRunner])
-class UdafTests extends FunSuite with DataFrameSuiteBase {
+class AggregatorTests extends FunSuite with DataFrameSuiteBase {
 
   import spark.implicits._
 
@@ -88,13 +88,14 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
  }
 
   test("test multiset simple") {
-    val ms = new SparkUDAFs.MultiSet()
+    val ms = udaf(new MultiSet())
     val expected: DataFrame =
       sqlContext.createDataFrame(List(mapExp(Map("b" -> 1, "a" -> 3))))
     assertDataFrameEquals(expected, df.agg(ms($"col_grp").as("map_col")))
   }
 
-  val mas = new SparkUDAFs.MultiArraySet[String]()
+  val mas = udaf(new MultiArraySet[String]())
+  //val mas = udaf(new MultiArraySet())
 
   test("test multiarrayset simple") {
     assertDataFrameEquals(
@@ -185,7 +186,7 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   }
 
   test("test mapmerge") {
-    val mapMerge = new SparkUDAFs.MapSetMerge()
+    val mapMerge = udaf( new MapSetMerge())
 
     spark.sql("drop table if exists mapmerge_table")
     deleteLeftoverFiles("mapmerge_table")
@@ -198,6 +199,8 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
     spark.sql(
       "insert into table mapmerge_table select map('k2', array('v3')) from (select 1) z")
 
+    spark.table("mapmerge_table").groupBy().agg(mapMerge($"c").as("map_col")).show
+
     assertDataFrameEquals(
       sqlContext.createDataFrame(
         List(mapArrExp(Map("k1" -> Array("v1"), "k2" -> Array("v3"))))),
@@ -205,52 +208,14 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
     )
   }
 
-  test("minKeyValue") {
-    assertDataFrameEquals(
-      sqlContext.createDataFrame(List(("b", "asd4"), ("a", "asd1"))),
-      df.groupBy($"col_grp".as("_1"))
-        .agg(SparkOverwriteUDAFs.minValueByKey($"col_ord", $"col_str").as("_2"))
-    )
-  }
-
-  case class Exp4(colGrp: String, colOrd: Int, colStr: String, asd: String)
-
-  val minKeyValueWindowExpectedSchema = List(
-    StructField("col_grp", StringType, true),
-    StructField("col_ord", IntegerType, false),
-    StructField("col_str", StringType, true),
-    StructField("asd", StringType, true)
-  )
-
-  test("minKeyValue window") {
-    assertDataFrameEquals(
-      sqlContext.createDataFrame(
-        sc.parallelize(
-          Seq(
-            Row("b", 1, "asd4", "asd4"),
-            Row("a", 1, "asd1", "asd1"),
-            Row("a", 2, "asd2", "asd1"),
-            Row("a", 3, "asd3", "asd1")
-          )),
-        StructType(minKeyValueWindowExpectedSchema)
-      ),
-      df.withColumn("asd",
-                    SparkOverwriteUDAFs
-                      .minValueByKey($"col_ord", $"col_str")
-                      .over(Window.partitionBy("col_grp")))
-    )
-  }
-
   case class Exp5(col_grp: String, col_ord: Option[Int])
   case class Exp6(col_ord: Option[Int], col_grp: Option[Int])
 
   test("countDistinctUpTo") {
-    import datafu.spark.SparkUDAFs.CountDistinctUpTo
+    val countDistinctUpTo2 = udaf(new CountDistinctUpTo(2))
+    val countDistinctUpTo3 = udaf(new CountDistinctUpTo(3))
+    val countDistinctUpTo6 = udaf(new CountDistinctUpTo(6))
 
-    val countDistinctUpTo2 = new CountDistinctUpTo(2)
-    val countDistinctUpTo3 = new CountDistinctUpTo(3)
-    val countDistinctUpTo6 = new CountDistinctUpTo(6)
-    
     val inputDF = sqlContext.createDataFrame(
       List(
         Exp5("c", Option(1)),
@@ -283,6 +248,13 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
         Exp6(Option(2), Option(1))
       ))
       
+ inputDF
+      .groupBy("col_ord")
+      .agg(countDistinctUpTo2($"col_grp").as("col_grp"))
+      .show
+  
+  results2DF.show
+      
     assertDataFrameEquals(results3DF,
                           inputDF
                             .groupBy("col_grp")
@@ -298,26 +270,6 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
                             .agg(countDistinctUpTo2($"col_grp").as("col_grp")))
   }
 
-  test("test_limited_collect_list") {
 
-    val maxSize = 10
-
-    val rows = (1 to 30).flatMap(x => (1 to x).map(n => (x, n, "some-string " + n))).toDF("num1", "num2", "str")
-
-    rows.show(10, false)
-
-    import org.apache.spark.sql.functions._
-
-    val result = rows.groupBy("num1").agg(SparkOverwriteUDAFs.collectLimitedList(expr("struct(*)"), maxSize).as("list"))
-      .withColumn("list_size", expr("size(list)"))
-
-    result.show(10, false)
-
-    SparkDFUtils.dedupRandomN(rows,$"num1",10).show(10,false)
-
-    val rows_different = result.filter(s"case when num1 > $maxSize then $maxSize else num1 end != list_size")
-
-    Assert.assertEquals(0, rows_different.count())
-
-  }
 }
+

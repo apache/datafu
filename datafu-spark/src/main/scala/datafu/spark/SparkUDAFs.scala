@@ -25,14 +25,18 @@ import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAg
 import org.apache.spark.sql.types.{ArrayType, _}
 
 
-// @TODO: add documentation and tests to all the functions. maybe also expose in python.
-
+/**
+ * UserDefineAggregateFunction is deprecated and will be removed in DataFu 2.1.0 in order to allow compilation with Spark 3.2 and up.
+ * Please use the methods in @Aggregators instead
+ */
+@Deprecated
 object SparkUDAFs {
 
   /**
     * Like Google's MultiSets.
     * Aggregate function that creates a map of key to its count.
     */
+  @Deprecated
   class MultiSet() extends UserDefinedAggregateFunction {
 
     def inputSchema: StructType = new StructType().add("key", StringType)
@@ -84,6 +88,7 @@ object SparkUDAFs {
     * Essentially the same as MultiSet, but gets an Array for input.
     * There is an extra option to limit the number of keys (like CountDistinctUpTo)
     */
+  @Deprecated
   class MultiArraySet[T: Ordering](dt: DataType = StringType, maxKeys: Int = -1)
       extends UserDefinedAggregateFunction {
 
@@ -159,6 +164,7 @@ object SparkUDAFs {
   /**
     * Merge maps of kind string -> set<string>
     */
+  @Deprecated
   class MapSetMerge extends UserDefinedAggregateFunction {
 
     def inputSchema: StructType = new StructType().add("key", dataType)
@@ -225,6 +231,7 @@ object SparkUDAFs {
     * Counts number of distinct records, but only up to a preset amount -
     * more efficient than an unbounded count
     */
+  @Deprecated
   class CountDistinctUpTo(maxItems: Int = -1)
       extends UserDefinedAggregateFunction {
 
