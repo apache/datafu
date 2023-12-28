@@ -36,7 +36,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import datafu.spark.Aggregators._
 
 @RunWith(classOf[JUnitRunner])
-class AggregatorTests extends FunSuite with DataFrameSuiteBase {
+class TestAggregators extends FunSuite with DataFrameSuiteBase {
 
   import spark.implicits._
 
@@ -95,7 +95,6 @@ class AggregatorTests extends FunSuite with DataFrameSuiteBase {
   }
 
   val mas = udaf(new MultiArraySet[String]())
-  //val mas = udaf(new MultiArraySet())
 
   test("test multiarrayset simple") {
     assertDataFrameEquals(
@@ -152,7 +151,7 @@ class AggregatorTests extends FunSuite with DataFrameSuiteBase {
     spark.sql(
       "insert into table mas_table2 select array('asd2') from (select 1)z")
 
-    val mas2 = new SparkUDAFs.MultiArraySet[String](maxKeys = 2)
+    val mas2 = udaf(new Aggregators.MultiArraySet[String](maxKeys = 2))
 
     assertDataFrameEquals(
       sqlContext.createDataFrame(List(mapExp(Map("dsa" -> 1, "asd" -> 5)))),
@@ -170,7 +169,7 @@ class AggregatorTests extends FunSuite with DataFrameSuiteBase {
       .parallelize(1 to N, 20)
       .toDF("num")
       .selectExpr("array('asd',concat('dsa',num)) as arr")
-    val mas = new SparkUDAFs.MultiArraySet[String](maxKeys = 3)
+    val mas = udaf(new Aggregators.MultiArraySet[String](maxKeys = 3))
     val time1 = System.currentTimeMillis()
     val mp = blah
       .groupBy()
@@ -198,8 +197,6 @@ class AggregatorTests extends FunSuite with DataFrameSuiteBase {
       "insert into table mapmerge_table select map('k1', array('v1')) from (select 1) z")
     spark.sql(
       "insert into table mapmerge_table select map('k2', array('v3')) from (select 1) z")
-
-    spark.table("mapmerge_table").groupBy().agg(mapMerge($"c").as("map_col")).show
 
     assertDataFrameEquals(
       sqlContext.createDataFrame(
@@ -247,13 +244,6 @@ class AggregatorTests extends FunSuite with DataFrameSuiteBase {
         Exp6(Option(4), Option(1)),
         Exp6(Option(2), Option(1))
       ))
-      
- inputDF
-      .groupBy("col_ord")
-      .agg(countDistinctUpTo2($"col_grp").as("col_grp"))
-      .show
-  
-  results2DF.show
       
     assertDataFrameEquals(results3DF,
                           inputDF

@@ -26,7 +26,13 @@ import scala.reflect.runtime.universe._
 import scala.collection.mutable.{Map, Set}
 import scala.reflect.ClassTag
 
+/**
+ * The implementations here reuse one of the buffers in the merge methods; if this isn't safe it needs to be changed
+ */
 object Aggregators {
+
+  val ss = SparkSession.builder.getOrCreate()
+  import ss.implicits._
 
   /**
    * Like Google's MultiSets.
@@ -48,8 +54,6 @@ object Aggregators {
       buffer1
     }
 
-    val ss = SparkSession.builder.getOrCreate()
-    import ss.implicits._
     override def finish(reduction: Map[String, Int]): Map[String, Int] = reduction
 
     def bufferEncoder: Encoder[Map[String, Int]] = implicitly[Encoder[Map[String, Int]]]
@@ -92,8 +96,12 @@ object Aggregators {
       }
     }
     override def reduce(buffer: Map[IN, Int], newItem: Array[IN]): Map[IN, Int] = {
-      for (i <- newItem.iterator) {
-        buffer.put(i, buffer.getOrElse(i, 0) + 1)
+      if (newItem == null) {
+        buffer
+      } else {
+        for (i <- newItem.iterator) {
+          buffer.put(i, buffer.getOrElse(i, 0) + 1)
+        }
       }
       limitKeys(buffer, 3)
     }
@@ -105,13 +113,13 @@ object Aggregators {
       limitKeys(buffer1, 3)
     }
 
-    override def finish(reduction: Map[IN, Int]): Map[IN, Int] = reduction
+    override def finish(reduction: Map[IN, Int]): Map[IN, Int] = limitKeys(reduction)
 
     implicit val inEncoder : Encoder[IN] = Encoders.kryo[IN]
 
-    def bufferEncoder: Encoder[Map[IN, Int]] = implicitly(ExpressionEncoder[Map[IN, Int]])
+    def bufferEncoder: Encoder[Map[IN, Int]] = implicitly[Encoder[Map[IN, Int]]]
 
-    def outputEncoder: Encoder[Map[IN, Int]] = implicitly(ExpressionEncoder[Map[IN, Int]])
+    def outputEncoder: Encoder[Map[IN, Int]] = implicitly[Encoder[Map[IN, Int]]]
   }
 
   // ----------------------------------------------------------------------------------------
@@ -119,15 +127,20 @@ object Aggregators {
   /**
    * Merge maps of kind string -> set<string>
    */
-  class MapSetMerge extends Aggregator[Map[String, Array[String]], Map[String, Set[String]], Map[String, Array[String]]] with Serializable {
+  class MapSetMerge extends Aggregator[Map[String, Array[String]], Map[String, scala.collection.immutable.Set[String]], Map[String, Array[String]]] with Serializable {
 
+    import scala.collection.immutable.Set
       override def zero: Map[String, Set[String]] = Map[String, Set[String]]()
 
       override def reduce(buffer: Map[String, Set[String]], newItem: Map[String, Array[String]]) : Map[String, Set[String]] = {
-        for (entry <- newItem.iterator) {
-            buffer.getOrElse(entry._1, Set[String]()) ++= entry._2
+        if (newItem == null) {
+          buffer
+        } else {
+          for (entry <- newItem.iterator) {
+            buffer.put(entry._1, buffer.getOrElse(entry._1, Set[String]()) ++ entry._2)
+          }
+          buffer
         }
-        buffer
       }
 
       override def merge(buffer1: Map[String, Set[String]], buffer2: Map[String, Set[String]]): Map[String, Set[String]] = {
@@ -150,18 +163,11 @@ object Aggregators {
         result
       }
 
-      val ss = SparkSession.builder.getOrCreate()
+     implicit val setEncoder = Encoders.kryo[Set[String]]
 
-      import ss.implicits._
+      def bufferEncoder= implicitly[Encoder[Map[String,Set[String]]]]
 
-     // implicit val setEncoder : Encoder[Set[String]] = Encoders.kryo[Set[String]]
-
-    //implicit val setEncoder : Encoder[Set[String]] = implicitly[Encoder[Set[String]]]
-    //implicit val arrayEncoder : Encoder[Array[String]] = Encoders.kryo[Array[String]]
-
-      def bufferEncoder: Encoder[Map[String, Set[String]]] = implicitly[Encoder[Map[String,Set[String]]]]
-      //def bufferEncoder: Encoder[Map[String, Set[String]]] = implicitly(ExpressionEncoder[Map[String, Set[String]]])
-      def outputEncoder: Encoder[Map[String, Array[String]]] = implicitly(ExpressionEncoder[Map[String, Array[String]]])
+      def outputEncoder = implicitly[Encoder[Map[String, Array[String]]]]
     }
 
   // ----------------------------------------------------------------------------------------
@@ -196,13 +202,9 @@ object Aggregators {
 
     override def finish(reduction: Set[String]): Int = reduction.size
 
-    val ss = SparkSession.builder.getOrCreate()
-    import ss.implicits._
-
     def bufferEncoder: Encoder[Set[String]] = Encoders.kryo[Set[String]]
     //def bufferEncoder: Encoder[Set[String]] = implicitly[Encoder[Set[String]]]
 
-    //def bufferEncoder: Encoder[Set[String]] = ExpressionEncoder()
     def outputEncoder: Encoder[Int] = Encoders.scalaInt
   }
 }
