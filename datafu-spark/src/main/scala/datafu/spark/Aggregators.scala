@@ -18,7 +18,6 @@
  */
 package datafu.spark
 
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.apache.spark.sql.expressions.Aggregator
 
@@ -27,7 +26,11 @@ import scala.collection.mutable.{Map, Set}
 import scala.reflect.ClassTag
 
 /**
- * The implementations here reuse one of the buffers in the merge methods; if this isn't safe it needs to be changed
+ * This file contains UDAFs which extend the Aggregator class.
+ * They were migrated from previous implementations which used UserDefinedAggregateFunction
+ *
+ * The implementations below reuse the intermediate buffer in the merge function
+ * ( see https://stackoverflow.com/questions/77713959/can-you-reuse-one-of-the-buffers-in-the-merge-method-of-spark-aggregators )
  */
 object Aggregators {
 
@@ -37,6 +40,7 @@ object Aggregators {
   /**
    * Like Google's MultiSets.
    * Aggregate function that creates a map of key to its count.
+   * Expects as input a column of type String
    */
   class MultiSet extends Aggregator[String, Map[String, Int], Map[String, Int]] with Serializable {
     
@@ -102,8 +106,8 @@ object Aggregators {
         for (i <- newItem.iterator) {
           buffer.put(i, buffer.getOrElse(i, 0) + 1)
         }
+        limitKeys(buffer, 3)
       }
-      limitKeys(buffer, 3)
     }
 
     override def merge(buffer1: Map[IN, Int], buffer2: Map[IN, Int]): Map[IN, Int] = {
@@ -125,7 +129,7 @@ object Aggregators {
   // ----------------------------------------------------------------------------------------
 
   /**
-   * Merge maps of kind string -> set<string>
+   * Performs a deep merge of maps of kind string -> set<string>
    */
   class MapSetMerge extends Aggregator[Map[String, Array[String]], Map[String, scala.collection.immutable.Set[String]], Map[String, Array[String]]] with Serializable {
 
@@ -186,24 +190,23 @@ object Aggregators {
     }
 
     // it doesn't matter which items get put in our set if we've reached the maximum
-    override def merge(buffer1: Set[String], buffer2: Set[String]): Set[String] = {
-      if (buffer1.size >= maxItems) {
-        buffer1
-      } else if (buffer2.size >= maxItems) {
-        buffer2
+    override def merge(b1: Set[String], b2: Set[String]): Set[String] = {
+      if (b1.size >= maxItems) {
+        b1
+      } else if (b2.size >= maxItems) {
+        b2
       } else {
-        val it = buffer2.iterator
-        while (buffer1.size < maxItems && it.hasNext) {
-          buffer1 += it.next
+        val it = b2.iterator
+        while (b1.size < maxItems && it.hasNext) {
+          b1 += it.next
         }
-        buffer1
+        b1
       }
     }
 
     override def finish(reduction: Set[String]): Int = reduction.size
 
     def bufferEncoder: Encoder[Set[String]] = Encoders.kryo[Set[String]]
-    //def bufferEncoder: Encoder[Set[String]] = implicitly[Encoder[Set[String]]]
 
     def outputEncoder: Encoder[Int] = Encoders.scalaInt
   }
