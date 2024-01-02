@@ -35,6 +35,7 @@ import scala.reflect.ClassTag
 object Aggregators {
 
   val ss = SparkSession.builder.getOrCreate()
+
   import ss.implicits._
 
   /**
@@ -43,10 +44,10 @@ object Aggregators {
    * Expects as input a column of type String
    */
   class MultiSet extends Aggregator[String, Map[String, Int], Map[String, Int]] with Serializable {
-    
+
     override def zero: Map[String, Int] = Map[String, Int]()
 
-    override def reduce(buffer: Map[String, Int], newItem: String) : Map[String, Int] = {
+    override def reduce(buffer: Map[String, Int], newItem: String): Map[String, Int] = {
       buffer.put(newItem, buffer.getOrElse(newItem, 0) + 1)
       buffer
     }
@@ -61,6 +62,7 @@ object Aggregators {
     override def finish(reduction: Map[String, Int]): Map[String, Int] = reduction
 
     def bufferEncoder: Encoder[Map[String, Int]] = implicitly[Encoder[Map[String, Int]]]
+
     def outputEncoder: Encoder[Map[String, Int]] = implicitly[Encoder[Map[String, Int]]]
   }
 
@@ -71,7 +73,7 @@ object Aggregators {
    * There is an extra option to limit the number of keys (like @CountDistinctUpTo)
    */
 
-  class MultiArraySet[IN : Ordering : TypeTag]( maxKeys: Int = -1)(implicit t:ClassTag[IN]) extends Aggregator[Array[IN], Map[IN, Int], Map[IN, Int]] with Serializable {
+  class MultiArraySet[IN: Ordering : TypeTag](maxKeys: Int = -1)(implicit t: ClassTag[IN]) extends Aggregator[Array[IN], Map[IN, Int], Map[IN, Int]] with Serializable {
 
     override def zero: Map[IN, Int] = Map[IN, Int]()
 
@@ -99,6 +101,7 @@ object Aggregators {
         mp
       }
     }
+
     override def reduce(buffer: Map[IN, Int], newItem: Array[IN]): Map[IN, Int] = {
       if (newItem == null) {
         buffer
@@ -119,7 +122,7 @@ object Aggregators {
 
     override def finish(reduction: Map[IN, Int]): Map[IN, Int] = limitKeys(reduction)
 
-    implicit val inEncoder : Encoder[IN] = Encoders.kryo[IN]
+    implicit val inEncoder: Encoder[IN] = Encoders.kryo[IN]
 
     def bufferEncoder: Encoder[Map[IN, Int]] = implicitly[Encoder[Map[IN, Int]]]
 
@@ -134,45 +137,46 @@ object Aggregators {
   class MapSetMerge extends Aggregator[Map[String, Array[String]], Map[String, scala.collection.immutable.Set[String]], Map[String, Array[String]]] with Serializable {
 
     import scala.collection.immutable.Set
-      override def zero: Map[String, Set[String]] = Map[String, Set[String]]()
 
-      override def reduce(buffer: Map[String, Set[String]], newItem: Map[String, Array[String]]) : Map[String, Set[String]] = {
-        if (newItem == null) {
-          buffer
-        } else {
-          for (entry <- newItem.iterator) {
-            buffer.put(entry._1, buffer.getOrElse(entry._1, Set[String]()) ++ entry._2)
-          }
-          buffer
+    override def zero: Map[String, Set[String]] = Map[String, Set[String]]()
+
+    override def reduce(buffer: Map[String, Set[String]], newItem: Map[String, Array[String]]): Map[String, Set[String]] = {
+      if (newItem == null) {
+        buffer
+      } else {
+        for (entry <- newItem.iterator) {
+          buffer.put(entry._1, buffer.getOrElse(entry._1, Set[String]()) ++ entry._2)
         }
+        buffer
       }
-
-      override def merge(buffer1: Map[String, Set[String]], buffer2: Map[String, Set[String]]): Map[String, Set[String]] = {
-        for (entry <- buffer2.iterator) {
-          if (buffer1.isDefinedAt(entry._1)) {
-            buffer1(entry._1) ++= entry._2
-          } else {
-            buffer1(entry._1) = entry._2
-          }
-        }
-        buffer1
-      }
-
-      override def finish(reduction: Map[String, Set[String]]): Map[String, Array[String]] = {
-        val result = Map[String, Array[String]]()
-
-        for (entry <- reduction.iterator) {
-          result.put(entry._1, entry._2.toArray)
-        }
-        result
-      }
-
-     implicit val setEncoder = Encoders.kryo[Set[String]]
-
-      def bufferEncoder= implicitly[Encoder[Map[String,Set[String]]]]
-
-      def outputEncoder = implicitly[Encoder[Map[String, Array[String]]]]
     }
+
+    override def merge(buffer1: Map[String, Set[String]], buffer2: Map[String, Set[String]]): Map[String, Set[String]] = {
+      for (entry <- buffer2.iterator) {
+        if (buffer1.isDefinedAt(entry._1)) {
+          buffer1(entry._1) ++= entry._2
+        } else {
+          buffer1(entry._1) = entry._2
+        }
+      }
+      buffer1
+    }
+
+    override def finish(reduction: Map[String, Set[String]]): Map[String, Array[String]] = {
+      val result = Map[String, Array[String]]()
+
+      for (entry <- reduction.iterator) {
+        result.put(entry._1, entry._2.toArray)
+      }
+      result
+    }
+
+    implicit val setEncoder = Encoders.kryo[Set[String]]
+
+    def bufferEncoder = implicitly[Encoder[Map[String, Set[String]]]]
+
+    def outputEncoder = implicitly[Encoder[Map[String, Array[String]]]]
+  }
 
   // ----------------------------------------------------------------------------------------
 

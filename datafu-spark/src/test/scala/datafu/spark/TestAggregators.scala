@@ -41,10 +41,10 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
   import spark.implicits._
 
   /**
-    * taken from https://github.com/holdenk/spark-testing-base/issues/234#issuecomment-390150835
-    *
-    * Solves problem with Hive in Spark 2.3.0 in spark-testing-base
-    */
+   * taken from https://github.com/holdenk/spark-testing-base/issues/234#issuecomment-390150835
+   *
+   * Solves problem with Hive in Spark 2.3.0 in spark-testing-base
+   */
   override def conf: SparkConf =
     super.conf.set(CATALOG_IMPLEMENTATION.key, "hive")
 
@@ -58,34 +58,35 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
 
   lazy val inputRDD = sc.parallelize(
     Seq(Row("a", 1, "asd1"),
-        Row("a", 2, "asd2"),
-        Row("a", 3, "asd3"),
-        Row("b", 1, "asd4")))
+      Row("a", 2, "asd2"),
+      Row("a", 3, "asd3"),
+      Row("b", 1, "asd4")))
 
   lazy val df =
     sqlContext.createDataFrame(inputRDD, StructType(inputSchema)).cache
 
   case class mapExp(map_col: Map[String, Int])
+
   case class mapArrExp(map_col: Map[String, Array[String]])
 
   lazy val defaultDbLocation = spark.sql("describe database default").toDF
-	.collect()
-	.filter(_.getString(0) == "Location")(0)(1)
-	.toString.replace("file:", "")
+    .collect()
+    .filter(_.getString(0) == "Location")(0)(1)
+    .toString.replace("file:", "")
 
-  def deleteLeftoverFiles(table : String) : Unit = {
-   
-	val tablePath = Paths.get(defaultDbLocation + File.separator + table)
-	
-	// sanity check - only delete files if the path seems to be to a Hive warehouse
-	if (defaultDbLocation.endsWith("warehouse") && Files.exists(tablePath)) Files.walkFileTree(tablePath, new SimpleFileVisitor[Path] {
-      		override def visitFile(path: Path, attrs: BasicFileAttributes): FileVisitResult = {
-        		Files.delete(path)
-        		FileVisitResult.CONTINUE
-      		}
-    	}
-  )
- }
+  def deleteLeftoverFiles(table: String): Unit = {
+
+    val tablePath = Paths.get(defaultDbLocation + File.separator + table)
+
+    // sanity check - only delete files if the path seems to be to a Hive warehouse
+    if (defaultDbLocation.endsWith("warehouse") && Files.exists(tablePath)) Files.walkFileTree(tablePath, new SimpleFileVisitor[Path] {
+      override def visitFile(path: Path, attrs: BasicFileAttributes): FileVisitResult = {
+        Files.delete(path)
+        FileVisitResult.CONTINUE
+      }
+    }
+    )
+  }
 
   test("test multiset simple") {
     val ms = udaf(new MultiSet())
@@ -110,19 +111,19 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
     // end case
     spark.sql("drop table if exists mas_table")
     deleteLeftoverFiles("mas_table")
-    	
+
     spark.sql("create table mas_table (arr array<string>)")
     spark.sql(
       "insert overwrite table mas_table select case when 1=2 then array('asd') end " +
-        "from (select 1)z")
+        "from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
 
     val expected = sqlContext.createDataFrame(List(mapExp(Map())))
 
@@ -139,17 +140,17 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
 
     spark.sql("create table mas_table2 (arr array<string>)")
     spark.sql(
-      "insert overwrite table mas_table2 select array('asd','dsa') from (select 1)z")
+      "insert overwrite table mas_table2 select array('asd','dsa') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd','abc') from (select 1)z")
+      "insert into table mas_table2 select array('asd','abc') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)z")
+      "insert into table mas_table2 select array('asd') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)z")
+      "insert into table mas_table2 select array('asd') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)z")
+      "insert into table mas_table2 select array('asd') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd2') from (select 1)z")
+      "insert into table mas_table2 select array('asd2') from (select 1)")
 
     val mas2 = udaf(new Aggregators.MultiArraySet[String](maxKeys = 2))
 
@@ -185,7 +186,7 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
   }
 
   test("test mapmerge") {
-    val mapMerge = udaf( new MapSetMerge())
+    val mapMerge = udaf(new MapSetMerge())
 
     spark.sql("drop table if exists mapmerge_table")
     deleteLeftoverFiles("mapmerge_table")
@@ -206,6 +207,7 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
   }
 
   case class Exp5(col_grp: String, col_ord: Option[Int])
+
   case class Exp6(col_ord: Option[Int], col_grp: Option[Int])
 
   test("countDistinctUpTo") {
@@ -237,27 +239,27 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
         Exp5("a", Option(4))
       ))
 
- val results2DF = sqlContext.createDataFrame(
+    val results2DF = sqlContext.createDataFrame(
       List(
-      	Exp6(Option(1), Option(2)),
-      	Exp6(Option(3), Option(1)),
+        Exp6(Option(1), Option(2)),
+        Exp6(Option(3), Option(1)),
         Exp6(Option(4), Option(1)),
         Exp6(Option(2), Option(1))
       ))
-      
+
     assertDataFrameEquals(results3DF,
-                          inputDF
-                            .groupBy("col_grp")
-                            .agg(countDistinctUpTo3($"col_ord").as("col_ord")))
+      inputDF
+        .groupBy("col_grp")
+        .agg(countDistinctUpTo3($"col_ord").as("col_ord")))
 
     assertDataFrameEquals(results6DF,
-                          inputDF
-                            .groupBy("col_grp")
-                            .agg(countDistinctUpTo6($"col_ord").as("col_ord")))
-                            
-       assertDataFrameEquals(results2DF,inputDF
-                            .groupBy("col_ord")
-                            .agg(countDistinctUpTo2($"col_grp").as("col_grp")))
+      inputDF
+        .groupBy("col_grp")
+        .agg(countDistinctUpTo6($"col_ord").as("col_ord")))
+
+    assertDataFrameEquals(results2DF, inputDF
+      .groupBy("col_ord")
+      .agg(countDistinctUpTo2($"col_grp").as("col_grp")))
   }
 
 

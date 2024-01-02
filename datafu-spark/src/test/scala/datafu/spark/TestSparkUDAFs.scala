@@ -114,15 +114,15 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
     spark.sql("create table mas_table (arr array<string>)")
     spark.sql(
       "insert overwrite table mas_table select case when 1=2 then array('asd') end " +
-        "from (select 1)z")
+        "from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
     spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)z")
+      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
 
     val expected = sqlContext.createDataFrame(List(mapExp(Map())))
 
@@ -139,17 +139,17 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
 
     spark.sql("create table mas_table2 (arr array<string>)")
     spark.sql(
-      "insert overwrite table mas_table2 select array('asd','dsa') from (select 1)z")
+      "insert overwrite table mas_table2 select array('asd','dsa') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd','abc') from (select 1)z")
+      "insert into table mas_table2 select array('asd','abc') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)z")
+      "insert into table mas_table2 select array('asd') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)z")
+      "insert into table mas_table2 select array('asd') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)z")
+      "insert into table mas_table2 select array('asd') from (select 1)")
     spark.sql(
-      "insert into table mas_table2 select array('asd2') from (select 1)z")
+      "insert into table mas_table2 select array('asd2') from (select 1)")
 
     val mas2 = new SparkUDAFs.MultiArraySet[String](maxKeys = 2)
 
