@@ -1,3 +1,15 @@
+# 2.0.0
+
+Improvements
+
+* Spark 3.0.0 - 3.1.3 supported (DATAFU-169)
+* New Aggregators replace deprecated UserDefinedAggregateFunction for  (DATAFU-173)
+ 
+Breaking changes
+
+* Spark 2.x no longer supported
+
+
 # 1.8.0
 
 Improvements
