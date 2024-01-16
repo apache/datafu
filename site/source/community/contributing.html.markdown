@@ -74,8 +74,8 @@ To run a single project's test - for example, for DataFu Pig only:
 
 To run a specific set of tests from the command line, you can define the `test.single` system property with a value matching the test class you want to run.  For example, to run all tests defined in the `QuantileTests` test class for DataFu Pig:
 
-    ./gradlew :datafu-pig:test -Dtest.single=QuantileTests
+    ./gradlew :datafu-pig:test --tests QuantileTests
 
 You can similarly run a specific Hourglass test like so:
 
-    ./gradlew :datafu-hourglass:test -Dtest.single=PartitionCollapsingTests
+    ./gradlew :datafu-hourglass:test --tests PartitionCollapsingTests

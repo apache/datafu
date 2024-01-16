@@ -1,6 +1,6 @@
 ---
 title: Apache DataFu Spark - Getting Started
-version: 1.8.0
+version: 2.0.0
 section_name: Getting Started
 license: >
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -22,16 +22,34 @@ license: >
 # DataFu Spark
 
 Apache DataFu Spark is a collection of utils and user-defined functions for working with large scale data in [Apache Spark](http://spark.apache.org/).
+<br>
+<br>
+
+## Compatibility Matrix
+
+This matrix represents versions of Spark that DataFu has been compiled and tested on. Some/many methods work on unsupported versions as well.
+<br>
+<br>
+
+| <u>DataFu | <u>Spark |
+| :---: | :-----: |
+| 1.7.0 | 2.2.0 to 2.2.2, 2.3.0 to 2.3.2 and 2.4.0 to 2.4.3 |
+| 1.8.0 | 2.2.3, 2.3.3, and 2.4.4 to 2.4.5 |
+| 2.0.0 | 3.0.x - 3.1.x |
+| 2.1.0 (unreleased) | 3.2.x and up |
+
+<br>
+## Examples
 
 A list of some of the things you can do with DataFu Spark is given below:
 
-* ["Dedup" a table](https://github.com/apache/datafu/blob/master/datafu-spark/src/main/scala/datafu/spark/SparkDFUtils.scala#L139) - remove duplicates based on a key and ordering (typically a date updated field, to get only the mostly recently updated record).
+* ["Dedup" a table](https://github.com/apache/datafu/blob/main/datafu-spark/src/main/scala/datafu/spark/SparkDFUtils.scala#L139) - remove duplicates based on a key and ordering (typically a date updated field, to get only the mostly recently updated record).
 
-* [Join a table with a numeric field with a table with a range](https://github.com/apache/datafu/blob/master/datafu-spark/src/main/scala/datafu/spark/SparkDFUtils.scala#L361)
+* [Join a table with a numeric field with a table with a range](https://github.com/apache/datafu/blob/main/datafu-spark/src/main/scala/datafu/spark/SparkDFUtils.scala#L361)
 
-* [Do a skewed join between tables](https://github.com/apache/datafu/blob/master/datafu-spark/src/main/scala/datafu/spark/SparkDFUtils.scala#L274) (where the small table is still too big to fit in memory)
+* [Do a skewed join between tables](https://github.com/apache/datafu/blob/main/datafu-spark/src/main/scala/datafu/spark/SparkDFUtils.scala#L274) (where the small table is still too big to fit in memory)
 
-* [Count distinct up to](https://github.com/apache/datafu/blob/master/datafu-spark/src/main/scala/datafu/spark/SparkUDAFs.scala#L224) - an efficient implementation when you just want to verify that a certain minimum of distinct rows appear in a table
+* [Count distinct up to](https://github.com/apache/datafu/blob/main/datafu-spark/src/main/scala/datafu/spark/Aggregators.scala#L187) - an efficient implementation when you just want to verify that a certain minimum of distinct rows appear in a table
 
 * Call Python code from Spark Scala, or Scala code from PySpark
 

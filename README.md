@@ -27,7 +27,7 @@ The project was inspired by the need for stable, well-tested libraries for data 
 
 It consists of three libraries:
 
-* **Apache DataFu Spark**: a collection of utils and user-defined functions for [Apache Spark](http://spark.apache.org/)
+* **[Apache DataFu Spark](https://github.com/apache/datafu/tree/main/datafu-spark)**: a collection of utils and user-defined functions for [Apache Spark](http://spark.apache.org/)
 * **Apache DataFu Pig**: a collection of user-defined functions for [Apache Pig](http://pig.apache.org/)
 * **Apache DataFu Hourglass**: an incremental processing framework for [Apache Hadoop](http://hadoop.apache.org/) in MapReduce
 

@@ -11,7 +11,6 @@ Once you have followed these instructions, you should have:
 * Your public key uploaded to a public keyserver using the `gpg --send-keys` command
 * Your public key listed in the `KEYS` file in this repo
 * Your public key viewable at https://people.apache.org/keys/committer/your-alias.asc
-* Your public key also viewable at https://people.apache.org/keys/group/datafu.asc
 
 After completing this, you should also configure git to use your key for signing.  If your signing key is identified by `01234567`, then you can configure git with:
 
@@ -202,15 +201,16 @@ Now copy the source release files into this directory and commit them.  Within 2
 
 ### Artifacts
 
-To distribute the artifacts, simple select the staged repository for DataFu that you prepared in Nexus and chooose Release.  They should then be available within the next day or so in the [central repository](http://search.maven.org/).
+To distribute the artifacts, simple select the staged repository for DataFu that you prepared in Nexus and choose Release.  They should then be available within the next day or so in the [central repository](http://search.maven.org/).
 
 ### Clean up old releases
 
-Once a source release has been committed to the release path [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu), the source releases under [https://dist.apache.org/repos/dist/dev/datafu](https://dist.apache.org/repos/dist/dev/datafu) can be removed.  Also the older releases under [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu) can be removed, as old releases are archived automatically through a
-separate process.
+Once a source release has been committed to the release path [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu), the source releases under [https://dist.apache.org/repos/dist/dev/datafu](https://dist.apache.org/repos/dist/dev/datafu) can be removed.  Also the older releases under [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu) can be removed, as old releases are archived automatically through a separate process.
 
 ## Updating the docs
 
 After you have released source and binary artifacts, you should add an entry to the DataFu website and update the various places that point to the previous release. You can look at [a previous release's commit](https://github.com/apache/datafu/commit/09a68527f5921e026c04e8e9940ef0466b41a7c0) in order to get an idea of which files need to be changed. Keep in mind that there is one place where the previous version is updated (if you're release 1.6.1 instead of 1.6.0, you need to replace *1.5.0*, not 1.6.0)
 
 After you have made these changes, build the site (and regenerate java/scaladocs) by using [the instructions here.](https://github.com/apache/datafu/blob/main/site/README.md)
+
+After the documentation and site are ready, make an additional git tag for the release with the prefix *v*, like so *v2.0.0*.
