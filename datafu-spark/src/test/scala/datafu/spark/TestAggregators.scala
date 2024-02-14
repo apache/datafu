@@ -158,7 +158,7 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
       sqlContext.createDataFrame(List(mapExp(Map("dsa" -> 1, "asd" -> 5)))),
       spark.table("mas_table2").groupBy().agg(mas2($"arr").as("map_col")))
 
-    val mas1 = new SparkUDAFs.MultiArraySet[String](maxKeys = 1)
+    val mas1 = udaf(new Aggregators.MultiArraySet[String](maxKeys = 1))
     assertDataFrameEquals(
       sqlContext.createDataFrame(List(mapExp(Map("asd" -> 5)))),
       spark.table("mas_table2").groupBy().agg(mas1($"arr").as("map_col")))
@@ -247,17 +247,17 @@ class TestAggregators extends FunSuite with DataFrameSuiteBase {
         Exp6(Option(2), Option(1))
       ))
 
-    assertDataFrameEquals(results3DF,
+    assertDataFrameNoOrderEquals(results3DF,
       inputDF
         .groupBy("col_grp")
         .agg(countDistinctUpTo3($"col_ord").as("col_ord")))
 
-    assertDataFrameEquals(results6DF,
+    assertDataFrameNoOrderEquals(results6DF,
       inputDF
         .groupBy("col_grp")
         .agg(countDistinctUpTo6($"col_ord").as("col_ord")))
 
-    assertDataFrameEquals(results2DF, inputDF
+    assertDataFrameNoOrderEquals(results2DF, inputDF
       .groupBy("col_ord")
       .agg(countDistinctUpTo2($"col_grp").as("col_grp")))
   }
