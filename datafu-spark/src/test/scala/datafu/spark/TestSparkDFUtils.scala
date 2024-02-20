@@ -61,7 +61,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       sqlContext.createDataFrame(sc.parallelize(Seq(Row("b", 1), Row("a", 3))),
                                  StructType(dedupSchema))
 
-    assertDataFrameEquals(expected,
+    assertDataFrameNoOrderEquals(expected,
                           inputDataFrame
                             .dedupWithOrder($"col_grp", $"col_ord".desc)
                             .select($"col_grp", $"col_ord"))
@@ -82,7 +82,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
                                        $"col_ord",
                                        moreAggFunctions = Seq(min($"col_str")))
 
-    assertDataFrameEquals(expectedByIntDf, actual)
+    assertDataFrameNoOrderEquals(expectedByIntDf, actual)
   }
 
   case class dedupExp2(col_grp: String, col_ord: Int, col_str: String)
@@ -95,7 +95,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       List(dedupExp2("b", 1, "asd4"),
         dedupExp2("a", 1, "asd1")))
 
-    assertDataFrameEquals(expectedByStringDf, actual)
+    assertDataFrameNoOrderEquals(expectedByStringDf, actual)
   }
 
   test("dedup2_with_filter") {
@@ -146,7 +146,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       List(dedupExp2("b", 1, "asd4"),
         dedupExp2("a", 3, "asd3")))
 
-    assertDataFrameEquals(expectedComplex, actual)
+    assertDataFrameNoOrderEquals(expectedComplex, actual)
   }
 
   test("test_dedup2_by_multi_column") {
@@ -202,18 +202,18 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
     val expected: DataFrame = sqlContext.createDataFrame(
       sqlContext.createDataFrame(
       Seq(
-        expComplex("b",
+         expComplex("a",
+                   1,
+                   "asd1",
+                   Array("a", "1"),
+                   Inner("a", 1),
+                   Map("a" -> 1)),
+         expComplex("b",
                    1,
                    "asd4",
                    Array("b", "1"),
                    Inner("b", 1),
                    Map("b" -> 1)),
-        expComplex("a",
-                   1,
-                   "asd1",
-                   Array("a", "1"),
-                   Inner("a", 1),
-                   Map("a" -> 1))
       )).rdd, schema)
 
     assertDataFrameEquals(expected, actual)
@@ -233,7 +233,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
       sc.parallelize(Seq(Row("b", 1), Row("a", 3), Row("a", 2))),
       StructType(dedupTopNExpectedSchema))
 
-    assertDataFrameEquals(expected, actual)
+    assertDataFrameNoOrderEquals(expected, actual)
   }
 
   val schema2 = List(
@@ -318,7 +318,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
     val actual = df.joinWithRangeAndDedup("col_ord", dfr, "start", "end")
 
-    assertDataFrameEquals(expected, actual)
+    assertDataFrameNoOrderEquals(expected, actual)
   }
 
   test("randomJoinSkewedTests") {

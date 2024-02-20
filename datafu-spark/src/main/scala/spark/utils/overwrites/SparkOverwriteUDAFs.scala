@@ -40,9 +40,19 @@ object SparkOverwriteUDAFs {
 }
 
 case class MinValueByKey(child1: Expression, child2: Expression)
-    extends ExtramumValueByKey(child1, child2, LessThan)
+    extends ExtramumValueByKey(child1, child2, LessThan) {
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): MinValueByKey = {
+    copy(child1=newChildren.head, child2=newChildren.tail.head)
+  }
+}
 case class MaxValueByKey(child1: Expression, child2: Expression)
-    extends ExtramumValueByKey(child1, child2, GreaterThan)
+    extends ExtramumValueByKey(child1, child2, GreaterThan) {
+
+  override def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): MaxValueByKey = {
+    copy(child1=newChildren.head, child2=newChildren.tail.head)
+  }
+}
 
 abstract class ExtramumValueByKey(
     child1: Expression,
@@ -124,6 +134,10 @@ case class CollectLimitedList(child: Expression,
   override def prettyName: String = "collect_limited_list"
 
   override def eval(buffer: ArrayBuffer[Any]): Any = new GenericArrayData(buffer.toArray)
+  
+  override def withNewChildInternal(newChild: Expression): Expression = {
+    copy(child = newChild)
+  }
 }
 
 /** *
