@@ -41,4 +41,4 @@ jobs:
 
     - name: Build and run tests
       run:
-       ./datafu-spark/build_and_test_spark.sh
+       ./datafu-spark/build_and_test_spark.sh -q

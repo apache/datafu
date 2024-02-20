@@ -197,7 +197,7 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
     val schema = df.drop("map_col_blah").schema
 
     val actual = df.dedupWithCombiner($"col_grp", expr("cast(concat('-',col_ord) as int)"))
-      .drop("map_col_blah")
+      .drop("map_col_blah").orderBy("col_grp")
 
     val expected: DataFrame = sqlContext.createDataFrame(
       sqlContext.createDataFrame(
