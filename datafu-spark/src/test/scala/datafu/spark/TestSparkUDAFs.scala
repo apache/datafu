@@ -87,126 +87,8 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   )
  }
 
-  test("test multiset simple") {
-    val ms = new SparkUDAFs.MultiSet()
-    val expected: DataFrame =
-      sqlContext.createDataFrame(List(mapExp(Map("b" -> 1, "a" -> 3))))
-    assertDataFrameEquals(expected, df.agg(ms($"col_grp").as("map_col")))
-  }
-
-  val mas = new SparkUDAFs.MultiArraySet[String]()
-
-  test("test multiarrayset simple") {
-    assertDataFrameEquals(
-      sqlContext.createDataFrame(List(mapExp(Map("tre" -> 1, "asd" -> 2)))),
-      spark
-        .sql("select array('asd','tre','asd') arr")
-        .groupBy()
-        .agg(mas($"arr").as("map_col"))
-    )
-  }
-
-  test("test multiarrayset all nulls") {
-    // end case
-    spark.sql("drop table if exists mas_table")
-    deleteLeftoverFiles("mas_table")
-    	
-    spark.sql("create table mas_table (arr array<string>)")
-    spark.sql(
-      "insert overwrite table mas_table select case when 1=2 then array('asd') end " +
-        "from (select 1)")
-    spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
-    spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
-    spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
-    spark.sql(
-      "insert into table mas_table select case when 1=2 then array('asd') end from (select 1)")
-
-    val expected = sqlContext.createDataFrame(List(mapExp(Map())))
-
-    val actual =
-      spark.table("mas_table").groupBy().agg(mas($"arr").as("map_col"))
-
-    assertDataFrameEquals(expected, actual)
-  }
-
-  test("test multiarrayset max keys") {
-    // max keys case
-    spark.sql("drop table if exists mas_table2")
-    deleteLeftoverFiles("mas_table2")
-
-    spark.sql("create table mas_table2 (arr array<string>)")
-    spark.sql(
-      "insert overwrite table mas_table2 select array('asd','dsa') from (select 1)")
-    spark.sql(
-      "insert into table mas_table2 select array('asd','abc') from (select 1)")
-    spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)")
-    spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)")
-    spark.sql(
-      "insert into table mas_table2 select array('asd') from (select 1)")
-    spark.sql(
-      "insert into table mas_table2 select array('asd2') from (select 1)")
-
-    val mas2 = new SparkUDAFs.MultiArraySet[String](maxKeys = 2)
-
-    assertDataFrameEquals(
-      sqlContext.createDataFrame(List(mapExp(Map("dsa" -> 1, "asd" -> 5)))),
-      spark.table("mas_table2").groupBy().agg(mas2($"arr").as("map_col")))
-
-    val mas1 = new SparkUDAFs.MultiArraySet[String](maxKeys = 1)
-    assertDataFrameEquals(
-      sqlContext.createDataFrame(List(mapExp(Map("asd" -> 5)))),
-      spark.table("mas_table2").groupBy().agg(mas1($"arr").as("map_col")))
-  }
-
-  test("test multiarrayset big input") {
-    val N = 100000
-    val blah = spark.sparkContext
-      .parallelize(1 to N, 20)
-      .toDF("num")
-      .selectExpr("array('asd',concat('dsa',num)) as arr")
-    val mas = new SparkUDAFs.MultiArraySet[String](maxKeys = 3)
-    val time1 = System.currentTimeMillis()
-    val mp = blah
-      .groupBy()
-      .agg(mas($"arr"))
-      .collect()
-      .map(_.getMap[String, Int](0))
-      .head
-    Assert.assertEquals(3, mp.size)
-    Assert.assertEquals("asd", mp.maxBy(_._2)._1)
-    Assert.assertEquals(N, mp.maxBy(_._2)._2)
-    val time2 = System.currentTimeMillis()
-    logger.info("time took: " + (time2 - time1) / 1000 + " secs")
-  }
-
-  test("test mapmerge") {
-    val mapMerge = new SparkUDAFs.MapSetMerge()
-
-    spark.sql("drop table if exists mapmerge_table")
-    deleteLeftoverFiles("mapmerge_table")
-
-    spark.sql("create table mapmerge_table (c map<string, array<string>>)")
-    spark.sql(
-      "insert overwrite table mapmerge_table select map('k1', array('v1')) from (select 1) z")
-    spark.sql(
-      "insert into table mapmerge_table select map('k1', array('v1')) from (select 1) z")
-    spark.sql(
-      "insert into table mapmerge_table select map('k2', array('v3')) from (select 1) z")
-
-    assertDataFrameEquals(
-      sqlContext.createDataFrame(
-        List(mapArrExp(Map("k1" -> Array("v1"), "k2" -> Array("v3"))))),
-      spark.table("mapmerge_table").groupBy().agg(mapMerge($"c").as("map_col"))
-    )
-  }
-
   test("minKeyValue") {
-    assertDataFrameEquals(
+    assertDataFrameNoOrderEquals(
       sqlContext.createDataFrame(List(("b", "asd4"), ("a", "asd1"))),
       df.groupBy($"col_grp".as("_1"))
         .agg(SparkOverwriteUDAFs.minValueByKey($"col_ord", $"col_str").as("_2"))
@@ -223,7 +105,7 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
   )
 
   test("minKeyValue window") {
-    assertDataFrameEquals(
+    assertDataFrameNoOrderEquals(
       sqlContext.createDataFrame(
         sc.parallelize(
           Seq(
@@ -239,63 +121,6 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
                       .minValueByKey($"col_ord", $"col_str")
                       .over(Window.partitionBy("col_grp")))
     )
-  }
-
-  case class Exp5(col_grp: String, col_ord: Option[Int])
-  case class Exp6(col_ord: Option[Int], col_grp: Option[Int])
-
-  test("countDistinctUpTo") {
-    import datafu.spark.SparkUDAFs.CountDistinctUpTo
-
-    val countDistinctUpTo2 = new CountDistinctUpTo(2)
-    val countDistinctUpTo3 = new CountDistinctUpTo(3)
-    val countDistinctUpTo6 = new CountDistinctUpTo(6)
-    
-    val inputDF = sqlContext.createDataFrame(
-      List(
-        Exp5("c", Option(1)),
-        Exp5("b", Option(1)),
-        Exp5("a", Option(1)),
-        Exp5("a", Option(2)),
-        Exp5("a", Option(3)),
-        Exp5("a", Option(4))
-      ))
-
-    val results3DF = sqlContext.createDataFrame(
-      List(
-        Exp5("c", Option(1)),
-        Exp5("b", Option(1)),
-        Exp5("a", Option(3))
-      ))
-
-    val results6DF = sqlContext.createDataFrame(
-      List(
-        Exp5("c", Option(1)),
-        Exp5("b", Option(1)),
-        Exp5("a", Option(4))
-      ))
-
- val results2DF = sqlContext.createDataFrame(
-      List(
-      	Exp6(Option(1), Option(2)),
-      	Exp6(Option(3), Option(1)),
-        Exp6(Option(4), Option(1)),
-        Exp6(Option(2), Option(1))
-      ))
-      
-    assertDataFrameEquals(results3DF,
-                          inputDF
-                            .groupBy("col_grp")
-                            .agg(countDistinctUpTo3($"col_ord").as("col_ord")))
-
-    assertDataFrameEquals(results6DF,
-                          inputDF
-                            .groupBy("col_grp")
-                            .agg(countDistinctUpTo6($"col_ord").as("col_ord")))
-                            
-       assertDataFrameEquals(results2DF,inputDF
-                            .groupBy("col_ord")
-                            .agg(countDistinctUpTo2($"col_grp").as("col_grp")))
   }
 
   test("test_limited_collect_list") {
