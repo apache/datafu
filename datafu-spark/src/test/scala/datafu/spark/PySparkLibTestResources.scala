@@ -27,7 +27,8 @@ class Py4JResource extends PythonResource(PathsResolver.py4j, true)
 object PathsResolver {
   
   val sparkSystemVersion = System.getProperty("datafu.spark.version")
-  
+
+  // take the py4j version from here: https://github.com/apache/spark/blob/master/dev/requirements.txt
   val py4js = Map(
       "3.0.0" -> "0.10.9.7",
       "3.0.1" -> "0.10.9.7",
@@ -35,7 +36,7 @@ object PathsResolver {
       "3.1.3" -> "0.10.9.7"
   )
 
-  val sparkVersion = if (sparkSystemVersion == null) "3.0.0" else sparkSystemVersion
+  val sparkVersion = if (sparkSystemVersion == null) "3.1.3" else sparkSystemVersion
   
   val py4jVersion = py4js.getOrElse(sparkVersion, "0.10.9.7") // our default
   

@@ -17,7 +17,7 @@
  * under the License.
  */
 ext {
-  scalaLibraryVersion = "2.12.10"
+  scalaLibraryVersion = "2.12.15"
   // Extra options for the compiler:
   // -feature: Give detailed warnings about language feature use (rather than just 'there were 4 warnings')
   scalaOptions = "-feature"
