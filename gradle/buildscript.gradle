@@ -21,7 +21,11 @@ repositories {
   repositories {
     maven {
       // For gradle-nexus-plugin
-      url 'https://jcenter.bintray.com/'
+      url 'https://repo.gradle.org/artifactory/libs-releases/'
+    }
+    maven {
+      // For gradle-sweeney-plugin
+      url 'https://plugins.gradle.org/m2/'
     }
   }
 }
