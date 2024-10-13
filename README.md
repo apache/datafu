@@ -116,7 +116,11 @@ To clean up the eclipse files:
 
 ### Using Intellij
 
-If you would like to use Intellij, generate and import the Eclipse files.
+If you would like to use Intellij, please import the base datafu directory as a Gradle project. You may run into the following issues:
+
+* Source/Tests directories not marked - please mark them manually.
+* Tests not identified - add junit manually to the module using Open Module Settings->Libraries
+* When running tests you get _Error scala: Output path ... is shared between_ - change your output path as described [here](https://stackoverflow.com/questions/18920334/output-path-is-shared-between-the-same-module-error)
 
 ### Running the Tests
 
