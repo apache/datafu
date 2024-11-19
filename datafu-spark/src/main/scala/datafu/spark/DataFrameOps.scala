@@ -56,6 +56,9 @@ object DataFrameOps {
                           columnsFilter,
                           columnsFilterKeep)
 
+    def dedupByAllExcept(ignoredColumn: String, aggFunction : String => Column = org.apache.spark.sql.functions.max) : DataFrame =
+      SparkDFUtils.dedupByAllExcept(df, ignoredColumn, aggFunction)
+      
     def flatten(colName: String): DataFrame = SparkDFUtils.flatten(df, colName)
 
     def changeSchema(newScheme: String*): DataFrame =
