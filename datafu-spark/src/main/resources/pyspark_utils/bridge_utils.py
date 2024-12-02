@@ -20,6 +20,7 @@ import os
 from py4j.java_gateway import JavaGateway, GatewayParameters
 from pyspark.conf import SparkConf
 from pyspark.context import SparkContext
+from pyspark.sql import SQLContext
 from pyspark.sql import SparkSession
 
 # use jvm gateway to create a java class instance by full-qualified class name
@@ -63,10 +64,9 @@ class Context(object):
         conf = SparkConf(_jvm = gateway.jvm, _jconf = jconf)
         self.sc = SparkContext(jsc=jsc, gateway=gateway, conf=conf)
 
-        # Spark 2
+        # Spark 3
         self.sparkSession = SparkSession(self.sc, jSparkSession)
-        self.sqlContext = self.sparkSession._wrapped
-
+        self.sqlContext = SQLContext(sparkContext=self.sc, sparkSession=self.sparkSession)
 ctx = None
 
 
