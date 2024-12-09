@@ -455,4 +455,38 @@ class DataFrameOpsTests extends FunSuite with DataFrameSuiteBase {
 
     assertDataFrameEquals(expected, actual)
   }
+  
+  test("test_dedup_by-all_except") {
+
+    val df = spark.createDataFrame(
+      Seq(("a", "a", 1, 2, "aa12", "a"),
+        ("a", "a", 1, 1, "aa11", "a"),
+        ("a", "a", 2, 1, "aa21", "a"),
+        ("a", "b", 3, 2, "ab32", "a"),
+        ("b", "a", 1, 1, "ba11", "a"))
+    ).toDF("col_grp1", "col_grp2", "col_grp3", "col_grp4", "col_grp5", "col_grp6")
+
+    val noChange = df.dedupByAllExcept("col_grp1")
+
+    assertDataFrameNoOrderEquals(df, noChange)
+
+    val df2 = spark.createDataFrame(
+      Seq(("a", "a"),
+        ("b", "a"),
+        ("c", "c"),
+        ("d", "d"),
+        ("e", "e"))
+    ).toDF("col_grp1", "col_grp2")
+
+    val loseRow = df2.dedupByAllExcept("col_grp1")
+
+    val expected = spark.createDataFrame(
+      Seq(("b", "a"),
+        ("c", "c"),
+        ("d", "d"),
+        ("e", "e"))
+    ).toDF("col_grp1", "col_grp2")
+
+   assertDataFrameNoOrderEquals(expected, loseRow)
+  }
 }
