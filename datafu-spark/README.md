@@ -34,19 +34,17 @@ In order to call the datafu-spark API's from Pyspark, you can do the following (
 First, call pyspark with the following parameters
 
 ```bash
-export PYTHONPATH=datafu-spark_2.11-1.8.0.jar
+export PYTHONPATH=datafu-spark_2.12-2.0.0.jar
 
-pyspark --jars datafu-spark_2.11-1.8.0.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.11-1.8.0.jar
+pyspark --jars datafu-spark_2.12-2.0.0.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.12-2.0.0.jar
 ```
 
 The following is an example of calling the Spark version of the datafu _dedup_ method
 
 ```python
-from pyspark_utils.df_utils import PySparkDFUtils
+from pyspark_utils import df_utils
 
-df_utils = PySparkDFUtils()
-
-df_people = sqlContext.createDataFrame([
+df_people = spark.createDataFrame([
      ("a", "Alice", 34),
      ("a", "Sara", 33),
      ("b", "Bob", 36),
@@ -57,12 +55,9 @@ df_people = sqlContext.createDataFrame([
      ("c", "Zoey", 36)],
      ["id", "name", "age"])
 
-func_dedup_res = df_utils.dedup_with_order(dataFrame=df_people, groupCol=df_people.id,
-                                orderCols=[df_people.age.desc(), df_people.name.desc()])
-
-func_dedup_res.registerTempTable("dedup")
-
-func_dedup_res.show()
+df_dedup = df_utils.dedup_with_order(df=df_people, group_col=df_people.id,
+                                     order_cols=[df_people.age.desc(), df_people.name.desc()])
+df_dedup.show()
 ```
 
 This should produce the following output
