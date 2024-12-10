@@ -34,9 +34,9 @@ In order to call the datafu-spark API's from Pyspark, you can do the following (
 First, call pyspark with the following parameters
 
 ```bash
-export PYTHONPATH=datafu-spark_2.11-1.8.0.jar
+export PYTHONPATH=datafu-spark_2.12-2.0.0.jar
 
-pyspark --jars datafu-spark_2.11-1.8.0.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.11-1.8.0.jar
+pyspark --jars datafu-spark_2.12-2.0.0.jar --conf spark.executorEnv.PYTHONPATH=datafu-spark_2.12-2.0.0.jar
 ```
 
 The following is an example of calling the Spark version of the datafu _dedup_ method
