@@ -228,9 +228,11 @@ export PYTHONPATH=datafu-spark_2.11-1.6.0.jarpyspark  --jars datafu-spark_2.11-1
 The following is an example of calling the Spark version of the datafu _dedupWithOrder_ method (taken from the _datafu-spark_ [tests](https://github.com/apache/datafu/blob/master/datafu-spark/src/test/resources/python_tests/df_utils_tests.py))
 
 ```
-from pyspark_utils import df_utils
+from pyspark_utils.df_utils import PySparkDFUtils
 
-df_people = spark.createDataFrame([  
+df_utils = PySparkDFUtils()
+
+df_people = sqlContext.createDataFrame([  
 ...     ("a", "Alice", 34),  
 ...     ("a", "Sara", 33),  
 ...     ("b", "Bob", 36),  
@@ -239,10 +241,9 @@ df_people = spark.createDataFrame([
 ...     ("c", "Esther", 32),  
 ...     ("c", "Fanny", 36),  
 ...     ("c", "Zoey", 36)],  
-...     ["id", "name", "age"])
-...
-...     df_dedup = df_utils.dedup_with_order(df=df_people, group_col=df_people.id, order_cols=[df_people.age.desc(), df_people.name.desc()])
-...     df_dedup.show()
+...     ["id", "name", "age"])func_dedup_res = df_utils.dedup_with_order(dataFrame=df_people, groupCol=df_people.id,orderCols=[df_people.age.desc(), df_people.name.desc()])
+...     func_dedup_res.registerTempTable("dedup")
+...     func_dedup_res.show()
 ```
 
 This should produce the following output:
