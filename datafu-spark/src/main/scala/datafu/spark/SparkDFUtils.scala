@@ -191,7 +191,7 @@ object SparkDFUtils {
     * the same functionality as {@link #dedupWithOrder} but implemented using UDAF to utilize
     * map side aggregation.
     * this function should be used in cases when you expect a large number of rows to get combined,
-    * as they share the same group column.
+    * as they share the same group column, or if you have some groups with extreme skew.
     *
     * @param df DataFrame to operate on
     * @param groupCol column to group by the records
