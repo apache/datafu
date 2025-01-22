@@ -222,7 +222,7 @@ case class CollectNumberOrderedElements(child: Expression, howManyToTake: Expres
 	  SortArray(data, ascending)
   }
 
-  override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
+  protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
     copy(child = newChildren.head)
   }
 }
