@@ -218,7 +218,9 @@ case class CollectNumberOrderedElements(child: Expression, howManyToTake: Expres
         unifiedArray))
   }
 
-  override lazy val evaluateExpression: AttributeReference = data
+  override lazy val evaluateExpression: Expression = {
+	  SortArray(data, ascending)
+  }
 
   override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
     copy(child = newChildren.head)
