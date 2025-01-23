@@ -145,4 +145,33 @@ class UdafTests extends FunSuite with DataFrameSuiteBase {
     Assert.assertEquals(0, rows_different.count())
 
   }
+
+  test("test_collectNumberOrderedElements") {
+    val nums = Seq(1,3,2,5,4,7,6,9,8)
+    val rows = nums.flatMap(x => (1 to x).map(n => (x, "str" + n))).toDF("num", "str")
+
+    import org.apache.spark.sql.functions._
+  
+    val result = rows.groupBy("num").agg(SparkOverwriteUDAFs.collectNumberOrderedElements(col("str"), 4, ascending = false).as("list"))
+
+    val schema = StructType(List(
+      StructField("num", IntegerType, nullable = false),
+      StructField("list", ArrayType(StringType, containsNull = false)
+    )))
+
+    val expected = sqlContext.createDataFrame(
+      sc.parallelize(Seq(
+        Row(1, Seq("str1")),
+        Row(2, Seq("str2", "str1")),
+        Row(3, Seq("str3", "str2", "str1")),
+        Row(4, Seq("str4", "str3", "str2", "str1")),
+        Row(5, Seq("str5", "str4", "str3", "str2")),
+        Row(6, Seq("str6", "str5", "str4", "str3")),
+        Row(7, Seq("str7", "str6", "str5", "str4")),
+        Row(8, Seq("str8", "str7", "str6", "str5")),
+        Row(9, Seq("str9", "str8", "str7", "str6")),
+      )), schema)
+
+    assertDataFrameNoOrderEquals(expected, result)
+  }
 }
