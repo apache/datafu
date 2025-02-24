@@ -143,6 +143,10 @@ class SparkDFUtilsBridge {
     SparkDFUtils.dedupRandomN(df, groupCol, maxSize)
   }
 
+  def dedupByAllExcept(df: DataFrame, ignoredColumn: String): DataFrame = {
+    SparkDFUtils.dedupByAllExcept(df, ignoredColumn, org.apache.spark.sql.functions.max)
+  }
+
   private def convertJavaListToSeq[T](list: JavaList[T]): Seq[T] = {
     scala.collection.JavaConverters
       .asScalaIteratorConverter(list.iterator())

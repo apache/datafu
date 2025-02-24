@@ -95,3 +95,9 @@ dfArray = sqlContext.createDataFrame([
 
 func_explodeArray_res = df_utils.explode_array(df=dfArray, array_col=dfArray.sentence_arr, alias="token")
 func_explodeArray_res.registerTempTable("explodeArray")
+
+func_dedupRandomN_res = df_utils.dedup_random_n(df_people, df_people.id, 1)
+func_dedupRandomN_res.registerTempTable("dedupRandomN")
+
+func_dedupByAllExcept_res = df_utils.dedup_by_all_except(df_people, "age")
+func_dedupByAllExcept_res.registerTempTable("dedupByAllExcept")

@@ -120,6 +120,13 @@ class TestScalaPythonBridge extends FunSuite {
                 "[a,Laura,34,a,34,36], [b,Margaret,36,a,34,36]")
     assertTable("explodeArray",
       "[0.0,WrappedArray(Hi, I heard, about, Spark),Hi,I heard,about,Spark]")
+    assertTable("explodeArray",
+      "[0.0,WrappedArray(Hi, I heard, about, Spark),Hi,I heard,about,Spark]")
+    assertTable("dedupRandomN",
+      "[a,[a,Alice,34]], [b,[b,Bob,36]], [c,[c,David,29]]")
+    assertTable("dedupByAllExcept",
+      "[a,Alice,34], [a,Sara,33], [b,Bob,36], [b,Charlie,30], [c,David,29], [c,Esther,32], [c,Fanny,36], [c,Zoey,36]"
+    )
   }
 
 }
