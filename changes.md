@@ -1,3 +1,20 @@
+# 2.1.0
+
+Additions
+
+* Add dedupByAllExcept method (DATAFU-167)
+* Add collectNumberOrderedElements (DATAFU-176)
+
+Improvements
+
+* Spark 3.0.0 - 3.4.x supported (DATAFU-175, DATAFU-179)
+* Expose dedupRandomN in Python (DATAFU-180)
+
+Breaking changes
+
+* Deprecated Spark UDAFs removed  (DATAFU-174)
+
+
 # 2.0.0
 
 Improvements
