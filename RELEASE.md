@@ -84,7 +84,9 @@ The source tarball needs to be signed.  You can do this either manually or autom
 Please note the following tweaks for signing the source (and binary) tarballs.
 
 	Gradle expects only 8 digits for your GPG key
-	Newer versions of GPG no longer create the file secring.gpg, but Gradle expects this format. See [this answer on Stack Overflow](https://stackoverflow.com/questions/27936119/gradle-uploadarchives-task-unable-to-read-secret-key/39573795#39573795) for instructions.
+	Newer versions of GPG no longer create the file secring.gpg, but Gradle expects this format.
+ 
+See [this answer on Stack Overflow](https://stackoverflow.com/questions/27936119/gradle-uploadarchives-task-unable-to-read-secret-key/39573795#39573795) for instructions on how to export a new secring.gpg.
 	
 The GPG key ID can be found by running `gpg --list-keys`.
 
@@ -97,6 +99,14 @@ This generates a source tarball.
 If you have configured your key information in your `gradle.properties` then you the archive should automatically be signed.  There should now be a corresponding ASC file alongside the tarball and MD5 file.  Otherwise you'll need to sign it manually by running:
 
     gpg --sign --armor --detach-sig build/distribution/source/apache-datafu-sources-*.tgz
+
+If you get this error
+
+	Inappropriate ioctl for device
+
+You can run this command (taken from [this answer on Stack Overflow](https://stackoverflow.com/a/72788147/150992))
+
+	export GPG_TTY=$(tty)
 
 If you have GPG v2 installed then you'll need to use `gpg2` instead.
 
