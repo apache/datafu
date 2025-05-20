@@ -11,7 +11,7 @@ This matrix represents versions of Spark that DataFu has been compiled and teste
 | 1.7.0 | 2.2.0 to 2.2.2, 2.3.0 to 2.3.2 and 2.4.0 to 2.4.3|
 | 1.8.0 | 2.2.3, 2.3.3, and 2.4.4 to 2.4.5|
 | 2.0.0 | 3.0.x - 3.1.x |
-| 2.1.0 (not released yet) | 3.0.x - 3.4.x |
+| 2.1.0 | 3.0.x - 3.4.x |
 
 # Examples
 
