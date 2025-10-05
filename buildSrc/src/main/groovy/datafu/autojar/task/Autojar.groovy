@@ -28,7 +28,7 @@ import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskDependency
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.util.ConfigureUtil
+import org.gradle.util.internal.ConfigureUtil
 
 /**
  * This is the primary Task type used to create Autojar archives.
