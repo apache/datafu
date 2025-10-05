@@ -37,7 +37,7 @@ jobs:
 
     - name: Bootstrap Gradle 5.6.4
       run:
-       ./gradlew -b bootstrap.gradle
+       gradle -b bootstrap.gradle
 
     - name: Build and run tests
       run:
