@@ -66,9 +66,12 @@ jobs:
          distribution: 'adopt'
          cache: 'gradle'
     
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+    
     - name: Bootstrap and Build
       run: |
-        gradle -b bootstrap.gradle
+        ./gradlew -b bootstrap.gradle
         ./gradlew clean assemble
 
     - name: Perform CodeQL Analysis
