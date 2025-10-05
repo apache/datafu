@@ -67,7 +67,7 @@ jobs:
          cache: 'gradle'
     
     - run: |
-       gradle -b bootstrap.gradle
+       gradle --build-file bootstrap.gradle
        ./gradlew clean assemble
 
     - name: Perform CodeQL Analysis
