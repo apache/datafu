@@ -66,9 +66,10 @@ jobs:
          distribution: 'adopt'
          cache: 'gradle'
     
-    - run: |
-       gradle -b bootstrap.gradle
-       ./gradlew clean assemble
+    - name: Bootstrap and Build
+      run: |
+        gradle -b bootstrap.gradle
+        ./gradlew clean assemble
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

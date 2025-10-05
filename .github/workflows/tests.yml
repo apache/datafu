@@ -36,9 +36,7 @@ jobs:
          python-version: '3.7'
 
     - name: Bootstrap Gradle 5.6.4
-      run:
-       gradle -b bootstrap.gradle
+      run: gradle -b bootstrap.gradle
 
     - name: Build and run tests
-      run:
-       ./datafu-spark/build_and_test_spark.sh -q
+      run: ./datafu-spark/build_and_test_spark.sh -q
