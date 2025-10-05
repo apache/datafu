@@ -1,89 +1,87 @@
-<!---
- Licensed to the Apache Software Foundation (ASF) under one or more
- contributor license agreements.  See the NOTICE file distributed with
- this work for additional information regarding copyright ownership.
- The ASF licenses this file to You under the Apache License, Version 2.0
- (the "License"); you may not use this file except in compliance with
- the License.  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
 # Apache DataFu
 
-[![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/datafu)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Apache Jira](https://img.shields.io/badge/ASF%20Jira-DATAFU-brightgreen)](https://issues.apache.org/jira/projects/DATAFU/)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.datafu/datafu-spark_2.12/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.apache.datafu%22)
-[![GitHub Actions Build](https://github.com/apache/datafu/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/apache/datafu/actions/workflows/tests.yml)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/apache/datafu)
+Apache DataFu is a collection of libraries for working with large-scale data in Hadoop.  The project includes libraries for data analysis and data mining.
 
-[Apache DataFu](http://datafu.apache.org) is a collection of libraries for working with large-scale data in Hadoop.
-The project was inspired by the need for stable, well-tested libraries for data mining and statistics.
+## Getting Started
 
-It consists of three libraries:
+### Prerequisites
 
-* **[Apache DataFu Spark](https://github.com/apache/datafu/tree/main/datafu-spark)**: a collection of utils and user-defined functions for [Apache Spark](http://spark.apache.org/)
-* **Apache DataFu Pig**: a collection of user-defined functions for [Apache Pig](http://pig.apache.org/)
-* **Apache DataFu Hourglass**: an incremental processing framework for [Apache Hadoop](http://hadoop.apache.org/) in MapReduce
+* Java 8 or higher
+* Hadoop 2.x or 3.x
+* Gradle 9.x (for building from source)
 
-For more information please visit the website:
+### Installation
 
-* [http://datafu.apache.org/](http://datafu.apache.org/)
+Download the latest release from the [releases page](https://github.com/apache/datafu/releases).
 
-If you'd like to jump in and get started, check out the corresponding guides for each library:
+### Building from Source
 
-* [Apache DataFu Spark - Getting Started](http://datafu.apache.org/docs/spark/getting-started.html)
-* [Apache DataFu Pig - Getting Started](http://datafu.apache.org/docs/datafu/getting-started.html)
-* [Apache DataFu Hourglass - Getting Started](http://datafu.apache.org/docs/hourglass/getting-started.html)
+Clone the repository:
 
-## Blog Posts
+    git clone https://github.com/apache/datafu.git
+    cd datafu
 
-* [Introducing Datafu Spark](https://datafu.apache.org/blog/2021/11/18/introducing-datafu-spark.html)
-* [A Look at PayPal's Contributions to DataFu](http://datafu.apache.org/blog/2019/01/29/a-look-at-paypals-contributions-to-datafu.html)
-* [DataFu's Hourglass: Incremental Data Processing in Hadoop](http://datafu.apache.org/blog/2013/10/03/datafus-hourglass-incremental-data-processing-in-hadoop.html)
-* [DataFu 1.0](http://datafu.apache.org/blog/2013/09/04/datafu-1-0.html)
-* [DataFu: The WD-40 of Big Data](http://datafu.apache.org/blog/2013/01/24/datafu-the-wd-40-of-big-data.html)
-* [Introducing DataFu](http://datafu.apache.org/blog/2012/01/10/introducing-datafu.html)
+Build the project:
 
-## Presentations
+    ./gradlew clean assemble
 
-* [A Brief Tour of DataFu](http://www.slideshare.net/matthewterencehayes/datafu)
-* [Building Data Products at LinkedIn with DataFu](http://www.slideshare.net/matthewterencehayes/building-data-products-at-linkedin-with-datafu)
-* [Hourglass: a Library for Incremental Processing on Hadoop (IEEE BigData 2013)](http://www.slideshare.net/matthewterencehayes/hourglass-a-library-for-incremental-processing-on-hadoop)
+### Running Tests
 
-## Papers
+To run all tests:
 
-* [Hourglass: a Library for Incremental Processing on Hadoop (IEEE BigData 2013)](http://www.slideshare.net/matthewterencehayes/hourglass-27038297)
+    ./gradlew test
 
-## Getting Help
+To run tests for a specific module:
 
-Bugs and feature requests can be filed [here](https://issues.apache.org/jira/browse/DATAFU).  For other help please see the [website](http://datafu.apache.org/).
+    ./gradlew :datafu-pig:test
 
-## Developers
+## Modules
 
-### Source release
+### DataFu Pig
 
-If you are starting from a source release, then you'll want to verify the release is valid and bootstrap the build environment.
+DataFu Pig provides a collection of useful user-defined functions (UDFs) for Apache Pig.
 
-To verify that the archive has the correct SHA512 checksum, the following two commands can be run.  These should produce the same output.
+### DataFu Hourglass
 
-  openssl sha512 < apache-datafu-sources-x.y.z.tgz
-  cat apache-datafu-sources-x.y.z.tgz.sha512
+DataFu Hourglass is a library for incremental data processing in Hadoop.
 
-To verify the archive against its signature, you can run:
+### DataFu Spark
 
-  gpg2 --verify apache-datafu-sources-x.y.z.tgz.asc
+DataFu Spark provides utilities for Apache Spark.
+
+## Documentation
+
+* [DataFu Pig Documentation](http://datafu.apache.org/docs/datafu/)
+* [DataFu Hourglass Documentation](http://datafu.apache.org/docs/hourglass/)
+* [DataFu Spark Documentation](http://datafu.apache.org/docs/spark/)
+
+## Contributing
+
+We welcome contributions! Please see our [contributing guide](http://datafu.apache.org/community/contributing.html) for details.
+
+## License
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
+
+## Support
+
+* [Mailing Lists](http://datafu.apache.org/community/mailing-lists.html)
+* [Issue Tracker](https://issues.apache.org/jira/browse/DATAFU)
+* [Website](http://datafu.apache.org/)
+
+## Release Information
+
+### Building from Source Release
+
+To build DataFu from a source release, first verify the signature:
+
+    gpg2 --verify apache-datafu-sources-x.y.z.tgz.asc
 
 The command above will assume you are verifying `apache-datafu-sources-x.y.z.tgz` and produce "Good signature" if the archive is valid.
 
 To build DataFu from a source release, it is first necessary to download a gradle wrapper script.  This bootstrapping process requires Gradle to be installed on the source machine.  Gradle is available through most package managers or directly from [its website](http://www.gradle.org/).  Once you have installed Gradle and have ensured that the `gradle` is available in your path, you can bootstrap the wrapper with:
 
-    gradle -b bootstrap.gradle
+    gradle -p . bootstrap.gradle
 
 After the bootstrap script has completed, you should find a `gradlew` script in the root of the project.  The regular gradlew instructions below should then be available.
 
@@ -140,5 +138,3 @@ The tests can also be run from within Eclipse.  You'll need to install the TestN
 
 Potential issues and workaround:
 * You may run out of heap when executing tests in Eclipse. To fix this adjust your heap settings for the TestNG plugin. Go to Eclipse->Preferences. Select TestNG->Run/Debug. Add "-Xmx1G" to the JVM args.
-* You may get a "broken pipe" error when running tests.  If so right click on the project, open the TestNG settings, and uncheck "Use project TestNG jar".
-

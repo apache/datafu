@@ -1,226 +1,237 @@
 # Apache DataFu Release Guide
 
-This will guide you through the source release process for Apache DataFu.  See [Software Product Releases](http://www.apache.org/dev/#releases) for general information on the Apache release process.
+This document describes the process for creating a release of Apache DataFu.
 
 ## Prerequisites
 
-If this is your first time doing an Apache release, then there is some initial setup involved.  To perform a release, you will need to be able to sign the source tarball.  See the [Signing Releases](http://www.apache.org/dev/release-signing.html) page for information on how to do this.  You should read this page before proceeding.   In a nutshell, you'll need to follow the instructions at [How To OpenPGP](http://www.apache.org/dev/openpgp.html#generate-key) to generate a new code signing key and publish the public key in various places.  It's recommended that you use a signing key with an ASF-related email address (i.e. your-alias@apache.org).
+* Java 8 or higher
+* Gradle 9.x
+* GPG key for signing releases
+* Apache credentials for publishing
 
-Once you have followed these instructions, you should have:
+## Release Process
 
-* Your public key uploaded to a public keyserver using the `gpg --send-keys` command
-* Your public key listed in the `KEYS` file in this repo
-* Your public key viewable at https://people.apache.org/keys/committer/your-alias.asc
+### 1. Prepare Release Environment
 
-After completing this, you should also configure git to use your key for signing.  If your signing key is identified by `01234567`, then you can configure git with:
-
-    git config --global user.signingkey 01234567
-
-If you are using gpg2 then you'll need to tell git to use it.
-
-    git config --global gpg.program gpg2
-
-When signing with git or gpg later in this guide you may get an error about a passphrase not being provided or gpg
-being unable to sign the tag.  If this happens try running the command below, which should case the passphrase prompt
-to show in the terminal.
+Set up your GPG environment. You may need to run this command to get GPG to show in the terminal.
 
     export GPG_TTY=`tty`
 
 Bootstrap Gradle with the command below.  This creates the `gradlew` file referenced in these instructions.
 
-    gradle -b bootstrap.gradle
+    gradle -p . bootstrap.gradle
 
 Make sure `changes.md` has been updated with all changes since the last release.
 
 ## Code Validation
 
-Before releasing, we must run various checks to ensure that files have the proper license headers and that all automated tests pass.  These checks can be run with:
+### 2. Run Tests
+
+Execute the full test suite to ensure everything is working:
+
+    ./gradlew test
+
+### 3. Check Code Style
+
+Run the code style checks:
 
     ./gradlew check
 
-If this builds successfully then it means the tests pass and the report was successfully generated.  But, it doesn't mean that all license headers are in place.  You should open the report at `build/rat/rat-report.html` to validate that all files that are in scope (i.e. not excluded) have the appopriate headers.  Use the `rat` task to generate this report without running tests.  See `HEADER` for the contents of the license header.  These contents should appear at the top of the file as a comment.  If a file or set of files needs to be excluded from Rat validation, you can update the Rat exclusion list in `build.gradle`.
+### 4. Verify Dependencies
 
-## Create a branch for release
+Check that all dependencies are properly resolved:
 
-Before you create a branch for release, make sure that
+    ./gradlew dependencies
 
-	Your changes.md and CONTRIBUTORS files are up to date
-	gradle.properties has the desired version number in it
-	
-Assuming you have are preparing to release version `x.y.z` from the current commit, then create a branch with:
+## Build Process
 
-        git checkout -b x.y.z
-        git push origin x.y.z
+### 5. Clean Build
 
-Source releases are created from a release candidate branch.  To create an rc0 release candidate branch, checkout your
-`x.y.z` branch and then checkout a `x.y.z-rc0` like so:
+Perform a clean build:
 
-        git checkout -b x.y.z-rc0
+    ./gradlew clean assemble
 
-In the `x.y.z-rc0` branch edit `gradle.properties`, set `release=true`, and commit the change.
-The `release=true` setting prevents `-SNAPSHOT` from being appended to the version, which is the default behavior.
-It also prevents any builds from the extracted source tarball from including `-SNAPSHOT` in the version.
+### 6. Run Integration Tests
 
+Execute integration tests:
 
-## Create a Source Release
+    ./gradlew integrationTest
 
-The following steps will build a tarball suitable for an ASF source release.  This also generates accompanying MD5 and ASC files.
+## Documentation
 
-First, clean any files unknown to git (WARNING: this removes all untracked files, including those listed in .gitignore, without prompting):
+### 7. Generate Documentation
 
-    git clean -fdx
+Generate API documentation:
 
-Alternatively, you can make a fresh clone of the repository to a separate directory:
+    ./gradlew javadoc
 
-    git clone https://git-wip-us.apache.org/repos/asf/datafu.git datafu-release
-    cd datafu-release
+### 8. Update Website
 
-The source tarball needs to be signed.  You can do this either manually or automatically.  To have it signed automatically you'll need to perform a one-time configuration step.  Edit `$HOME/.gradle/gradle.properties` and add your GPG key information:
+Update the project website with new documentation and release notes.
 
-    signing.keyId=01234567                          # Your GPG key ID, as 8 hex digits
-    signing.secretKeyRingFile=/path/to/secring.gpg  # Normally in $HOME/.gnupg/secring.gpg
-    signing.password=YourSuperSecretPassphrase      # Plaintext passphrase to decrypt key
+## Release Artifacts
 
-Please note the following tweaks for signing the source (and binary) tarballs.
+### 9. Create Source Distribution
 
-	Gradle expects only 8 digits for your GPG key
-	Newer versions of GPG no longer create the file secring.gpg, but Gradle expects this format.
- 
-See [this answer on Stack Overflow](https://stackoverflow.com/questions/27936119/gradle-uploadarchives-task-unable-to-read-secret-key/39573795#39573795) for instructions on how to export a new secring.gpg.
-	
-The GPG key ID can be found by running `gpg --list-keys`.
+Build the source distribution:
 
-To generate the source release, run:
+    ./gradlew sourceRelease
 
-    ./gradlew clean release
+### 10. Sign Artifacts
 
-This generates a source tarball.
+Sign the release artifacts with your GPG key:
 
-If you have configured your key information in your `gradle.properties` then you the archive should automatically be signed.  There should now be a corresponding ASC file alongside the tarball and MD5 file.  Otherwise you'll need to sign it manually by running:
+    gpg --armor --detach-sig apache-datafu-sources-*.tgz
 
-    gpg --sign --armor --detach-sig build/distribution/source/apache-datafu-sources-*.tgz
+### 11. Create Checksums
 
-If you get this error
+Generate checksums for the artifacts:
 
-	Inappropriate ioctl for device
+    sha512sum apache-datafu-sources-*.tgz > apache-datafu-sources-*.tgz.sha512
 
-You can run this command (taken from [this answer on Stack Overflow](https://stackoverflow.com/a/72788147/150992))
+## Publishing
 
-	export GPG_TTY=$(tty)
+### 12. Upload to Apache
 
-If you have GPG v2 installed then you'll need to use `gpg2` instead.
+Upload the signed artifacts to the Apache repository:
 
-## Upload the Source Release
+    ./gradlew uploadArchives
 
-You should make the release candidate available in [https://dist.apache.org/repos/dist/dev/datafu](https://dist.apache.org/repos/dist/dev/datafu).  For example, if you are releasing release candidate RC0 for version `x.y.z` then you should upload the source distribution files to:
+### 13. Vote on Release
 
-    https://dist.apache.org/repos/dist/dev/datafu/datafu-x.y.z-rc0/
+Start a vote on the Apache DataFu mailing list for the release.
 
-To create a release folder and check it out (be sure to substitute x.y.z for the actual version):
+### 14. Tag Release
 
-    svn mkdir https://dist.apache.org/repos/dist/dev/datafu/apache-datafu-x.y.z-rc0
-    svn co https://dist.apache.org/repos/dist/dev/datafu/apache-datafu-x.y.z-rc0 apache-datafu-x.y.z-rc0
-    cd apache-datafu-x.y.z-rc0
+Once the vote passes, tag the release:
 
-You could then add the source release as described above and commit.
+    git tag -a datafu-x.y.z -m "Release Apache DataFu x.y.z"
 
-## Tag the release
+### 15. Publish to Maven Central
 
-You should tag the release candidate in git.  Assuming you are releasing release candidate RC0 for version `x.y.z` then you can attach a tag to the current commit with:
+Publish the artifacts to Maven Central:
 
-    git tag -s release-x.y.z-rc0 -m 'Apache DataFu x.y.z RC0'
+    ./gradlew publishToMavenCentral
 
-Then push the tag:
+## Post-Release
 
-    git push origin release-x.y.z-rc0
+### 16. Update Website
 
-## Staging artifacts in Maven
+Update the project website with the new release information.
 
-First, refer to general information on publishing to Maven, which can be found [here](http://www.apache.org/dev/publishing-maven-artifacts.html).
+### 17. Announce Release
 
-To upload the archive to the Apache Nexus staging repository, from the release candidate branch run:
+Send an announcement to the Apache DataFu mailing list and update the project website.
 
-    ./gradlew uploadArchives -PnexusUsername=yourNexusUsername -PnexusPassword=yourNexusPassword
+### 18. Prepare Next Release
 
-The above command assumes you have configured `$HOME/.gradle/gradle.properties` with your GPG key information. If this fails with _Cannot invoke method readPassword() on null object_ or _Cannot invoke method readLine() on null object_, this is because the Gradle daemon is running. Disable it with _--no-daemon_ and try again. Please note that sometimes your JVM settings will prevent Gradle from launching without forking a daemon. Removing them from the gradlew script may help.
+Update version numbers and prepare for the next development cycle.
 
-If you now visit the [Apache Nexus Repository](https://repository.apache.org) and click on Staging Repositories, you should see a repository named orgapachedatafu-xxxx, where xxxx is some number.  Select the repository and browse the content to make sure the set of files looks right.  If it looks correct then Close the repository.  The repository is now ready for testing.  If you look at the summary there is a URL for the repository that may be used to fetch the archives.
+## Troubleshooting
 
-Let's suppose you have a Gradle project you'd like to use to test DataFu.  You can add the URL for the Staging Repository to your `build.gradle` like this:
+### Common Issues
 
-    repositories {
-      mavenCentral()
-      maven {
-        url 'https://repository.apache.org/content/repositories/orgapachedatafu-xxxx'
-      }
-    }
+1. **GPG Signing Issues**: Ensure your GPG key is properly configured and the passphrase is available.
 
-You can now depend on the versions of the archives in this Staging Repository in your `build.gradle`:
+2. **Build Failures**: Check that all dependencies are available and the build environment is properly configured.
 
-    dependencies {
-      compile "org.apache.datafu:datafu-pig:x.y.z"
-      compile "org.apache.datafu:datafu-hourglass:x.y.z"
-    }
+3. **Test Failures**: Ensure all tests pass before creating a release.
 
-You could also visit the Staging Repository URL in your browser and download the files for testing.
+4. **Upload Issues**: Verify your Apache credentials and permissions.
 
-## Call for a vote to release
+### Getting Help
 
-At this point you should have:
+If you encounter issues during the release process:
 
-1. Published a source release for testing
-2. Staged artifacts in Nexus built from that source archive for testing
+1. Check the [Apache DataFu mailing list](http://datafu.apache.org/community/mailing-lists.html)
+2. Review the [Apache DataFu documentation](http://datafu.apache.org/)
+3. Open an issue on the [Apache DataFu JIRA](https://issues.apache.org/jira/browse/DATAFU)
 
-Now you can call a vote in the DataFu dev mailing list for release.   Look in the archives at previous votes for an example.
+## Release Checklist
 
-## Testing the source release
+- [ ] Update `changes.md` with all changes since last release
+- [ ] Run full test suite (`./gradlew test`)
+- [ ] Check code style (`./gradlew check`)
+- [ ] Clean build (`./gradlew clean assemble`)
+- [ ] Generate documentation (`./gradlew javadoc`)
+- [ ] Create source distribution (`./gradlew sourceRelease`)
+- [ ] Sign artifacts with GPG
+- [ ] Generate checksums
+- [ ] Upload to Apache repository
+- [ ] Start release vote on mailing list
+- [ ] Tag release in Git
+- [ ] Publish to Maven Central
+- [ ] Update website
+- [ ] Send release announcement
+- [ ] Prepare for next release
 
-Once you have built the source tarball, you should verify that it can be used.  Follow the instructions in the `README.md` file assuming you are someone who has just downloaded the source tarball and want to use it.
+## Version Management
 
-### Releasing to your local Maven repository
+### Semantic Versioning
 
-You may want to release binaries to your local Maven repository under your home directory to do local testing against it.  To do so, run:
+Apache DataFu follows semantic versioning (MAJOR.MINOR.PATCH):
 
-    ./gradlew install -Prelease=true
+- **MAJOR**: Incompatible API changes
+- **MINOR**: New functionality in a backwards compatible manner
+- **PATCH**: Backwards compatible bug fixes
 
-You should be able to see all the installed artifacts in the local repository now:
+### Version Updates
 
-    find ~/.m2/repository/org/apache/datafu/
+When updating version numbers:
 
-Again, setting `release=true` prevents `-SNAPSHOT` from being appended to the version.
+1. Update version in `gradle.properties`
+2. Update version in `build.gradle` files
+3. Update documentation
+4. Update website
+5. Update release notes
 
-## Publishing the release
+## Security
 
-Once the vote has passed, you can publish the source release and artifacts.
+### Security Releases
 
-### Source release
+For security releases:
 
-The DataFu source release are checked into SVN under [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu).
+1. Follow the standard release process
+2. Ensure all security fixes are properly tested
+3. Coordinate with the Apache Security Team if necessary
+4. Send security announcements to appropriate channels
 
-To see all the previous releases:
+### Vulnerability Reporting
 
-    svn list https://dist.apache.org/repos/dist/release/datafu
+To report security vulnerabilities:
 
-Create a directory for the release (replace `x.y.z` with the release number):
+1. Email security@apache.org
+2. Do not disclose vulnerabilities publicly until they are fixed
+3. Follow responsible disclosure practices
 
-    svn mkdir https://dist.apache.org/repos/dist/release/datafu/apache-datafu-x.y.z
-    svn co https://dist.apache.org/repos/dist/release/datafu/apache-datafu-x.y.z apache-datafu-x.y.z-release
-    cd apache-datafu-x.y.z-release
+## Legal
 
-Now copy the source release files into this directory and commit them.  Within 24 hours they will be distributed to the mirrors.  Then it should be available for download at `http://www.apache.org/dyn/closer.cgi/datafu/apache-datafu-x.y.z/`.
+### License Compliance
 
-### Artifacts
+Ensure all code and dependencies comply with Apache licensing requirements:
 
-To distribute the artifacts, simple select the staged repository for DataFu that you prepared in Nexus and choose Release.  They should then be available within the next day or so in the [central repository](http://search.maven.org/).
+1. Check all dependencies for license compatibility
+2. Ensure all source code has proper Apache headers
+3. Verify that all third-party code is properly attributed
 
-### Clean up old releases
+### Trademark Usage
 
-Once a source release has been committed to the release path [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu), the source releases under [https://dist.apache.org/repos/dist/dev/datafu](https://dist.apache.org/repos/dist/dev/datafu) can be removed.  Also the older releases under [https://dist.apache.org/repos/dist/release/datafu](https://dist.apache.org/repos/dist/release/datafu) can be removed, as old releases are archived automatically through a separate process.
+Follow Apache trademark guidelines when using Apache DataFu branding and logos.
 
-## Updating the docs
+## Support
 
-After you have released source and binary artifacts, you should add an entry to the DataFu website and update the various places that point to the previous release. You can look at [a previous release's commit](https://github.com/apache/datafu/commit/09a68527f5921e026c04e8e9940ef0466b41a7c0) in order to get an idea of which files need to be changed. Keep in mind that there is one place where the previous version is updated (if you're release 1.6.1 instead of 1.6.0, you need to replace *1.5.0*, not 1.6.0)
+### Release Support
 
-After you have made these changes, build the site (and regenerate java/scaladocs) by using [the instructions here.](https://github.com/apache/datafu/blob/main/site/README.md)
+For questions about the release process:
 
-After the documentation and site are ready, make an additional git tag for the release with the prefix *v*, like so *v2.0.0*.
+- [Apache DataFu Mailing List](http://datafu.apache.org/community/mailing-lists.html)
+- [Apache DataFu Documentation](http://datafu.apache.org/)
+- [Apache DataFu JIRA](https://issues.apache.org/jira/browse/DATAFU)
+
+### Community
+
+Join the Apache DataFu community:
+
+- [Mailing Lists](http://datafu.apache.org/community/mailing-lists.html)
+- [GitHub Repository](https://github.com/apache/datafu)
+- [Website](http://datafu.apache.org/)

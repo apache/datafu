@@ -71,7 +71,7 @@ jobs:
     
     - name: Bootstrap and Build
       run: |
-        ./gradlew -b bootstrap.gradle
+        ./gradlew -p . bootstrap.gradle
         ./gradlew clean assemble
 
     - name: Perform CodeQL Analysis
