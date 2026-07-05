@@ -9,6 +9,8 @@ on:
   schedule:
     - cron: '36 3 * * 5'
 
+  workflow_dispatch:
+
 jobs:
   analyze:
     name: Test
