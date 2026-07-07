@@ -9,6 +9,8 @@ on:
   schedule:
     - cron: '36 3 * * 5'
 
+  workflow_dispatch:
+
 jobs:
   analyze:
     name: Test
@@ -34,10 +36,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
          python-version: '3.7'
-
-    - name: Bootstrap Gradle 5.6.4
-      run:
-       gradle -b bootstrap.gradle
 
     - name: Build and run tests
       run:
