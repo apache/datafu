@@ -24,6 +24,7 @@ import sys
 from pprint import pprint as p
 p(sys.path)
 
+from pyspark_utils.bridge_utils import UDFRegister
 from pyspark.sql import functions as F
 
 
@@ -42,6 +43,11 @@ dfout.groupBy(dfout['d']).agg(F.count(F.col('d')).alias('cnt')).show()
 
 sqlContext.sql("select d * 4 as d from dfout").registerTempTable("dfout2")
 
+###############################################################
+# check scala UDFs
+###############################################################
+UDFRegister(sqlContext, "datafu.spark.SparkUDFs")
+sqlContext.sql("select coalesceVal('', 'asd')").show()
 
 ###############################################################
 # check python UDFs
