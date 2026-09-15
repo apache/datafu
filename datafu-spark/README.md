@@ -12,6 +12,7 @@ This matrix represents versions of Spark that DataFu has been compiled and teste
 | 1.8.0 | 2.2.3, 2.3.3, and 2.4.4 to 2.4.5|
 | 2.0.0 | 3.0.x - 3.1.x |
 | 2.1.0 | 3.0.x - 3.4.x |
+| 2.2.0 (not released yet) | 3.0.x - 3.5.x |
 
 # Examples
 
@@ -25,7 +26,7 @@ Here are some examples of things you can do with it:
 
 * [Count distinct up to](https://github.com/apache/datafu/blob/main/datafu-spark/src/main/scala/datafu/spark/Aggregators.scala#L187) - an efficient implementation when you just want to verify that a certain minimum of distinct rows appear in a table
 
-It has been tested on Spark releases from 3.0.0 to 3.4.2 using Scala 2.12. You can check if your Spark/Scala version combination has been tested by looking [here.](https://github.com/apache/datafu/blob/main/datafu-spark/build_and_test_spark.sh#L20)
+It has been tested on Spark releases from 3.0.0 to 3.5.9 using Scala 2.12. You can check if your Spark/Scala version combination has been tested by looking [here.](https://github.com/apache/datafu/blob/main/datafu-spark/build_and_test_spark.sh#L20)
 
 -----------
 
