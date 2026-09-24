@@ -7,7 +7,7 @@ Additions
 
 Improvements
 
-* Spark 3.0.0 - 3.4.x supported (DATAFU-175, DATAFU-179)
+* Spark 3.0.0 - 3.5.x supported (DATAFU-175, DATAFU-179, DATAFU-182)
 * Expose dedupRandomN in Python (DATAFU-180)
 
 Breaking changes
