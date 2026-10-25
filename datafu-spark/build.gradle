@@ -142,11 +142,27 @@ tasks.compileTestScala.dependsOn('zipPySpark')
 tasks.eclipse.dependsOn('downloadPy4js')
 tasks.compileTestScala.dependsOn('downloadPy4js')
 
+if (project.hasProperty('releasedDatafuJar')) {
+  def releasedDatafuJar = file(project.property('releasedDatafuJar'))
+  if (!releasedDatafuJar.isFile()) {
+    throw new GradleException("Released DataFu JAR does not exist: ${releasedDatafuJar}")
+  }
+
+  // Compile and run the existing tests against the released artifact, not main source output.
+  sourceSets.test.compileClasspath = configurations.testCompile + files(releasedDatafuJar)
+  sourceSets.test.runtimeClasspath = sourceSets.test.output + configurations.testRuntime + files(releasedDatafuJar)
+}
+
 test {
+  classpath = sourceSets.test.runtimeClasspath
   systemProperty 'datafu.jar.dir', file('build/libs')
   systemProperty 'datafu.data.dir', file('data')
 
   systemProperty 'datafu.spark.version', sparkVersion
+  if (project.hasProperty('releasedDatafuJar')) {
+    systemProperty 'java.io.tmpdir', file('build/released-jar-test-tmp')
+    doFirst { file('build/released-jar-test-tmp').mkdirs() }
+  }
 
 // removed so the daemon is cancelled
   maxHeapSize = "2G"

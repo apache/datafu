@@ -37,6 +37,8 @@ jobs:
       with:
          python-version: '3.8'
 
-    - name: Build and run tests
-      run:
-       ./datafu-spark/build_and_test_spark.sh -q
+    - name: Build and run source-compatibility matrix
+      run: ./datafu-spark/build_and_test_spark.sh -q
+
+    - name: Test released JAR against Spark patch releases
+      run: bash ./datafu-spark/test_released_jar_compatibility.sh
