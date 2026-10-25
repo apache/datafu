@@ -21,8 +21,8 @@ package org.apache.spark.sql.datafu.types
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions.aggregate.{Collect, DeclarativeAggregate, ImperativeAggregate}
-import org.apache.spark.sql.catalyst.expressions.{AttributeReference, BinaryComparison, Concat, CreateArray, ExpectsInputTypes, Expression, GreaterThan, If, IsNull, LessThan, Literal, Size, Slice, SortArray}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, AggregateFunction, Collect, Complete, DeclarativeAggregate, ImperativeAggregate}
+import org.apache.spark.sql.catalyst.expressions.{AttributeReference, BinaryComparison, Concat, CreateArray, ExpectsInputTypes, Expression, GreaterThan, If, IsNull, LessThan, Literal, NamedExpression, Size, Slice, SortArray}
 import org.apache.spark.sql.catalyst.util.{GenericArrayData, TypeUtils}
 import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.types.{AbstractDataType, AnyDataType, ArrayType, DataType}
@@ -38,17 +38,20 @@ In order to support Spark 3.1.x as well as Spark 3.2.0 and up, the methods withN
  Idea taken from https://github.com/apache/sedona/pull/557
  */
 object SparkOverwriteUDAFs {
+  private def asAggregateExpression(function: AggregateFunction): AggregateExpression =
+    AggregateExpression(function, Complete, false, None, NamedExpression.newExprId)
+
   def minValueByKey(key: Column, value: Column): Column =
-    Column(MinValueByKey(key.expr, value.expr).toAggregateExpression(false))
+    Column(asAggregateExpression(MinValueByKey(key.expr, value.expr)))
 
   def maxValueByKey(key: Column, value: Column): Column =
-    Column(MaxValueByKey(key.expr, value.expr).toAggregateExpression(false))
+    Column(asAggregateExpression(MaxValueByKey(key.expr, value.expr)))
 
   def collectLimitedList(e: Column, maxSize: Int): Column =
-    Column(CollectLimitedList(e.expr, howMuchToTake = maxSize).toAggregateExpression(false))
+    Column(asAggregateExpression(CollectLimitedList(e.expr, howMuchToTake = maxSize)))
 
   def collectNumberOrderedElements(col: Column, howManyToTake: Int, ascending: Boolean = false) =
-    Column(CollectNumberOrderedElements(col.expr, lit(howManyToTake).expr, lit(ascending).expr).toAggregateExpression(false))
+    Column(asAggregateExpression(CollectNumberOrderedElements(col.expr, lit(howManyToTake).expr, lit(ascending).expr)))
 
 }
 
